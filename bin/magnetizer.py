@@ -2,7 +2,7 @@ from webpage import *
 
 def main():
 
-    webpage = Webpage()
+    webpage = Webpage('../content/my-post.md')
     print(webpage.html)
 
 if __name__ == "__main__":
