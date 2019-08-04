@@ -2,7 +2,7 @@ from webpage import *
 
 def main():
 
-    template = Template()
+    template = Template('_page.html')
 
     webpage = Webpage(template)
     webpage.read('../content/my-post.md')
