@@ -9,15 +9,20 @@ class Webpage:
         
         self.template = template
         self.md = None
+        self.filename = None
 
     def read(self, filename):
 
         with open('../content/' + filename, 'r') as myfile:
             self.md = myfile.read()
 
+        output_filename = filename.split('-', 1)[1].split('.', 1)[0] + '.html'
+
+        self.filename = output_filename
+
     def write(self):
 
-        with open('../public/my-post.html', 'w') as myfile:
+        with open('../public/' + self.filename, 'w') as myfile:
             myfile.write(self.html())
 
     def html(self):

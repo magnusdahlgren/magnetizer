@@ -5,7 +5,7 @@ def main():
     template = Template('_page.html')
 
     webpage = Webpage(template)
-    webpage.read('my-post.md')
+    webpage.read('123-this-is-my-file.md')
     webpage.write()
 
 if __name__ == "__main__":

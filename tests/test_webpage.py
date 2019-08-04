@@ -11,7 +11,7 @@ def test_webpage_from_file():
     template.clear()
 
     webpage = Webpage(template)
-    webpage.read('my-post.md')
+    webpage.read('123-this-is-my-file.md')
 
     assert webpage.html() == RESULT
 
@@ -52,6 +52,7 @@ def test_webpage_write():
 
     webpage = Webpage(template)
     webpage.md = RESULT
+    webpage.filename = 'my-post.html'
     webpage.write()
 
     with open('../public/my-post.html', 'r') as myfile:
@@ -69,6 +70,18 @@ def test_template_from_file():
 
     assert webpage.html() == RESULT
 
-    
+
+def test_filename_should_be_generated_from_input_file():
+
+    FILENAME = '123-this-is-my-file.md'
+    RESULT = 'this-is-my-file.html'
+
+    template = Template('_test.html')
+    template.clear()
+
+    webpage = Webpage(template)
+    webpage.read(FILENAME)
+
+    assert webpage.filename == RESULT
 
 # run the tests from bin with $ python -m pytest ../tests/
