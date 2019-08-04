@@ -12,7 +12,7 @@ class Webpage:
 
     def read(self, filename):
 
-        with open(filename, 'r') as myfile:
+        with open('../content/' + filename, 'r') as myfile:
             self.md = myfile.read()
 
     def write(self):

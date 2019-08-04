@@ -11,7 +11,7 @@ def test_webpage_from_file():
     template.clear()
 
     webpage = Webpage(template)
-    webpage.read('../content/my-post.md')
+    webpage.read('my-post.md')
 
     assert webpage.html() == RESULT
 
