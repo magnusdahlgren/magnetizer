@@ -6,7 +6,7 @@ def main():
 
     webpage = Webpage(template)
     webpage.read('../content/my-post.md')
-    print(webpage.html())
+    webpage.write()
 
 if __name__ == "__main__":
     main()
