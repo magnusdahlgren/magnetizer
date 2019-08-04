@@ -1,4 +1,5 @@
 from template import *
+from markdown import markdown
 
 TEMPLATE_CONTENT = "<!-- MAGNETIZER_CONTENT -->"
 
@@ -16,5 +17,5 @@ class Webpage:
 
     def html(self):
 
-        return self.template.template.replace(TEMPLATE_CONTENT, self.md, 1)
+        return self.template.template.replace(TEMPLATE_CONTENT, markdown(self.md), 1)
 
