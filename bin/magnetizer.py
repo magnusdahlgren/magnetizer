@@ -2,11 +2,7 @@ from webpage import *
 
 def main():
 
-    template = Template('_page.html')
-
-    webpage = Webpage(template)
-    webpage.read('123-this-is-my-file.md')
-    webpage.write()
+    Webpage.write_posts_from_directory('../content')
 
 if __name__ == "__main__":
     main()

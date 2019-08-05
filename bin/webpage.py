@@ -1,5 +1,7 @@
 from template import *
 from markdown import markdown
+from os import listdir
+
 
 TEMPLATE_CONTENT = "<!-- MAGNETIZER_CONTENT -->"
 
@@ -29,3 +31,24 @@ class Webpage:
 
         return self.template.template.replace(TEMPLATE_CONTENT, markdown(self.md), 1)
 
+
+    @staticmethod
+    def write_posts_from_filenames(filenames):
+
+        template = Template('_page.html')
+
+        for filename in filenames: 
+
+            webpage = Webpage(template)
+            webpage.read(filename)
+            webpage.write()
+            print('Generated: ' + filename) 
+
+
+    @staticmethod
+    def write_posts_from_directory(directory):
+
+        filenames = sorted(listdir(directory), reverse=True)
+        Webpage.write_posts_from_filenames(filenames)
+
+   
