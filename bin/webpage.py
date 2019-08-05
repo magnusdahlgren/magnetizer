@@ -1,4 +1,5 @@
 from template import *
+from blogpost import *
 from markdown import markdown
 from os import listdir
 

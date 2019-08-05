@@ -84,4 +84,35 @@ def test_filename_should_be_generated_from_input_file():
 
     assert webpage.filename == RESULT
 
+
+def test_blogpost_render_html():
+
+    RESULT = '<h1>Example</h1>'
+
+    template = Template(None)
+
+    blogpost = Blogpost(template)
+    blogpost.md = "# Example"
+
+    assert blogpost.html() == RESULT
+
+
+def test_blogpost_template():
+
+    RESULT = '<article><h1>Example</h1></article>'
+
+    template = Template(None)
+    template.template = '<article><!-- MAGNETIZER_CONTENT --></article>'
+
+    blogpost = Blogpost(template)
+    blogpost.md = "# Example"
+
+    assert blogpost.html() == RESULT
+
+
+@pytest.mark.skip(reason="test not implemented")
+def test_blogpost_template_from_file():
+
+    assert True
+
 # run the tests from bin with $ python -m pytest ../tests/
