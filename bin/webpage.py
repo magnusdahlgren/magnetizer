@@ -38,8 +38,7 @@ class Webpage:
             blogpost.read(filename)
             html += blogpost.html
 
-        self.html = html
-
+        self.html = self.template.template.replace(self.website.magnetizer_content_tag, html, 1)
 
 
     def write(self):
@@ -52,21 +51,38 @@ class Webpage:
     @staticmethod
     def write_webpages_from_filenames(website, filenames):
 
-        # template = Template('_page.html')
-
         for filename in filenames: 
 
             webpage = Webpage(website)
             webpage.read(filename)
             webpage.write()
 
-            print('Generated: ' + filename) 
+            print('Generated: ' + webpage.filename) 
 
 
     @staticmethod
     def write_webpages_from_directory(website, directory):
 
-        filenames = sorted(listdir(directory), reverse=True)
+        filenames = Webpage.filenames_from_directory(directory)        
         Webpage.write_webpages_from_filenames(website, filenames)
 
+
+    @staticmethod
+    def write_index_page_from_directory(website, directory):
+
+        filenames = Webpage.filenames_from_directory(directory)        
+        webpage = Webpage(website)
+
+        webpage.read_multiple(filenames)
+        webpage.filename = 'index.html'
+        webpage.title = '(TBD)'
+        webpage.write()
+
+        print('Generated: ' + webpage.filename) 
+
+
    
+    @staticmethod
+    def filenames_from_directory(directory):
+
+        return sorted(listdir(directory), reverse=True)

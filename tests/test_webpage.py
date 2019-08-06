@@ -45,9 +45,11 @@ def test_webpage_from_file():
 
 def test_webpage_from_multiple_files():
 
-    RESULT = '<article><p>This is the first post</p></article>'
+    RESULT = "<html>"
+    RESULT += '<article><p>This is the first post</p></article>'
     RESULT += '<article><p>This is the sixth post</p></article>'
     RESULT += '<article><p>This is the first post</p></article>'
+    RESULT += "</html>"
 
     webpage = Webpage(test_website)
     webpage.read_multiple(['001-test-number-one.md', '006-test-number-six.md', '001-test-number-one.md'])
@@ -162,5 +164,14 @@ def test_webpage_title_in_html():
     assert webpage.html.count(RESULT) == 1
 
 
+def test_index_page():
+
+    Webpage.write_index_page_from_directory(test_website, test_website.config_source_path)
+
+    with open(test_website.config_output_path + 'index.html', 'r') as myfile:
+        assert myfile.read().count('<html>') == 1
+
+    test_website.wipe()
+  
 
 # run the tests from bin with $ python -m pytest ../tests/
