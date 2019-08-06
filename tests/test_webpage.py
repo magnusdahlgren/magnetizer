@@ -79,9 +79,12 @@ def test_webpage_write():
     with open(test_website.config_output_path + webpage.filename, 'r') as myfile:
         assert myfile.read() == RESULT
 
+    test_website.wipe()
+
 
 def test_website_wipe():
 
+    # Make sure there is at least one file in output directory
     webpage = Webpage(test_website)
     webpage.html = ''
     webpage.filename = 'my-post.html'
@@ -103,7 +106,6 @@ def test_webpage_write_multiple_from_filenames():
     assert len(filenames) == len([name for name in listdir(test_website.config_output_path) if path.isfile(path.join(test_website.config_output_path, name))])
 
     test_website.wipe()
-
 
 
 # run the tests from bin with $ python -m pytest ../tests/
