@@ -29,6 +29,19 @@ class Webpage:
         self.html = self.html.replace(self.website.magnetizer_title_tag, self.title, 1)
 
 
+    def read_multiple(self, filenames):
+
+        blogpost = Blogpost(self.website)
+        html = ''
+
+        for filename in filenames:
+            blogpost.read(filename)
+            html += blogpost.html
+
+        self.html = html
+
+
+
     def write(self):
 
         with open(self.website.config_output_path + self.filename, 'w') as myfile:

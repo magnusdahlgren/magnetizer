@@ -43,6 +43,17 @@ def test_webpage_from_file():
 
     assert webpage.html == RESULT
 
+def test_webpage_from_multiple_files():
+
+    RESULT = '<article><p>This is the first post</p></article>'
+    RESULT += '<article><p>This is the sixth post</p></article>'
+    RESULT += '<article><p>This is the first post</p></article>'
+
+    webpage = Webpage(test_website)
+    webpage.read_multiple(['001-test-number-one.md', '006-test-number-six.md', '001-test-number-one.md'])
+
+    assert webpage.html == RESULT
+
 
 def test_blogpost_filename_from_source_file():
 
