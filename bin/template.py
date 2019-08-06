@@ -15,5 +15,7 @@ class Template:
             self.template = Template.MAGNETIZER_CONTENT_TAG
 
     def render(self, html):
+
+        result = self.template.replace(Template.MAGNETIZER_CONTENT_TAG, html, 1)
         
-        return self.template.replace(Template.MAGNETIZER_CONTENT_TAG, html, 1)
+        return result

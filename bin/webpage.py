@@ -26,6 +26,7 @@ class Webpage:
         self.title = blogpost.title       
         self.html = self.template.template.replace(self.website.magnetizer_content_tag, blogpost.html, 1)
 
+        self.html = self.html.replace(self.website.magnetizer_title_tag, self.title, 1)
 
 
     def write(self):

@@ -138,4 +138,18 @@ def test_webpage_title_from_first_row_of_file():
     assert webpage.title == RESULT
 
 
+def test_webpage_title_in_html():
+
+    RESULT = '<head><title>This is blog post number four</title></head>'
+
+    webpage = Webpage(test_website)
+    webpage.template.template = '<head><title><!-- MAGNETIZER_TITLE --></title></head>'
+    webpage.read('004-test-number-four.md')
+
+    print (webpage.html.count(RESULT))
+
+    assert webpage.html.count(RESULT) == 1
+
+
+
 # run the tests from bin with $ python -m pytest ../tests/

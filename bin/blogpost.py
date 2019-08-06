@@ -33,7 +33,6 @@ class Blogpost:
             candidate = markdown(candidate)
             candidate = sub('<[^>]*>', '', candidate)
             candidate = candidate.strip()
-            print(candidate)
             if candidate != '':
                 return candidate
 
