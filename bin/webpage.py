@@ -10,10 +10,11 @@ class Webpage:
 
     def __init__(self, website):
         
+        self.website  = website
         self.template = Template(website.config_template_path + website.template_webpage)
         self.filename = None
         self.html     = None
-        self.website  = website
+        self.title    = None
 
     
     def read(self, filename):
@@ -21,7 +22,8 @@ class Webpage:
         blogpost = Blogpost(self.website)
         blogpost.read(filename)
 
-        self.filename = blogpost.filename         
+        self.filename = blogpost.filename
+        self.title = blogpost.title       
         self.html = self.template.template.replace(self.website.magnetizer_content_tag, blogpost.html, 1)
 
 

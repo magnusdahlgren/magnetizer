@@ -128,4 +128,14 @@ def test_blogpost_title_from_other_row_of_file():
     assert blogpost.title == RESULT
 
 
+def test_webpage_title_from_first_row_of_file():
+
+    RESULT = "This is blog post number four"
+
+    webpage = Webpage(test_website)
+    webpage.read('004-test-number-four.md')
+
+    assert webpage.title == RESULT
+
+
 # run the tests from bin with $ python -m pytest ../tests/
