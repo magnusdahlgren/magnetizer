@@ -2,7 +2,9 @@ from webpage import *
 
 def main():
 
-    Webpage.write_posts_from_directory('../content')
+    website = Website()
+
+    Webpage.write_webpages_from_directory(website, '../content')
 
 if __name__ == "__main__":
     main()

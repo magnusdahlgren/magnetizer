@@ -1,118 +1,109 @@
 import pytest
 from webpage import *
+from website import *
 from random import *
+from os import listdir, path
+
+test_website = Website()
+
+test_website.config_source_path = '../tests/content/'
+test_website.config_template_path = '../tests/templates/'
+test_website.config_output_path = '../tests/public/'
+
+test_website.template_blogpost = '_test_blogpost.html'
+test_website.template_webpage  = '_test_webpage.html'
+
+
+def test_blogpost_from_file():
+
+    RESULT = '<article><p>This is the first post</p></article>'
+
+    blogpost = Blogpost(test_website)
+    blogpost.read('001-test-number-one.md')
+
+    assert blogpost.html == RESULT
+
+
+def test_blogpost_with_markdown():
+
+    RESULT = '<article><h1>This is a test heading</h1></article>'
+
+    blogpost = Blogpost(test_website)
+    blogpost.read('002-test-number-two.md')
+
+    assert blogpost.html == RESULT
 
 
 def test_webpage_from_file():
 
-    RESULT = '<p>This is a test</p>'
+    RESULT = '<html><article><p>This is the first post</p></article></html>'
 
-    template = Template('_test.html')
-    template.clear()
+    webpage = Webpage(test_website)
+    webpage.read('001-test-number-one.md')
 
-    webpage = Webpage(template)
-    webpage.read('123-this-is-my-file.md')
-
-    assert webpage.html() == RESULT
+    assert webpage.html == RESULT
 
 
+def test_blogpost_filename_from_source_file():
 
-def test_webpage_with_template():
+    RESULT = "test-number-one.html"
 
-    RESULT = '<html><body><p>(Web page content)</p></body></html>'
+    blogpost = Blogpost(test_website)
+    blogpost.read('001-test-number-one.md')
 
-    template = Template('_test.html')
-    template.template = '<html><body><!-- MAGNETIZER_CONTENT --></body></html>'
-
-    webpage = Webpage(template)
-    webpage.md = '(Web page content)'
-
-    assert webpage.html() == RESULT
+    assert blogpost.filename == RESULT
 
 
-def test_webpage_with_markdown():
+def test_webpage_filename_from_blogpost_filename():
 
-    RESULT = '<h1>(Web page content)</h1>'
+    blogpost = Blogpost(test_website)
+    blogpost.read('001-test-number-one.md')
 
-    template = Template('_test.html')
-    template.clear()
+    webpage = Webpage(test_website)
+    webpage.read('001-test-number-one.md')
 
-    webpage = Webpage(template)
-    webpage.md = '# (Web page content)'
-
-    assert webpage.html() == RESULT
+    assert webpage.filename == blogpost.filename
 
 
 def test_webpage_write():
 
-    RESULT = 'TEST-' + str(randint(1, 1000000))
+    RESULT = "This is a test!"
 
-    template = Template('_test.html')
-    template.clear()
-
-    webpage = Webpage(template)
-    webpage.md = RESULT
+    webpage = Webpage(test_website)
+    webpage.html = RESULT
     webpage.filename = 'my-post.html'
     webpage.write()
 
-    with open('../public/my-post.html', 'r') as myfile:
-        assert myfile.read() == '<p>' + RESULT + '</p>'
+    print(test_website.config_output_path + webpage.filename)
+
+    with open(test_website.config_output_path + webpage.filename, 'r') as myfile:
+        assert myfile.read() == RESULT
 
 
-def test_template_from_file():
+def test_website_wipe():
 
-    RESULT = '<html><body class="test"><h1>Web page content</h1></body></html>'
+    webpage = Webpage(test_website)
+    webpage.html = ''
+    webpage.filename = 'my-post.html'
+    webpage.write()
 
-    template = Template('_test.html')
+    test_website.wipe()
 
-    webpage = Webpage(template)
-    webpage.md = '# Web page content'
-
-    assert webpage.html() == RESULT
-
-
-def test_filename_should_be_generated_from_input_file():
-
-    FILENAME = '123-this-is-my-file.md'
-    RESULT = 'this-is-my-file.html'
-
-    template = Template('_test.html')
-    template.clear()
-
-    webpage = Webpage(template)
-    webpage.read(FILENAME)
-
-    assert webpage.filename == RESULT
+    assert 0 == len([name for name in listdir(test_website.config_output_path) if path.isfile(path.join(test_website.config_output_path, name))])
 
 
-def test_blogpost_render_html():
+def test_webpage_write_multiple_from_filenames():
 
-    RESULT = '<h1>Example</h1>'
+    test_website.wipe()
 
-    template = Template(None)
+    filenames = ['001-test-number-one.md', '002-test-number-two.md', '003-test-number-three.md']
 
-    blogpost = Blogpost(template)
-    blogpost.md = "# Example"
+    Webpage.write_webpages_from_filenames(test_website, filenames)
 
-    assert blogpost.html() == RESULT
+    assert len(filenames) == len([name for name in listdir(test_website.config_output_path) if path.isfile(path.join(test_website.config_output_path, name))])
 
-
-def test_blogpost_template():
-
-    RESULT = '<article><h1>Example</h1></article>'
-
-    template = Template(None)
-    template.template = '<article><!-- MAGNETIZER_CONTENT --></article>'
-
-    blogpost = Blogpost(template)
-    blogpost.md = "# Example"
-
-    assert blogpost.html() == RESULT
+    test_website.wipe()
 
 
-@pytest.mark.skip(reason="test not implemented")
-def test_blogpost_template_from_file():
-
-    assert True
 
 # run the tests from bin with $ python -m pytest ../tests/

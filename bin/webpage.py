@@ -1,55 +1,56 @@
+from website import *
 from template import *
 from blogpost import *
 from markdown import markdown
 from os import listdir
 
 
-TEMPLATE_CONTENT = "<!-- MAGNETIZER_CONTENT -->"
 
 class Webpage:
 
-    def __init__(self, template):
+    def __init__(self, website):
         
-        self.template = template
-        self.md = None
+        self.template = Template(website.config_template_path + website.template_webpage)
         self.filename = None
+        self.html     = None
+        self.website  = website
 
+    
     def read(self, filename):
 
-        with open('../content/' + filename, 'r') as myfile:
-            self.md = myfile.read()
+        blogpost = Blogpost(self.website)
+        blogpost.read(filename)
 
-        output_filename = filename.split('-', 1)[1].split('.', 1)[0] + '.html'
+        self.filename = blogpost.filename         
+        self.html = self.template.template.replace(self.website.magnetizer_content_tag, blogpost.html, 1)
 
-        self.filename = output_filename
+
 
     def write(self):
 
-        with open('../public/' + self.filename, 'w') as myfile:
-            myfile.write(self.html())
+        with open(self.website.config_output_path + self.filename, 'w') as myfile:
+            myfile.write(self.html)
 
-    def html(self):
-
-        return self.template.template.replace(TEMPLATE_CONTENT, markdown(self.md), 1)
 
 
     @staticmethod
-    def write_posts_from_filenames(filenames):
+    def write_webpages_from_filenames(website, filenames):
 
-        template = Template('_page.html')
+        # template = Template('_page.html')
 
         for filename in filenames: 
 
-            webpage = Webpage(template)
+            webpage = Webpage(website)
             webpage.read(filename)
             webpage.write()
+
             print('Generated: ' + filename) 
 
 
     @staticmethod
-    def write_posts_from_directory(directory):
+    def write_webpages_from_directory(website, directory):
 
         filenames = sorted(listdir(directory), reverse=True)
-        Webpage.write_posts_from_filenames(filenames)
+        Webpage.write_webpages_from_filenames(website, filenames)
 
    
