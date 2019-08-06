@@ -108,4 +108,24 @@ def test_webpage_write_multiple_from_filenames():
     test_website.wipe()
 
 
+def test_blogpost_title_from_first_row_of_file():
+
+    RESULT = "This is blog post number four"
+
+    blogpost = Blogpost(test_website)
+    blogpost.read('004-test-number-four.md')
+
+    assert blogpost.title == RESULT
+
+
+def test_blogpost_title_from_other_row_of_file():
+
+    RESULT = "This is blog post number five"
+
+    blogpost = Blogpost(test_website)
+    blogpost.read('005-test-number-five.md')
+
+    assert blogpost.title == RESULT
+
+
 # run the tests from bin with $ python -m pytest ../tests/
