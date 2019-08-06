@@ -1,8 +1,5 @@
 from os import listdir, path, remove
-
-CONFIG_SOURCE_PATH    = '../content/'
-CONFIG_TEMPLATE_PATH  = '../templates/'
-CONFIG_OUTPUT_PATH    = '../public/'
+from config import *
 
 MAGNETIZER_CONTENT_TAG = '<!-- MAGNETIZER_CONTENT -->'
 
