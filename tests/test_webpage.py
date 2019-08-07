@@ -34,6 +34,16 @@ def test_blogpost_with_markdown():
     assert blogpost.html == RESULT
 
 
+def test_blogpost_footer():
+
+    RESULT = '<article><p>This is the first post</p></article><footer>footer</footer>'
+
+    blogpost = Blogpost(test_website)
+    blogpost.template.template += test_website.magnetizer_blogpost_footer_tag
+    blogpost.read('001-test-number-one.md')
+
+    assert blogpost.html == RESULT
+
 def test_webpage_from_file():
 
     RESULT = '<html><article><p>This is the first post</p></article></html>'
@@ -172,6 +182,8 @@ def test_index_page():
         assert myfile.read().count('<html>') == 1
 
     test_website.wipe()
+
+
   
 
 # run the tests from bin with $ python -m pytest ../tests/
