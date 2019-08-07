@@ -13,6 +13,8 @@ class Website:
 
     def __init__(self):
         
+        self.name = CONFIG_WEBSITE_NAME
+        
         self.config_source_path     = CONFIG_SOURCE_PATH
         self.config_template_path   = CONFIG_TEMPLATE_PATH
         self.config_output_path     = CONFIG_OUTPUT_PATH
@@ -26,6 +28,11 @@ class Website:
         self.template_blogpost_footer = TEMPLATE_BLOGPOST_FOOTER
 
         self.blogpost_footer = Website.read_file(self.config_template_path, self.template_blogpost_footer)
+
+
+    def refresh(self):
+        self.blogpost_footer = Website.read_file(self.config_template_path, self.template_blogpost_footer)
+
 
     def wipe(self):
 

@@ -38,7 +38,9 @@ class Webpage:
             blogpost.read(filename)
             html += blogpost.html
 
+        self.title = self.website.name
         self.html = self.template.template.replace(self.website.magnetizer_content_tag, html, 1)
+        self.html = self.html.replace(self.website.magnetizer_title_tag, self.title, 1)
 
 
     def write(self):

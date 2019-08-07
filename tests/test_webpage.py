@@ -10,8 +10,12 @@ test_website.config_source_path = '../tests/content/'
 test_website.config_template_path = '../tests/templates/'
 test_website.config_output_path = '../tests/public/'
 
-test_website.template_blogpost = '_test_blogpost.html'
 test_website.template_webpage  = '_test_webpage.html'
+test_website.template_blogpost = '_test_blogpost.html'
+test_website.template_blogpost_footer = '_test_blogpost_footer.html'
+test_website.name = 'Test website name'
+
+test_website.refresh()
 
 
 def test_blogpost_from_file():
@@ -44,6 +48,7 @@ def test_blogpost_footer():
 
     assert blogpost.html == RESULT
 
+
 def test_webpage_from_file():
 
     RESULT = '<html><article><p>This is the first post</p></article></html>'
@@ -65,6 +70,16 @@ def test_webpage_from_multiple_files():
     webpage.read_multiple(['001-test-number-one.md', '006-test-number-six.md', '001-test-number-one.md'])
 
     assert webpage.html == RESULT
+
+
+def test_webpage_from_multiple_files_page_title():
+
+    RESULT = test_website.name
+
+    webpage = Webpage(test_website)
+    webpage.read_multiple(['001-test-number-one.md'])
+
+    assert webpage.title == RESULT
 
 
 def test_blogpost_filename_from_source_file():
