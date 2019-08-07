@@ -21,22 +21,22 @@ test_website.refresh()
 
 def test_blogpost_from_file():
 
-    RESULT = '<article><p>This is the first post</p></article>'
+    RESULT = '<article><p>This is the first post</p></article><footer>footer</footer>'
 
     blogpost = Blogpost(test_website)
     blogpost.read('001-test-number-one.md')
 
-    assert blogpost.html == RESULT
+    assert blogpost.html_full == RESULT
 
 
 def test_blogpost_with_markdown():
 
-    RESULT = '<article><h1>This is a test heading</h1></article>'
+    RESULT = '<article><h1>This is a test heading</h1></article><footer>footer</footer>'
 
     blogpost = Blogpost(test_website)
     blogpost.read('002-test-number-two.md')
 
-    assert blogpost.html == RESULT
+    assert blogpost.html_full == RESULT
 
 
 def test_webpage_blogpost_from_file_with_footer():
@@ -52,9 +52,9 @@ def test_webpage_blogpost_from_file_with_footer():
 def test_webpage_from_multiple_files():
 
     RESULT = "<html>"
-    RESULT += '<article><p>This is the first post</p></article>'
-    RESULT += '<article><p>This is the sixth post</p></article>'
-    RESULT += '<article><p>This is the first post</p></article>'
+    RESULT += "<article><p>This is the first post</p><a href=''>Read more</a></article>"
+    RESULT += "<article><p>This is the sixth post</p><a href=''>Read more</a></article>"
+    RESULT += "<article><p>This is the first post</p><a href=''>Read more</a></article>"
     RESULT += "</html>"
 
     webpage = Webpage(test_website)
@@ -65,7 +65,7 @@ def test_webpage_from_multiple_files():
 
 def test_webpage_from_multiple_files_with_header():
 
-    RESULT = "<html><div>header</div><article><p>This is the first post</p></article></html>"
+    RESULT = "<html><div>header</div><article><p>This is the first post</p><a href=''>Read more</a></article></html>"
 
     webpage = Webpage(test_website)
     webpage.template = Template(test_website.config_template_path + '_test_webpage_with_header.html')
@@ -93,6 +93,18 @@ def test_webpage_from_multiple_files_no_blogpost_footer():
     webpage.read_multiple(['001-test-number-one.md','006-test-number-six.md'])
 
     assert webpage.html.count(RESULT) == 0
+
+
+def test_blogpost_full_and_short_html():
+
+    RESULT_FULL = "<article><p>Don't hide(hidden)</p></article><footer>footer</footer>"
+    RESULT_SHORT = "<article><p>Don't hide</p><a href=''>Read more</a></article>"
+
+    blogpost = Blogpost(test_website)
+    blogpost.read('007-test-number-seven.md')
+
+    assert blogpost.html_full == RESULT_FULL
+    assert blogpost.html == RESULT_SHORT
 
 
 def test_blogpost_filename_from_source_file():
@@ -210,6 +222,5 @@ def test_index_page():
     test_website.wipe()
 
 
-  
 
 # run the tests from bin with $ python -m pytest ../tests/
