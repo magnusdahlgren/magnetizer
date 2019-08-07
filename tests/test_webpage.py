@@ -12,6 +12,7 @@ test_website.config_output_path = '../tests/public/'
 
 test_website.template_webpage  = '_test_webpage.html'
 test_website.template_blogpost = '_test_blogpost.html'
+test_website.template_index_header    = '_test_index_header.html'
 test_website.template_blogpost_footer = '_test_blogpost_footer.html'
 test_website.name = 'Test website name'
 
@@ -58,6 +59,18 @@ def test_webpage_from_multiple_files():
 
     webpage = Webpage(test_website)
     webpage.read_multiple(['001-test-number-one.md', '006-test-number-six.md', '001-test-number-one.md'])
+
+    assert webpage.html == RESULT
+
+
+def test_webpage_from_multiple_files_with_header():
+
+    RESULT = "<html><div>header</div><article><p>This is the first post</p></article></html>"
+
+    webpage = Webpage(test_website)
+    webpage.template = Template(test_website.config_template_path + '_test_webpage_with_header.html')
+
+    webpage.read_multiple(['001-test-number-one.md'])
 
     assert webpage.html == RESULT
 
