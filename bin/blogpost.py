@@ -13,6 +13,8 @@ class Blogpost:
         self.filename = None
         self.title = None
         self.footer = website.blogpost_footer
+        self.html = None
+        self.html_with_footer = None
 
 
     def read(self, filename):
@@ -23,7 +25,9 @@ class Blogpost:
         self.filename = filename.split('-', 1)[1].split('.', 1)[0] + '.html'
         self.title = self.title_from_markdown_source(self.md)
         self.html = self.template.render(markdown(self.md))
-        self.html = self.html.replace(self.website.magnetizer_blogpost_footer_tag, self.footer, 1)
+
+        self.html_with_footer = self.html.replace(self.website.magnetizer_blogpost_footer_tag, self.footer, 1)
+        self.html = self.html.replace(self.website.magnetizer_blogpost_footer_tag, '', 1)
 
 
     def title_from_markdown_source(self, md):

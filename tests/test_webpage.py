@@ -38,25 +38,15 @@ def test_blogpost_with_markdown():
     assert blogpost.html == RESULT
 
 
-def test_blogpost_footer():
+def test_webpage_blogpost_from_file_with_footer():
 
-    RESULT = '<article><p>This is the first post</p></article><footer>footer</footer>'
-
-    blogpost = Blogpost(test_website)
-    blogpost.template.template += test_website.magnetizer_blogpost_footer_tag
-    blogpost.read('001-test-number-one.md')
-
-    assert blogpost.html == RESULT
-
-
-def test_webpage_from_file():
-
-    RESULT = '<html><article><p>This is the first post</p></article></html>'
+    RESULT = "<html><article><p>This is the first post</p></article><footer>footer</footer></html>"
 
     webpage = Webpage(test_website)
     webpage.read('001-test-number-one.md')
 
     assert webpage.html == RESULT
+
 
 def test_webpage_from_multiple_files():
 
@@ -80,6 +70,16 @@ def test_webpage_from_multiple_files_page_title():
     webpage.read_multiple(['001-test-number-one.md'])
 
     assert webpage.title == RESULT
+
+
+def test_webpage_from_multiple_files_no_blogpost_footer():
+
+    RESULT = "<footer>footer</footer>"
+
+    webpage = Webpage(test_website)
+    webpage.read_multiple(['001-test-number-one.md','006-test-number-six.md'])
+
+    assert webpage.html.count(RESULT) == 0
 
 
 def test_blogpost_filename_from_source_file():
@@ -183,8 +183,6 @@ def test_webpage_title_in_html():
     webpage = Webpage(test_website)
     webpage.template.template = '<head><title><!-- MAGNETIZER_TITLE --></title></head>'
     webpage.read('004-test-number-four.md')
-
-    print (webpage.html.count(RESULT))
 
     assert webpage.html.count(RESULT) == 1
 
