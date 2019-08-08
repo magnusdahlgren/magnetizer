@@ -47,6 +47,10 @@ def test_webpage_blogpost_from_file_with_footer():
     webpage = Webpage(test_website)
     webpage.read('001-test-number-one.md')
 
+    # Meta title should be "Blogpost title - Website name"
+    assert webpage.title == 'This is the first post - Test website name'
+
+    # Blogpost footer should be present
     assert webpage.html == RESULT
 
 
@@ -201,19 +205,9 @@ def test_blogpost_title_from_other_row_of_file():
     assert blogpost.title == RESULT
 
 
-def test_webpage_title_from_first_row_of_file():
-
-    RESULT = "This is blog post number four"
-
-    webpage = Webpage(test_website)
-    webpage.read('004-test-number-four.md')
-
-    assert webpage.title == RESULT
-
-
 def test_webpage_title_in_html():
 
-    RESULT = '<head><title>This is blog post number four</title></head>'
+    RESULT = '<head><title>This is blog post number four - Test website name</title></head>'
 
     webpage = Webpage(test_website)
     webpage.template.template = '<head><title><!-- MAGNETIZER_TITLE --></title></head>'
