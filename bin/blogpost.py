@@ -38,7 +38,9 @@ class Blogpost:
         else:
             readmore = ""
 
-        self.html = self.template.render(markdown(s) + readmore)
+        self.html = markdown(s) + readmore
+        self.html = Blogpost.turn_first_row_into_link_if_h1(self.html, '')
+        self.html = self.template.render(self.html)
         self.html = self.html.replace(self.website.magnetizer_blogpost_footer_tag, '', 1)
 
 
@@ -55,4 +57,19 @@ class Blogpost:
                 return candidate
 
         return 'Untitled'
+
+    
+    @staticmethod
+    def turn_first_row_into_link_if_h1(html, url):
+
+        rows = html.split('\n', 1)
+
+        if rows[0].startswith('<h1>'):
+
+            rows[0] = rows[0].replace('<h1>', '')
+            rows[0] = rows[0].replace('</h1>', '')
+
+            rows[0] = "<h1><a href='" + url + "'>" + rows[0] + "</a></h1>"
+
+        return '\n'.join(rows)
 

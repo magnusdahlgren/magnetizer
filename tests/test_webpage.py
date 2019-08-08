@@ -31,7 +31,7 @@ def test_blogpost_from_file():
 
 def test_blogpost_with_markdown():
 
-    RESULT = '<article><h1>This is a test heading</h1></article><footer>footer</footer>'
+    RESULT = '<article><p><strong>This text is strong</strong></p></article><footer>footer</footer>'
 
     blogpost = Blogpost(test_website)
     blogpost.read('002-test-number-two.md')
@@ -102,6 +102,18 @@ def test_blogpost_full_and_short_html():
 
     blogpost = Blogpost(test_website)
     blogpost.read('007-test-number-seven.md')
+
+    assert blogpost.html_full == RESULT_FULL
+    assert blogpost.html == RESULT_SHORT
+
+
+def test_blogpost_link_from_h1_on_first_row():
+
+    RESULT_FULL = "<article><h1>This is a heading</h1>\n<p>This is the text</p></article><footer>footer</footer>"
+    RESULT_SHORT = "<article><h1><a href=''>This is a heading</a></h1>\n<p>This is the text</p></article>"
+
+    blogpost = Blogpost(test_website)
+    blogpost.read('008-test-number-eight.md')
 
     assert blogpost.html_full == RESULT_FULL
     assert blogpost.html == RESULT_SHORT
