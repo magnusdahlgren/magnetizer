@@ -49,7 +49,7 @@ def test_webpage_blogpost_from_file_with_footer():
     assert webpage.html == RESULT
 
 
-def test_webpage_from_multiple_files():
+def test_index_page():
 
     RESULT = "<html>"
     RESULT += "<article><p>This is the first post</p></article>"
@@ -60,10 +60,17 @@ def test_webpage_from_multiple_files():
     webpage = Webpage(test_website)
     webpage.read_multiple(['001-test-number-one.md', '006-test-number-six.md', '001-test-number-one.md'])
 
+    # Make sure all the posts are showing
     assert webpage.html == RESULT
 
+    # Index title = "Website Name - Tag Line"
+    assert webpage.title == test_website.name
 
-def test_webpage_from_multiple_files_with_header():
+    # Don't show blogpost footers on index 
+    assert webpage.html.count('<footer>footer</footer>') == 0
+
+
+def test_index_page_with_header():
 
     RESULT = "<html><div>header</div><article><p>This is the first post</p></article></html>"
 
@@ -75,26 +82,16 @@ def test_webpage_from_multiple_files_with_header():
     assert webpage.html == RESULT
 
 
-def test_webpage_from_multiple_files_page_title():
+def test_write_index_page():
 
-    RESULT = test_website.name
+    Webpage.write_index_page_from_directory(test_website, test_website.config_source_path)
 
-    webpage = Webpage(test_website)
-    webpage.read_multiple(['001-test-number-one.md'])
+    with open(test_website.config_output_path + 'index.html', 'r') as myfile:
+        assert myfile.read().count('<html>') == 1
 
-    assert webpage.title == RESULT
+    test_website.wipe()
 
-
-def test_webpage_from_multiple_files_no_blogpost_footer():
-
-    RESULT = "<footer>footer</footer>"
-
-    webpage = Webpage(test_website)
-    webpage.read_multiple(['001-test-number-one.md','006-test-number-six.md'])
-
-    assert webpage.html.count(RESULT) == 0
-
-
+    
 def test_blogpost_full_and_short_html():
 
     RESULT_FULL = "<article><p>Don't hide(hidden)</p></article><footer>footer</footer>"
@@ -222,16 +219,6 @@ def test_webpage_title_in_html():
     webpage.read('004-test-number-four.md')
 
     assert webpage.html.count(RESULT) == 1
-
-
-def test_index_page():
-
-    Webpage.write_index_page_from_directory(test_website, test_website.config_source_path)
-
-    with open(test_website.config_output_path + 'index.html', 'r') as myfile:
-        assert myfile.read().count('<html>') == 1
-
-    test_website.wipe()
 
 
 
