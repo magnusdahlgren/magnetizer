@@ -1,5 +1,6 @@
-from os import listdir, path, remove
+from os import listdir, path, remove, mkdir, rename
 from config import *
+import shutil
 
 MAGNETIZER_CONTENT_TAG         = '<!-- MAGNETIZER_CONTENT -->'
 MAGNETIZER_TITLE_TAG           = '<!-- MAGNETIZER_TITLE -->'
@@ -23,6 +24,7 @@ class Website:
         self.config_source_path     = CONFIG_SOURCE_PATH
         self.config_template_path   = CONFIG_TEMPLATE_PATH
         self.config_output_path     = CONFIG_OUTPUT_PATH
+        self.config_resources_path  = CONFIG_RESOURCES_PATH
 
         self.magnetizer_content_tag = MAGNETIZER_CONTENT_TAG
         self.magnetizer_title_tag   = MAGNETIZER_TITLE_TAG
@@ -45,14 +47,27 @@ class Website:
         self.index_header = Website.read_file(self.config_template_path, self.template_index_header)
 
 
-    def wipe(self):
+    def move_out(self):
 
-        print('### Deleting html files from ' + self.config_output_path)
-        for filename in listdir(self.config_output_path):
-            filename_parts = filename.split('.', 1)
-            if len(filename_parts) > 1 and filename_parts[1] == 'html':
-                print('  x ' + filename)
-                remove(self.config_output_path + filename)
+        archive_directory_path = self.config_output_path[:-1] + '_/'
+        print ('Renaming ' + self.config_output_path + ' --> ' + archive_directory_path)
+
+        shutil.rmtree(archive_directory_path, ignore_errors=True)
+
+        rename(self.config_output_path, archive_directory_path)
+        mkdir(self.config_output_path)
+        print ('Created new directory ' + self.config_output_path)
+
+
+    def copy_resources(self):
+
+        for filename in listdir(self.config_resources_path):
+
+            if path.isfile(self.config_resources_path + filename):
+
+                shutil.copyfile(self.config_resources_path + filename , self.config_output_path + filename)
+                print ('copied: ' + filename)
+
 
     @staticmethod
     def read_file(directory, filename):
