@@ -98,7 +98,7 @@ def test_webpage_from_multiple_files_no_blogpost_footer():
 def test_blogpost_full_and_short_html():
 
     RESULT_FULL = "<article><p>Don't hide(hidden)</p></article><footer>footer</footer>"
-    RESULT_SHORT = "<article><p>Don't hide</p><a href=''>Read more</a></article>"
+    RESULT_SHORT = "<article><p>Don't hide</p><a href='test-number-seven.html'>Read more</a></article>"
 
     blogpost = Blogpost(test_website)
     blogpost.read('007-test-number-seven.md')
@@ -110,7 +110,7 @@ def test_blogpost_full_and_short_html():
 def test_blogpost_link_from_h1_on_first_row():
 
     RESULT_FULL = "<article><h1>This is a heading</h1>\n<p>This is the text</p></article><footer>footer</footer>"
-    RESULT_SHORT = "<article><h1><a href=''>This is a heading</a></h1>\n<p>This is the text</p></article>"
+    RESULT_SHORT = "<article><h1><a href='test-number-eight.html'>This is a heading</a></h1>\n<p>This is the text</p></article>"
 
     blogpost = Blogpost(test_website)
     blogpost.read('008-test-number-eight.md')

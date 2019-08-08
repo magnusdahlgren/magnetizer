@@ -34,12 +34,12 @@ class Blogpost:
         s = self.md.split(self.website.magnetizer_break_tag, maxsplit=1)[0]
 
         if s != self.md:
-            readmore = "<a href=''>Read more</a>"
+            readmore = "<a href='" + self.filename + "'>Read more</a>"
         else:
             readmore = ""
 
         self.html = markdown(s) + readmore
-        self.html = Blogpost.turn_first_row_into_link_if_h1(self.html, '')
+        self.html = Blogpost.turn_first_row_into_link_if_h1(self.html, self.filename)
         self.html = self.template.render(self.html)
         self.html = self.html.replace(self.website.magnetizer_blogpost_footer_tag, '', 1)
 
