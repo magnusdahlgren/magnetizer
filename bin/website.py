@@ -16,7 +16,8 @@ class Website:
 
     def __init__(self):
         
-        self.name = CONFIG_WEBSITE_NAME
+        self.name    = CONFIG_WEBSITE_NAME
+        self.tagline = CONFIG_WEBSITE_TAGLINE
         
         self.config_source_path     = CONFIG_SOURCE_PATH
         self.config_template_path   = CONFIG_TEMPLATE_PATH

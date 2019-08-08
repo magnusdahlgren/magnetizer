@@ -15,6 +15,7 @@ test_website.template_blogpost = '_test_blogpost.html'
 test_website.template_index_header    = '_test_index_header.html'
 test_website.template_blogpost_footer = '_test_blogpost_footer.html'
 test_website.name = 'Test website name'
+test_website.tagline = 'test tag line'
 
 test_website.refresh()
 
@@ -64,7 +65,7 @@ def test_index_page():
     assert webpage.html == RESULT
 
     # Index title = "Website Name - Tag Line"
-    assert webpage.title == test_website.name
+    assert webpage.title == "Test website name - test tag line"
 
     # Don't show blogpost footers on index 
     assert webpage.html.count('<footer>footer</footer>') == 0
@@ -91,7 +92,7 @@ def test_write_index_page():
 
     test_website.wipe()
 
-    
+
 def test_blogpost_full_and_short_html():
 
     RESULT_FULL = "<article><p>Don't hide(hidden)</p></article><footer>footer</footer>"

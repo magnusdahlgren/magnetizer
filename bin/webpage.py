@@ -39,7 +39,7 @@ class Webpage:
             blogpost.read(filename)
             html += blogpost.html
 
-        self.title = self.website.name
+        self.title = self.website.name + ' - ' + self.website.tagline
         self.html = self.template.template.replace(self.website.magnetizer_content_tag, html, 1)
         self.html = self.html.replace(self.website.magnetizer_title_tag, self.title, 1)
         self.html = self.html.replace(self.website.magnetizer_index_header_tag, self.website.index_header)
