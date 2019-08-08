@@ -5,7 +5,8 @@ MAGNETIZER_CONTENT_TAG         = '<!-- MAGNETIZER_CONTENT -->'
 MAGNETIZER_TITLE_TAG           = '<!-- MAGNETIZER_TITLE -->'
 MAGNETIZER_INDEX_HEADER_TAG    = '<!-- MAGNETIZER_INDEX_HEADER -->'
 MAGNETIZER_BLOGPOST_FOOTER_TAG = '<!-- MAGNETIZER_BLOGPOST_FOOTER -->'
-MAGNETIZER_BREAK_TAG            = '<!-- BREAK -->'
+MAGNETIZER_DATE_TAG            = '<!-- MAGNETIZER_DATE -->'
+MAGNETIZER_BREAK_TAG           = '<!-- BREAK -->'
 
 TEMPLATE_WEBPAGE  = '_page.html'
 TEMPLATE_BLOGPOST = '_blogpost.html'
@@ -27,6 +28,7 @@ class Website:
         self.magnetizer_title_tag   = MAGNETIZER_TITLE_TAG
         self.magnetizer_index_header_tag    = MAGNETIZER_INDEX_HEADER_TAG
         self.magnetizer_blogpost_footer_tag = MAGNETIZER_BLOGPOST_FOOTER_TAG
+        self.magnetizer_date_tag  = MAGNETIZER_DATE_TAG
         self.magnetizer_break_tag = MAGNETIZER_BREAK_TAG
 
         self.template_webpage         = TEMPLATE_WEBPAGE

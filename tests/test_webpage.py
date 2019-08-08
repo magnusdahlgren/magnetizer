@@ -131,6 +131,26 @@ def test_blogpost_filename_from_source_file():
     assert blogpost.filename == RESULT
 
 
+def test_blogpost_with_date():
+
+    COMMENT = '<!-- 1/8/1998 -->'
+    RESULT_NO_LINK = "<date class='magnetizer-date'>1 August 1998</date>"
+    RESULT_WITH_LINK = "<date class='magnetizer-date'><a href='blogpost-with-date.html'>1 August 1998</a></date>"
+
+    blogpost = Blogpost(test_website)
+    blogpost.read('009-blogpost-with-date.md')
+
+    #blogpost should have the correct date
+    assert blogpost.date == "1 August 1998"
+
+    #blogpost full html should have date (not link)
+    assert blogpost.html_full.count(RESULT_WITH_LINK) == 0
+    assert blogpost.html_full.count(RESULT_NO_LINK) == 1
+
+    #blogpost short html should have date with link
+    assert blogpost.html.count(RESULT_WITH_LINK) == 1
+
+
 def test_webpage_filename_from_blogpost_filename():
 
     blogpost = Blogpost(test_website)

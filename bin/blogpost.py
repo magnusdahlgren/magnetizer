@@ -1,6 +1,8 @@
 from template import *
 from markdown import markdown
 from re import sub
+from datetime import *
+from re import search
 
 
 class Blogpost:
@@ -14,6 +16,7 @@ class Blogpost:
         self.title = None
         self.footer = website.blogpost_footer
         self.html = None
+        self.date = None
 
         self.html_full = None
         self.html_short_version = None
@@ -24,8 +27,12 @@ class Blogpost:
         with open(self.website.config_source_path + filename, 'r') as myfile:
             self.md = myfile.read()
 
-        self.filename = filename.split('-', 1)[1].split('.', 1)[0] + '.html'
-        self.title = self.title_from_markdown_source(self.md)
+        self.filename  = filename.split('-', 1)[1].split('.', 1)[0] + '.html'
+        self.title     = self.title_from_markdown_source(self.md)
+        self.date = self.date_from_markdown_source()
+
+        # Remove any comment tags containing dates
+        # self.md = sub(r'<!-- \d\d?/\d\d?/\d\d\d\d? -->', '', self.md)
 
         self.html_full = self.template.render(markdown(self.md))
         self.html_full = self.html_full.replace(self.website.magnetizer_blogpost_footer_tag, self.footer, 1)
@@ -33,6 +40,7 @@ class Blogpost:
 
         s = self.md.split(self.website.magnetizer_break_tag, maxsplit=1)[0]
 
+        # Show 'read more' if post has been abbreviated  
         if s != self.md:
             readmore = "<a href='" + self.filename + "'>Read more</a>"
         else:
@@ -43,6 +51,16 @@ class Blogpost:
         self.html = self.template.render(self.html)
         self.html = self.html.replace(self.website.magnetizer_blogpost_footer_tag, '', 1)
 
+        if self.date is not None:
+
+            self.html_full = self.html_full.replace(self.website.magnetizer_date_tag, "<date class='magnetizer-date'>" + self.date + "</date>", 1)
+
+            # date in short html should be a link
+            self.html = self.html.replace(self.website.magnetizer_date_tag, "<date class='magnetizer-date'>" + Blogpost.make_it_a_link(self.date, self.filename) + "</date>", 1)
+
+        # Remove all remaining comment tags from html
+        self.html = sub(r'<!--(.*?)-->', '', self.html)
+        self.html_full = sub(r'<!--(.*?)-->', '', self.html_full)
 
     def title_from_markdown_source(self, md):
 
@@ -58,6 +76,16 @@ class Blogpost:
 
         return 'Untitled'
 
+    def date_from_markdown_source(self):
+
+        match = search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.md)
+
+        if match:
+            date = datetime.strptime(match[1], '%d/%m/%Y')
+            return date.strftime('%-d %B %Y')
+        else:
+            return None
+
     
     @staticmethod
     def turn_first_row_into_link_if_h1(html, url):
@@ -69,7 +97,12 @@ class Blogpost:
             rows[0] = rows[0].replace('<h1>', '')
             rows[0] = rows[0].replace('</h1>', '')
 
-            rows[0] = "<h1><a href='" + url + "'>" + rows[0] + "</a></h1>"
+            rows[0] = "<h1>" + Blogpost.make_it_a_link(rows[0], url) + "</h1>"
 
         return '\n'.join(rows)
 
+
+    @staticmethod
+    def make_it_a_link(text, url):
+
+        return "<a href='" + url + "'>" + text + "</a>"
