@@ -31,10 +31,14 @@ class Blogpost:
         self.html_full = self.html_full.replace(self.website.magnetizer_blogpost_footer_tag, self.footer, 1)
         self.html_full = self.html_full.replace(self.website.magnetizer_break_tag, '', 1)
 
-        s = markdown(self.md.split(self.website.magnetizer_break_tag, maxsplit=1)[0])
-        s += "<a href=''>Read more</a>"
+        s = self.md.split(self.website.magnetizer_break_tag, maxsplit=1)[0]
 
-        self.html = self.template.render(s)
+        if s != self.md:
+            readmore = "<a href=''>Read more</a>"
+        else:
+            readmore = ""
+
+        self.html = self.template.render(markdown(s) + readmore)
         self.html = self.html.replace(self.website.magnetizer_blogpost_footer_tag, '', 1)
 
 

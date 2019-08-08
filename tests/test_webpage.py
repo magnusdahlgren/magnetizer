@@ -52,9 +52,9 @@ def test_webpage_blogpost_from_file_with_footer():
 def test_webpage_from_multiple_files():
 
     RESULT = "<html>"
-    RESULT += "<article><p>This is the first post</p><a href=''>Read more</a></article>"
-    RESULT += "<article><p>This is the sixth post</p><a href=''>Read more</a></article>"
-    RESULT += "<article><p>This is the first post</p><a href=''>Read more</a></article>"
+    RESULT += "<article><p>This is the first post</p></article>"
+    RESULT += "<article><p>This is the sixth post</p></article>"
+    RESULT += "<article><p>This is the first post</p></article>"
     RESULT += "</html>"
 
     webpage = Webpage(test_website)
@@ -65,7 +65,7 @@ def test_webpage_from_multiple_files():
 
 def test_webpage_from_multiple_files_with_header():
 
-    RESULT = "<html><div>header</div><article><p>This is the first post</p><a href=''>Read more</a></article></html>"
+    RESULT = "<html><div>header</div><article><p>This is the first post</p></article></html>"
 
     webpage = Webpage(test_website)
     webpage.template = Template(test_website.config_template_path + '_test_webpage_with_header.html')
