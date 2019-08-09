@@ -9,8 +9,8 @@ test_website = Website('../tests/config/test_magnetizer.cfg')
 
 # test_website.config_source_path = '../tests/content/'
 # test_website.config_template_path = '../tests/templates/' website.config.value('template_path')
-test_website.config_resources_path = '../tests/resources/'
-test_website.config_output_path = '../tests/public/'
+# test_website.config_resources_path = '../tests/resources/'
+# test_website.config_output_path = '../tests/public/'
 
 test_website.template_webpage  = '_test_webpage.html'
 test_website.template_blogpost = '_test_blogpost.html'
@@ -91,7 +91,7 @@ def test_write_index_page():
 
     Webpage.write_index_page_from_directory(test_website, test_website.config.value('source_path'))
 
-    with open(test_website.config_output_path + 'index.html', 'r') as myfile:
+    with open(test_website.config.value('output_path') + 'index.html', 'r') as myfile:
         assert myfile.read().count('<html>') == 1
 
     test_website.move_out()
@@ -171,9 +171,9 @@ def test_webpage_write():
     webpage.filename = 'my-post.html'
     webpage.write()
 
-    print(test_website.config_output_path + webpage.filename)
+    print(test_website.config.value('output_path') + webpage.filename)
 
-    with open(test_website.config_output_path + webpage.filename, 'r') as myfile:
+    with open(test_website.config.value('output_path') + webpage.filename, 'r') as myfile:
         assert myfile.read() == RESULT
 
     test_website.move_out()
@@ -181,7 +181,7 @@ def test_webpage_write():
 
 def test_website_move_out():
 
-    ARCHIVE_DIR = test_website.config_output_path[:-1] + '_/'
+    ARCHIVE_DIR = test_website.config.value('output_path')[:-1] + '_/'
     shutil.rmtree(ARCHIVE_DIR, ignore_errors=True)
 
     # Make sure there is at least one file in output directory
@@ -196,7 +196,7 @@ def test_website_move_out():
     assert path.isfile(ARCHIVE_DIR + webpage.filename)
 
     # Output directory should be empty
-    assert not listdir(test_website.config_output_path)
+    assert not listdir(test_website.config.value('output_path'))
 
 
 def test_webpage_write_multiple_from_filenames():
@@ -207,7 +207,7 @@ def test_webpage_write_multiple_from_filenames():
 
     Webpage.write_webpages_from_filenames(test_website, filenames)
 
-    assert len(filenames) == len([name for name in listdir(test_website.config_output_path) if path.isfile(path.join(test_website.config_output_path, name))])
+    assert len(filenames) == len([name for name in listdir(test_website.config.value('output_path')) if path.isfile(path.join(test_website.config.value('output_path'), name))])
 
     test_website.move_out()
 
@@ -248,7 +248,7 @@ def test_resources_copy_to_public():
     test_website.move_out()
     test_website.copy_resources()
 
-    assert path.isfile(test_website.config_output_path + "resource.txt")
+    assert path.isfile(test_website.config.value('output_path') + "resource.txt")
 
 
 

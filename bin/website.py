@@ -2,11 +2,6 @@ from os import listdir, path, remove, mkdir, rename
 from config import *
 import shutil
 
-# remove
-CONFIG_RESOURCES_PATH = '../resources/'
-CONFIG_OUTPUT_PATH    = '../public/'
-# end remove
-
 MAGNETIZER_CONTENT_TAG         = '<!-- MAGNETIZER_CONTENT -->'
 MAGNETIZER_TITLE_TAG           = '<!-- MAGNETIZER_TITLE -->'
 MAGNETIZER_INDEX_HEADER_TAG    = '<!-- MAGNETIZER_INDEX_HEADER -->'
@@ -23,9 +18,6 @@ class Website:
 
         self.config = Config(config_file_name)
                 
-        self.config_output_path     = CONFIG_OUTPUT_PATH
-        self.config_resources_path  = CONFIG_RESOURCES_PATH
-
         self.magnetizer_content_tag         = MAGNETIZER_CONTENT_TAG
         self.magnetizer_title_tag           = MAGNETIZER_TITLE_TAG
         self.magnetizer_index_header_tag    = MAGNETIZER_INDEX_HEADER_TAG
@@ -47,23 +39,23 @@ class Website:
 
     def move_out(self):
 
-        archive_directory_path = self.config_output_path[:-1] + '_/'
-        print ('Renaming ' + self.config_output_path + ' --> ' + archive_directory_path)
+        archive_directory_path = self.config.value('output_path')[:-1] + '_/'
+        print ('Renaming ' + self.config.value('output_path') + ' --> ' + archive_directory_path)
 
         shutil.rmtree(archive_directory_path, ignore_errors=True)
 
-        rename(self.config_output_path, archive_directory_path)
-        mkdir(self.config_output_path)
-        print ('Created new directory ' + self.config_output_path)
+        rename(self.config.value('output_path'), archive_directory_path)
+        mkdir(self.config.value('output_path'))
+        print ('Created new directory ' + self.config.value('output_path'))
 
 
     def copy_resources(self):
 
-        for filename in listdir(self.config_resources_path):
+        for filename in listdir(self.config.value('resources_path')):
 
-            if path.isfile(self.config_resources_path + filename):
+            if path.isfile(self.config.value('resources_path') + filename):
 
-                shutil.copyfile(self.config_resources_path + filename , self.config_output_path + filename)
+                shutil.copyfile(self.config.value('resources_path') + filename , self.config.value('output_path') + filename)
                 print ('copied: ' + filename)
 
 

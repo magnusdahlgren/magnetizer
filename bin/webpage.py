@@ -47,7 +47,7 @@ class Webpage:
 
     def write(self):
 
-        with open(self.website.config_output_path + self.filename, 'w') as myfile:
+        with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
             myfile.write(self.html)
 
 
