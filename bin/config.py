@@ -16,16 +16,17 @@ class Config:
                 key = parts[0].strip()
                 value = parts[1].strip()
 
+                if value.startswith('[') and value.endswith(']'):
+
+                    value = value[1:-1].split(',')
+
+                    value = [element.strip() for element in value]
+
                 self.config[key] = value
 
 
     def value(self, key):
         return self.config[key]
-
-        # if key in self.config:
-        #    return self.config[key]
-        #else:
-        #    return None
         
 
 
