@@ -5,7 +5,7 @@ from random import *
 from os import listdir, path
 import shutil
 
-test_website = Website()
+test_website = Website('../tests/config/test_magnetizer.cfg')
 
 test_website.config_source_path = '../tests/content/'
 test_website.config_template_path = '../tests/templates/'
@@ -16,8 +16,6 @@ test_website.template_webpage  = '_test_webpage.html'
 test_website.template_blogpost = '_test_blogpost.html'
 test_website.template_index_header    = '_test_index_header.html'
 test_website.template_blogpost_footer = '_test_blogpost_footer.html'
-test_website.name = 'Test website name'
-test_website.tagline = 'test tag line'
 
 test_website.refresh()
 

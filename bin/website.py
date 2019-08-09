@@ -1,6 +1,17 @@
 from os import listdir, path, remove, mkdir, rename
 from oldconfig import *
+from config import *
 import shutil
+
+# remove
+CONFIG_SOURCE_PATH    = '../content/'
+CONFIG_TEMPLATE_PATH  = '../templates/'
+CONFIG_RESOURCES_PATH = '../resources/'
+CONFIG_OUTPUT_PATH    = '../public/'
+
+CONFIG_WEBSITE_NAME   = 'Magnetizer Test Site'
+CONFIG_WEBSITE_TAGLINE = 'Something to build on'
+# end remove
 
 MAGNETIZER_CONTENT_TAG         = '<!-- MAGNETIZER_CONTENT -->'
 MAGNETIZER_TITLE_TAG           = '<!-- MAGNETIZER_TITLE -->'
@@ -16,22 +27,24 @@ TEMPLATE_BLOGPOST_FOOTER = '_blogpost_footer.html'
 
 class Website:
 
-    def __init__(self):
+    def __init__(self, config_file_name):
+
+        self.config = Config(config_file_name)
         
-        self.name    = CONFIG_WEBSITE_NAME
-        self.tagline = CONFIG_WEBSITE_TAGLINE
+        self.name    = self.config.value('website_name')
+        self.tagline = self.config.value('website_tagline')
         
         self.config_source_path     = CONFIG_SOURCE_PATH
         self.config_template_path   = CONFIG_TEMPLATE_PATH
         self.config_output_path     = CONFIG_OUTPUT_PATH
         self.config_resources_path  = CONFIG_RESOURCES_PATH
 
-        self.magnetizer_content_tag = MAGNETIZER_CONTENT_TAG
-        self.magnetizer_title_tag   = MAGNETIZER_TITLE_TAG
+        self.magnetizer_content_tag         = MAGNETIZER_CONTENT_TAG
+        self.magnetizer_title_tag           = MAGNETIZER_TITLE_TAG
         self.magnetizer_index_header_tag    = MAGNETIZER_INDEX_HEADER_TAG
         self.magnetizer_blogpost_footer_tag = MAGNETIZER_BLOGPOST_FOOTER_TAG
-        self.magnetizer_date_tag  = MAGNETIZER_DATE_TAG
-        self.magnetizer_break_tag = MAGNETIZER_BREAK_TAG
+        self.magnetizer_date_tag            = MAGNETIZER_DATE_TAG
+        self.magnetizer_break_tag           = MAGNETIZER_BREAK_TAG
 
         self.template_webpage         = TEMPLATE_WEBPAGE
         self.template_blogpost        = TEMPLATE_BLOGPOST
