@@ -3,8 +3,6 @@ from config import *
 import shutil
 
 # remove
-CONFIG_SOURCE_PATH    = '../content/'
-CONFIG_TEMPLATE_PATH  = '../templates/'
 CONFIG_RESOURCES_PATH = '../resources/'
 CONFIG_OUTPUT_PATH    = '../public/'
 # end remove
@@ -18,8 +16,6 @@ MAGNETIZER_BREAK_TAG           = '<!-- BREAK -->'
 
 TEMPLATE_WEBPAGE  = '_page.html'
 TEMPLATE_BLOGPOST = '_blogpost.html'
-TEMPLATE_INDEX_HEADER    = '_index_header.html'
-TEMPLATE_BLOGPOST_FOOTER = '_blogpost_footer.html'
 
 class Website:
 

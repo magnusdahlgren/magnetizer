@@ -20,11 +20,12 @@ class Config:
 
 
     def value(self, key):
+        return self.config[key]
 
-        if key in self.config:
-            return self.config[key]
-        else:
-            return None
+        # if key in self.config:
+        #    return self.config[key]
+        #else:
+        #    return None
         
 
 
