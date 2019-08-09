@@ -1,5 +1,5 @@
 from os import listdir, path, remove, mkdir, rename
-from config import *
+from oldconfig import *
 import shutil
 
 MAGNETIZER_CONTENT_TAG         = '<!-- MAGNETIZER_CONTENT -->'

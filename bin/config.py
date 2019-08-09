@@ -1,7 +1,22 @@
-CONFIG_SOURCE_PATH    = '../content/'
-CONFIG_TEMPLATE_PATH  = '../templates/'
-CONFIG_RESOURCES_PATH = '../resources/'
-CONFIG_OUTPUT_PATH    = '../public/'
+class Config:
 
-CONFIG_WEBSITE_NAME   = 'Magnetizer Test Site'
-CONFIG_WEBSITE_TAGLINE = 'Something to build on'
+    def __init__(self, filename):
+        
+        self.config = {}
+
+        with open(filename, 'r') as f:
+            raw_config = f.readlines()
+
+        for line in raw_config:
+
+            parts = line.split('=', 1)
+
+            if len(parts) == 2:
+
+                key = parts[0].strip()
+                value = parts[1].strip()
+
+                self.config[key] = value
+        
+
+
