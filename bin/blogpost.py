@@ -10,7 +10,7 @@ class Blogpost:
     def __init__(self, website):
         
         self.website = website
-        self.template = Template(website.config_template_path + website.template_blogpost)
+        self.template = Template(website.config.value('template_path') + website.template_blogpost)
         self.md = None
         self.filename = None
         self.title = None
@@ -24,7 +24,7 @@ class Blogpost:
 
     def read(self, filename):
 
-        with open(self.website.config_source_path + filename, 'r') as myfile:
+        with open(self.website.config.value('source_path') + filename, 'r') as myfile:
             self.md = myfile.read()
 
         self.filename  = filename.split('-', 1)[1].split('.', 1)[0] + '.html'

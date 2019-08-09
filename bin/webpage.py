@@ -11,7 +11,7 @@ class Webpage:
     def __init__(self, website):
         
         self.website  = website
-        self.template = Template(website.config_template_path + website.template_webpage)
+        self.template = Template(website.config.value('template_path') + website.template_webpage)
         self.filename = None
         self.html     = None
         self.title    = None

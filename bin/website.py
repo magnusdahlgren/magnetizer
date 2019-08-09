@@ -26,12 +26,7 @@ class Website:
     def __init__(self, config_file_name):
 
         self.config = Config(config_file_name)
-        
-        # self.name    = website.config.value('website_name')
-        # self.tagline = self.config.value('website_tagline')
-        
-        self.config_source_path     = CONFIG_SOURCE_PATH
-        self.config_template_path   = CONFIG_TEMPLATE_PATH
+                
         self.config_output_path     = CONFIG_OUTPUT_PATH
         self.config_resources_path  = CONFIG_RESOURCES_PATH
 
@@ -44,16 +39,14 @@ class Website:
 
         self.template_webpage         = TEMPLATE_WEBPAGE
         self.template_blogpost        = TEMPLATE_BLOGPOST
-        self.template_index_header    = TEMPLATE_INDEX_HEADER
-        self.template_blogpost_footer = TEMPLATE_BLOGPOST_FOOTER
 
-        self.blogpost_footer = Website.read_file(self.config_template_path, self.template_blogpost_footer)
-        self.index_header = Website.read_file(self.config_template_path, self.template_index_header)
+        self.blogpost_footer = Website.read_file(self.config.value('template_path'), self.config.value('blogpost_footer_template_filename'))
+        self.index_header = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
 
     def refresh(self):
         # todo: remove duplication with above
-        self.blogpost_footer = Website.read_file(self.config_template_path, self.template_blogpost_footer)
-        self.index_header = Website.read_file(self.config_template_path, self.template_index_header)
+        self.blogpost_footer = Website.read_file(self.config.value('template_path'), self.config.value('blogpost_footer_template_filename'))
+        self.index_header = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
 
 
     def move_out(self):

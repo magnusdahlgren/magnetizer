@@ -5,8 +5,8 @@ def main():
     website = Website('../config/magnetizer.cfg')
     website.move_out()
 
-    Webpage.write_webpages_from_directory(website, website.config_source_path)
-    Webpage.write_index_page_from_directory(website, website.config_source_path)
+    Webpage.write_webpages_from_directory(website, website.config.value('source_path'))
+    Webpage.write_index_page_from_directory(website, website.config.value('source_path'))
 
     website.copy_resources()
 

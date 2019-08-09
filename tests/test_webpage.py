@@ -7,15 +7,15 @@ import shutil
 
 test_website = Website('../tests/config/test_magnetizer.cfg')
 
-test_website.config_source_path = '../tests/content/'
-test_website.config_template_path = '../tests/templates/'
+# test_website.config_source_path = '../tests/content/'
+# test_website.config_template_path = '../tests/templates/' website.config.value('template_path')
 test_website.config_resources_path = '../tests/resources/'
 test_website.config_output_path = '../tests/public/'
 
 test_website.template_webpage  = '_test_webpage.html'
 test_website.template_blogpost = '_test_blogpost.html'
-test_website.template_index_header    = '_test_index_header.html'
-test_website.template_blogpost_footer = '_test_blogpost_footer.html'
+# test_website.template_index_header    = '_test_index_header.html'
+# test_website.template_blogpost_footer = '_test_blogpost_footer.html'
 
 test_website.refresh()
 
@@ -80,7 +80,7 @@ def test_index_page_with_header():
     RESULT = "<html><div>header</div><article><p>This is the first post</p></article></html>"
 
     webpage = Webpage(test_website)
-    webpage.template = Template(test_website.config_template_path + '_test_webpage_with_header.html')
+    webpage.template = Template(test_website.config.value('template_path') + '_test_webpage_with_header.html')
 
     webpage.read_multiple(['001-test-number-one.md'])
 
@@ -89,7 +89,7 @@ def test_index_page_with_header():
 
 def test_write_index_page():
 
-    Webpage.write_index_page_from_directory(test_website, test_website.config_source_path)
+    Webpage.write_index_page_from_directory(test_website, test_website.config.value('source_path'))
 
     with open(test_website.config_output_path + 'index.html', 'r') as myfile:
         assert myfile.read().count('<html>') == 1
