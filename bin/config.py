@@ -11,12 +11,20 @@ class Config:
 
             parts = line.split('=', 1)
 
-            if len(parts) == 2:
+            if len(parts) == 2 and not parts[0].startswith('#'):
 
                 key = parts[0].strip()
                 value = parts[1].strip()
 
                 self.config[key] = value
+
+
+    def value(self, key):
+
+        if key in self.config:
+            return self.config[key]
+        else:
+            return None
         
 
 
