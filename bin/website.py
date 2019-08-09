@@ -2,28 +2,23 @@ from os import listdir, path, remove, mkdir, rename
 from config import *
 import shutil
 
-MAGNETIZER_CONTENT_TAG         = '<!-- MAGNETIZER_CONTENT -->'
-MAGNETIZER_TITLE_TAG           = '<!-- MAGNETIZER_TITLE -->'
-MAGNETIZER_INDEX_HEADER_TAG    = '<!-- MAGNETIZER_INDEX_HEADER -->'
-MAGNETIZER_BLOGPOST_FOOTER_TAG = '<!-- MAGNETIZER_BLOGPOST_FOOTER -->'
-MAGNETIZER_DATE_TAG            = '<!-- MAGNETIZER_DATE -->'
-MAGNETIZER_BREAK_TAG           = '<!-- BREAK -->'
-
 class Website:
 
     def __init__(self, config_file_name):
 
         self.config = Config(config_file_name)
                 
-        self.magnetizer_content_tag         = MAGNETIZER_CONTENT_TAG
-        self.magnetizer_title_tag           = MAGNETIZER_TITLE_TAG
-        self.magnetizer_index_header_tag    = MAGNETIZER_INDEX_HEADER_TAG
-        self.magnetizer_blogpost_footer_tag = MAGNETIZER_BLOGPOST_FOOTER_TAG
-        self.magnetizer_date_tag            = MAGNETIZER_DATE_TAG
-        self.magnetizer_break_tag           = MAGNETIZER_BREAK_TAG
-
         self.blogpost_footer = Website.read_file(self.config.value('template_path'), self.config.value('blogpost_footer_template_filename'))
         self.index_header = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
+
+    tag = {
+        'content'        : '<!-- MAGNETIZER_CONTENT -->',
+        'title'          : '<!-- MAGNETIZER_TITLE -->',
+        'index_header'   : '<!-- MAGNETIZER_INDEX_HEADER -->',
+        'blogpost_footer': '<!-- MAGNETIZER_BLOGPOST_FOOTER -->',
+        'date'           : '<!-- MAGNETIZER_DATE -->',
+        'break'          : '<!-- BREAK -->'
+    }
 
     def refresh(self):
         # todo: remove duplication with above
@@ -58,4 +53,6 @@ class Website:
 
         with open(directory + filename, 'r') as myfile:
             return myfile.read()
+
+    TAG = {}
 

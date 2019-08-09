@@ -31,14 +31,11 @@ class Blogpost:
         self.title     = self.title_from_markdown_source(self.md)
         self.date = self.date_from_markdown_source()
 
-        # Remove any comment tags containing dates
-        # self.md = sub(r'<!-- \d\d?/\d\d?/\d\d\d\d? -->', '', self.md)
-
         self.html_full = self.template.render(markdown(self.md))
-        self.html_full = self.html_full.replace(self.website.magnetizer_blogpost_footer_tag, self.footer, 1)
-        self.html_full = self.html_full.replace(self.website.magnetizer_break_tag, '', 1)
+        self.html_full = self.html_full.replace(self.website.tag['blogpost_footer'], self.footer, 1)
+        self.html_full = self.html_full.replace(self.website.tag['break'], '', 1)
 
-        s = self.md.split(self.website.magnetizer_break_tag, maxsplit=1)[0]
+        s = self.md.split(self.website.tag['break'], maxsplit=1)[0]
 
         # Show 'read more' if post has been abbreviated  
         if s != self.md:
@@ -49,14 +46,14 @@ class Blogpost:
         self.html = markdown(s) + readmore
         self.html = Blogpost.turn_first_row_into_link_if_h1(self.html, self.filename)
         self.html = self.template.render(self.html)
-        self.html = self.html.replace(self.website.magnetizer_blogpost_footer_tag, '', 1)
+        self.html = self.html.replace(self.website.tag['blogpost_footer'], '', 1)
 
         if self.date is not None:
 
-            self.html_full = self.html_full.replace(self.website.magnetizer_date_tag, "<date class='magnetizer-date'>" + self.date + "</date>", 1)
+            self.html_full = self.html_full.replace(self.website.tag['date'], "<date class='magnetizer-date'>" + self.date + "</date>", 1)
 
             # date in short html should be a link
-            self.html = self.html.replace(self.website.magnetizer_date_tag, "<date class='magnetizer-date'>" + Blogpost.make_it_a_link(self.date, self.filename) + "</date>", 1)
+            self.html = self.html.replace(self.website.tag['date'], "<date class='magnetizer-date'>" + Blogpost.make_it_a_link(self.date, self.filename) + "</date>", 1)
 
         # Remove all remaining comment tags from html
         self.html = sub(r'<!--(.*?)-->', '', self.html)

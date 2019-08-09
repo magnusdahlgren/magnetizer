@@ -24,10 +24,10 @@ class Webpage:
 
         self.filename = blogpost.filename
         self.title = blogpost.title + ' - ' + self.website.config.value('website_name')
-        self.html = self.template.template.replace(self.website.magnetizer_content_tag, blogpost.html_full, 1)
-        self.html = self.html.replace(self.website.magnetizer_index_header_tag, '')
+        self.html = self.template.template.replace(self.website.tag['content'], blogpost.html_full, 1)
+        self.html = self.html.replace(self.website.tag['index_header'], '')
 
-        self.html = self.html.replace(self.website.magnetizer_title_tag, self.title, 1)
+        self.html = self.html.replace(self.website.tag['title'], self.title, 1)
 
 
     def read_multiple(self, filenames):
@@ -40,9 +40,9 @@ class Webpage:
             html += blogpost.html
 
         self.title = self.website.config.value('website_name') + ' - ' + self.website.config.value('website_tagline')
-        self.html = self.template.template.replace(self.website.magnetizer_content_tag, html, 1)
-        self.html = self.html.replace(self.website.magnetizer_title_tag, self.title, 1)
-        self.html = self.html.replace(self.website.magnetizer_index_header_tag, self.website.index_header)
+        self.html = self.template.template.replace(self.website.tag['content'], html, 1)
+        self.html = self.html.replace(self.website.tag['title'], self.title, 1)
+        self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header)
 
 
     def write(self):
