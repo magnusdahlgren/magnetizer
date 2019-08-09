@@ -9,9 +9,6 @@ MAGNETIZER_BLOGPOST_FOOTER_TAG = '<!-- MAGNETIZER_BLOGPOST_FOOTER -->'
 MAGNETIZER_DATE_TAG            = '<!-- MAGNETIZER_DATE -->'
 MAGNETIZER_BREAK_TAG           = '<!-- BREAK -->'
 
-TEMPLATE_WEBPAGE  = '_page.html'
-TEMPLATE_BLOGPOST = '_blogpost.html'
-
 class Website:
 
     def __init__(self, config_file_name):
@@ -24,9 +21,6 @@ class Website:
         self.magnetizer_blogpost_footer_tag = MAGNETIZER_BLOGPOST_FOOTER_TAG
         self.magnetizer_date_tag            = MAGNETIZER_DATE_TAG
         self.magnetizer_break_tag           = MAGNETIZER_BREAK_TAG
-
-        self.template_webpage         = TEMPLATE_WEBPAGE
-        self.template_blogpost        = TEMPLATE_BLOGPOST
 
         self.blogpost_footer = Website.read_file(self.config.value('template_path'), self.config.value('blogpost_footer_template_filename'))
         self.index_header = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))

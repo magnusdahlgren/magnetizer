@@ -6,17 +6,6 @@ from os import listdir, path
 import shutil
 
 test_website = Website('../tests/config/test_magnetizer.cfg')
-
-# test_website.config_source_path = '../tests/content/'
-# test_website.config_template_path = '../tests/templates/' website.config.value('template_path')
-# test_website.config_resources_path = '../tests/resources/'
-# test_website.config_output_path = '../tests/public/'
-
-test_website.template_webpage  = '_test_webpage.html'
-test_website.template_blogpost = '_test_blogpost.html'
-# test_website.template_index_header    = '_test_index_header.html'
-# test_website.template_blogpost_footer = '_test_blogpost_footer.html'
-
 test_website.refresh()
 
 

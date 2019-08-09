@@ -10,7 +10,7 @@ class Blogpost:
     def __init__(self, website):
         
         self.website = website
-        self.template = Template(website.config.value('template_path') + website.template_blogpost)
+        self.template = Template(website.config.value('template_path') + website.config.value('blogpost_template_filename'))
         self.md = None
         self.filename = None
         self.title = None
