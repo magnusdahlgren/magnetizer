@@ -238,6 +238,8 @@ def test_resources_copy_to_public():
     test_website.copy_resources()
 
     assert path.isfile(test_website.config.value('output_path') + "resource.txt")
+    assert path.isfile(test_website.config.value('output_path') + "resource.jpg")
+    assert not path.isfile(test_website.config.value('output_path') + "resource.xxx")
 
 
 

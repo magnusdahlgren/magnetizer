@@ -44,8 +44,16 @@ class Website:
 
             if path.isfile(self.config.value('resources_path') + filename):
 
-                shutil.copyfile(self.config.value('resources_path') + filename , self.config.value('output_path') + filename)
-                print ('copied: ' + filename)
+                extension = filename.split('.')[-1]
+
+                if '.' + extension in self.config.value('approved_filetypes'):
+                    shutil.copyfile(self.config.value('resources_path') + filename , self.config.value('output_path') + filename)
+                    print ('copied: ' + filename)
+                else:
+                    print ('ignored: ' + filename + ' (filetype .' + extension + ' not allowed)')
+
+                
+
 
 
     @staticmethod
