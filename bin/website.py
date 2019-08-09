@@ -1,5 +1,4 @@
 from os import listdir, path, remove, mkdir, rename
-from oldconfig import *
 from config import *
 import shutil
 
@@ -8,9 +7,6 @@ CONFIG_SOURCE_PATH    = '../content/'
 CONFIG_TEMPLATE_PATH  = '../templates/'
 CONFIG_RESOURCES_PATH = '../resources/'
 CONFIG_OUTPUT_PATH    = '../public/'
-
-CONFIG_WEBSITE_NAME   = 'Magnetizer Test Site'
-CONFIG_WEBSITE_TAGLINE = 'Something to build on'
 # end remove
 
 MAGNETIZER_CONTENT_TAG         = '<!-- MAGNETIZER_CONTENT -->'
@@ -31,8 +27,8 @@ class Website:
 
         self.config = Config(config_file_name)
         
-        self.name    = self.config.value('website_name')
-        self.tagline = self.config.value('website_tagline')
+        # self.name    = website.config.value('website_name')
+        # self.tagline = self.config.value('website_tagline')
         
         self.config_source_path     = CONFIG_SOURCE_PATH
         self.config_template_path   = CONFIG_TEMPLATE_PATH

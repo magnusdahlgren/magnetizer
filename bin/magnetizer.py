@@ -2,7 +2,7 @@ from webpage import *
 
 def main():
 
-    website = Website()
+    website = Website('../config/magnetizer.cfg')
     website.move_out()
 
     Webpage.write_webpages_from_directory(website, website.config_source_path)
