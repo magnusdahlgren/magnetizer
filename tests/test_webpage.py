@@ -83,7 +83,7 @@ def test_write_index_page():
     with open(test_website.config.value('output_path') + 'index.html', 'r') as myfile:
         assert myfile.read().count('<html>') == 1
 
-    test_website.move_out()
+    test_website.wipe()
 
 
 def test_blogpost_full_and_short_html():
@@ -165,32 +165,12 @@ def test_webpage_write():
     with open(test_website.config.value('output_path') + webpage.filename, 'r') as myfile:
         assert myfile.read() == RESULT
 
-    test_website.move_out()
-
-
-def test_website_move_out():
-
-    ARCHIVE_DIR = test_website.config.value('output_path')[:-1] + '_/'
-    shutil.rmtree(ARCHIVE_DIR, ignore_errors=True)
-
-    # Make sure there is at least one file in output directory
-    webpage = Webpage(test_website)
-    webpage.html = ''
-    webpage.filename = 'my-post.html'
-    webpage.write()
-
-    test_website.move_out()
-
-    # Archive directory should contain the file
-    assert path.isfile(ARCHIVE_DIR + webpage.filename)
-
-    # Output directory should be empty
-    assert not listdir(test_website.config.value('output_path'))
+    test_website.wipe()
 
 
 def test_webpage_write_multiple_from_filenames():
 
-    test_website.move_out()
+    test_website.wipe()
 
     filenames = ['001-test-number-one.md', '002-test-number-two.md', '003-test-number-three.md']
 
@@ -198,7 +178,7 @@ def test_webpage_write_multiple_from_filenames():
 
     assert len(filenames) == len([name for name in listdir(test_website.config.value('output_path')) if path.isfile(path.join(test_website.config.value('output_path'), name))])
 
-    test_website.move_out()
+    test_website.wipe()
 
 
 def test_blogpost_title_from_first_row_of_file():
@@ -234,7 +214,7 @@ def test_webpage_title_in_html():
 
 def test_resources_copy_to_public():
 
-    test_website.move_out()
+    test_website.wipe()
     test_website.copy_resources()
 
     assert path.isfile(test_website.config.value('output_path') + 'resource.txt')
@@ -262,9 +242,7 @@ def test_wipe_output_directory():
 
     for filename in files_to_leave_in_place:
         assert path.isfile(test_website.config.value('output_path') + filename)
-
-
-
+        remove(test_website.config.value('output_path') + filename)
 
 
 # run the tests from bin with $ python -m pytest ../tests/

@@ -26,7 +26,7 @@ class Website:
         self.index_header = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
 
 
-    def move_out(self):
+    # def move_out(self):
 
         archive_directory_path = self.config.value('output_path')[:-1] + '_/'
         print ('Renaming ' + self.config.value('output_path') + ' --> ' + archive_directory_path)
