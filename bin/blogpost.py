@@ -16,10 +16,8 @@ class Blogpost:
         self.title = None
         self.footer = website.blogpost_footer
         self.html = None
-        self.date = None
-
         self.html_full = None
-        self.html_short_version = None
+        self.date = None
 
 
     def read(self, filename):
@@ -59,6 +57,7 @@ class Blogpost:
         self.html = sub(r'<!--(.*?)-->', '', self.html)
         self.html_full = sub(r'<!--(.*?)-->', '', self.html_full)
 
+ 
     def title_from_markdown_source(self, md):
 
         rows = md.split('\n')
@@ -73,6 +72,7 @@ class Blogpost:
 
         return 'Untitled'
 
+ 
     def date_from_markdown_source(self):
 
         match = search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.md)
@@ -90,10 +90,8 @@ class Blogpost:
         rows = html.split('\n', 1)
 
         if rows[0].startswith('<h1>'):
-
             rows[0] = rows[0].replace('<h1>', '')
             rows[0] = rows[0].replace('</h1>', '')
-
             rows[0] = "<h1>" + Blogpost.make_it_a_link(rows[0], url) + "</h1>"
 
         return '\n'.join(rows)

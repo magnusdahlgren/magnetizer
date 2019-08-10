@@ -26,7 +26,6 @@ class Webpage:
         self.title = blogpost.title + ' - ' + self.website.config.value('website_name')
         self.html = self.template.template.replace(self.website.tag['content'], blogpost.html_full, 1)
         self.html = self.html.replace(self.website.tag['index_header'], '')
-
         self.html = self.html.replace(self.website.tag['title'], self.title, 1)
 
 
@@ -49,7 +48,6 @@ class Webpage:
 
         with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
             myfile.write(self.html)
-
 
 
     @staticmethod
@@ -87,7 +85,6 @@ class Webpage:
         print('  Generated: ' + webpage.filename + ' (index)')
 
 
-   
     @staticmethod
     def filenames_from_directory(directory):
 

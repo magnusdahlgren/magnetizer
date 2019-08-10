@@ -7,10 +7,8 @@ class Website:
     def __init__(self, config_file_name):
 
         self.config = Config(config_file_name)
+        self.refresh()
                 
-        self.blogpost_footer = Website.read_file(self.config.value('template_path'), self.config.value('blogpost_footer_template_filename'))
-        self.index_header = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
-
     tag = {
         'content'        : '<!-- MAGNETIZER_CONTENT -->',
         'title'          : '<!-- MAGNETIZER_TITLE -->',
@@ -21,27 +19,13 @@ class Website:
     }
 
     def refresh(self):
-        # todo: remove duplication with above
         self.blogpost_footer = Website.read_file(self.config.value('template_path'), self.config.value('blogpost_footer_template_filename'))
         self.index_header = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
-
-
-    # def move_out(self):
-
-        archive_directory_path = self.config.value('output_path')[:-1] + '_/'
-        print ('Renaming ' + self.config.value('output_path') + ' --> ' + archive_directory_path)
-
-        shutil.rmtree(archive_directory_path, ignore_errors=True)
-
-        rename(self.config.value('output_path'), archive_directory_path)
-        mkdir(self.config.value('output_path'))
-        print ('Created new directory ' + self.config.value('output_path'))
 
 
     def copy_resources(self):
 
         print('### Copying resources: ' + self.config.value('resources_path') + ' --> ' + self.config.value('output_path'))
-
 
         for filename in listdir(self.config.value('resources_path')):
 
@@ -76,6 +60,3 @@ class Website:
 
         with open(directory + filename, 'r') as myfile:
             return myfile.read()
-
-    TAG = {}
-
