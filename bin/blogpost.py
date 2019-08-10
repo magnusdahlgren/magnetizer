@@ -10,7 +10,7 @@ class Blogpost:
     def __init__(self, website):
         
         self.website = website
-        self.template = Template(website.config.value('template_path') + website.config.value('blogpost_template_filename'))
+        self.template = Template(website, website.config.value('template_path') + website.config.value('blogpost_template_filename'))
         self.md = None
         self.filename = None
         self.title = None
@@ -29,7 +29,7 @@ class Blogpost:
         self.title     = self.title_from_markdown_source(self.md)
         self.date = self.date_from_markdown_source()
 
-        self.html_full = self.template.render(markdown(self.md))
+        self.html_full = self.template.render(self.website, markdown(self.md))
         self.html_full = self.html_full.replace(self.website.tag['blogpost_footer'], self.footer, 1)
         self.html_full = self.html_full.replace(self.website.tag['break'], '', 1)
 
@@ -43,7 +43,7 @@ class Blogpost:
 
         self.html = markdown(s) + readmore
         self.html = Blogpost.turn_first_row_into_link_if_h1(self.html, self.filename)
-        self.html = self.template.render(self.html)
+        self.html = self.template.render(self.website, self.html)
         self.html = self.html.replace(self.website.tag['blogpost_footer'], '', 1)
 
         if self.date is not None:

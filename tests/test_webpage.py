@@ -69,7 +69,7 @@ def test_index_page_with_header():
     RESULT = "<html><div>header</div><article><p>This is the first post</p></article></html>"
 
     webpage = Webpage(test_website)
-    webpage.template = Template(test_website.config.value('template_path') + '_test_webpage_with_header.html')
+    webpage.template = Template(test_website, test_website.config.value('template_path') + '_test_webpage_with_header.html')
 
     webpage.read_multiple(['001-test-number-one.md'])
 
