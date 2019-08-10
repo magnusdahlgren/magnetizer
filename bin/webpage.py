@@ -40,7 +40,7 @@ class Webpage:
         self.title = self.website.config.value('website_name') + ' - ' + self.website.config.value('website_tagline')
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['title'], self.title, 1)
-        self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header)
+        self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
 
 
     def write(self):

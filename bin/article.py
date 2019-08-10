@@ -14,7 +14,7 @@ class Article:
         self.md = None
         self.filename = None
         self.title = None
-        self.footer = website.article_footer
+        self.footer_html = website.article_footer_html
         self.html = None
         self.html_full = None
         self.date = None
@@ -30,7 +30,7 @@ class Article:
         self.date = self.date_from_markdown_source()
 
         self.html_full = self.template.render(self.website, markdown(self.md))
-        self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer, 1)
+        self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer_html, 1)
         self.html_full = self.html_full.replace(self.website.tag['break'], '', 1)
 
         s = self.md.split(self.website.tag['break'], maxsplit=1)[0]

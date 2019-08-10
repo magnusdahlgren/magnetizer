@@ -19,14 +19,13 @@ class Website:
     }
 
     def refresh(self):
-        self.article_footer = Website.read_file(self.config.value('template_path'), self.config.value('article_footer_template_filename'))
-        self.index_header = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
+        self.article_footer_html = Website.read_file(self.config.value('template_path'), self.config.value('article_footer_template_filename'))
+        self.index_header_html = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
 
 
     def copy_resources(self):
 
         print('### Copying resources: ' + self.config.value('resources_path') + ' --> ' + self.config.value('output_path'))
-
         for filename in listdir(self.config.value('resources_path')):
 
             if path.isfile(self.config.value('resources_path') + filename):
