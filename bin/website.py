@@ -40,6 +40,9 @@ class Website:
 
     def copy_resources(self):
 
+        print('### Copying resources: ' + self.config.value('resources_path') + ' --> ' + self.config.value('output_path'))
+
+
         for filename in listdir(self.config.value('resources_path')):
 
             if path.isfile(self.config.value('resources_path') + filename):
@@ -48,9 +51,9 @@ class Website:
 
                 if '.' + extension in self.config.value('approved_filetypes'):
                     shutil.copyfile(self.config.value('resources_path') + filename , self.config.value('output_path') + filename)
-                    print ('copied: ' + filename)
+                    print ('  copied: ' + filename)
                 else:
-                    print ('ignored: ' + filename + ' (filetype .' + extension + ' not allowed)')
+                    print ('  ignored: ' + filename + ' (filetype .' + extension + ' not allowed)')
 
 
     def wipe(self):
@@ -63,9 +66,9 @@ class Website:
 
                 if extension == 'html' or '.' + extension in self.config.value('approved_filetypes'):
                     remove(self.config.value('output_path') + filename)
-                    print ('deleted: ' + filename)
+                    print ('  deleted: ' + filename)
                 else:
-                    print ('ignored: ' + filename + ' (filetype .' + extension + ')')
+                    print ('  ignored: ' + filename + ' (filetype .' + extension + ')')
 
                 
     @staticmethod

@@ -55,13 +55,15 @@ class Webpage:
     @staticmethod
     def write_webpages_from_filenames(website, filenames):
 
+        print('### Generating files: ' + website.config.value('source_path') + ' --> ' + website.config.value('output_path'))
+
         for filename in filenames: 
 
             webpage = Webpage(website)
             webpage.read(filename)
             webpage.write()
 
-            print('Generated: ' + webpage.filename) 
+            print('  Generated: ' + webpage.filename) 
 
 
     @staticmethod
@@ -82,7 +84,7 @@ class Webpage:
         webpage.title = '(TBD)'
         webpage.write()
 
-        print('Generated: ' + webpage.filename) 
+        print('  Generated: ' + webpage.filename + ' (index)')
 
 
    
