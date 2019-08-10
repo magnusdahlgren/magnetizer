@@ -46,13 +46,13 @@ class Website:
         for filename in listdir(self.config.value('output_path')):
             
             if path.isfile(self.config.value('output_path') + filename):
-                extension = filename.split('.')[-1]
+                extension = '.' + filename.split('.')[-1]
 
-                if extension == 'html' or '.' + extension in self.config.value('approved_filetypes'):
+                if extension == '.html' or extension in self.config.value('approved_filetypes'):
                     remove(self.config.value('output_path') + filename)
                     print ('  deleted: ' + filename)
                 else:
-                    print ('  ignored: ' + filename + ' (filetype .' + extension + ')')
+                    print ('  ignored: ' + filename + ' (filetype ' + extension + ')')
 
                 
     @staticmethod

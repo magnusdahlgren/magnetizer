@@ -5,7 +5,6 @@ from markdown import markdown
 from os import listdir
 
 
-
 class Webpage:
 
     def __init__(self, website):
@@ -79,7 +78,6 @@ class Webpage:
 
         webpage.read_multiple(filenames)
         webpage.filename = 'index.html'
-        webpage.title = '(TBD)'
         webpage.write()
 
         print('  Generated: ' + webpage.filename + ' (index)')
