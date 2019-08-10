@@ -1,6 +1,6 @@
 from website import *
 from template import *
-from blogpost import *
+from article import *
 from markdown import markdown
 from os import listdir
 
@@ -18,24 +18,24 @@ class Webpage:
     
     def read(self, filename):
 
-        blogpost = Blogpost(self.website)
-        blogpost.read(filename)
+        article = Article(self.website)
+        article.read(filename)
 
-        self.filename = blogpost.filename
-        self.title = blogpost.title + ' - ' + self.website.config.value('website_name')
-        self.html = self.template.template.replace(self.website.tag['content'], blogpost.html_full, 1)
+        self.filename = article.filename
+        self.title = article.title + ' - ' + self.website.config.value('website_name')
+        self.html = self.template.template.replace(self.website.tag['content'], article.html_full, 1)
         self.html = self.html.replace(self.website.tag['index_header'], '')
         self.html = self.html.replace(self.website.tag['title'], self.title, 1)
 
 
     def read_multiple(self, filenames):
 
-        blogpost = Blogpost(self.website)
+        article = Article(self.website)
         html = ''
 
         for filename in filenames:
-            blogpost.read(filename)
-            html += blogpost.html
+            article.read(filename)
+            html += article.html
 
         self.title = self.website.config.value('website_name') + ' - ' + self.website.config.value('website_tagline')
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)

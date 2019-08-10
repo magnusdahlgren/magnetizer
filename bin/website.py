@@ -13,13 +13,13 @@ class Website:
         'content'        : '<!-- MAGNETIZER_CONTENT -->',
         'title'          : '<!-- MAGNETIZER_TITLE -->',
         'index_header'   : '<!-- MAGNETIZER_INDEX_HEADER -->',
-        'blogpost_footer': '<!-- MAGNETIZER_BLOGPOST_FOOTER -->',
+        'article_footer': '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
         'date'           : '<!-- MAGNETIZER_DATE -->',
         'break'          : '<!-- BREAK -->'
     }
 
     def refresh(self):
-        self.blogpost_footer = Website.read_file(self.config.value('template_path'), self.config.value('blogpost_footer_template_filename'))
+        self.article_footer = Website.read_file(self.config.value('template_path'), self.config.value('article_footer_template_filename'))
         self.index_header = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
 
 

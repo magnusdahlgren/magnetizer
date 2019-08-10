@@ -9,37 +9,37 @@ test_website = Website('../tests/config/test_magnetizer.cfg')
 test_website.refresh()
 
 
-def test_blogpost_from_file():
+def test_article_from_file():
 
     RESULT = '<article><p>This is the first post</p></article><footer>footer</footer>'
 
-    blogpost = Blogpost(test_website)
-    blogpost.read('001-test-number-one.md')
+    article = Article(test_website)
+    article.read('001-test-number-one.md')
 
-    assert blogpost.html_full == RESULT
+    assert article.html_full == RESULT
 
 
-def test_blogpost_with_markdown():
+def test_article_with_markdown():
 
     RESULT = '<article><p><strong>This text is strong</strong></p></article><footer>footer</footer>'
 
-    blogpost = Blogpost(test_website)
-    blogpost.read('002-test-number-two.md')
+    article = Article(test_website)
+    article.read('002-test-number-two.md')
 
-    assert blogpost.html_full == RESULT
+    assert article.html_full == RESULT
 
 
-def test_webpage_blogpost_from_file_with_footer():
+def test_webpage_article_from_file_with_footer():
 
     RESULT = "<html><article><p>This is the first post</p></article><footer>footer</footer></html>"
 
     webpage = Webpage(test_website)
     webpage.read('001-test-number-one.md')
 
-    # Meta title should be "Blogpost title - Website name"
+    # Meta title should be "Article title - Website name"
     assert webpage.title == 'This is the first post - Test website name'
 
-    # Blogpost footer should be present
+    # Article footer should be present
     assert webpage.html == RESULT
 
 
@@ -60,7 +60,7 @@ def test_index_page():
     # Index title = "Website Name - Tag Line"
     assert webpage.title == "Test website name - test tag line"
 
-    # Don't show blogpost footers on index 
+    # Don't show article footers on index 
     assert webpage.html.count('<footer>footer</footer>') == 0
 
 
@@ -86,69 +86,69 @@ def test_write_index_page():
     test_website.wipe()
 
 
-def test_blogpost_full_and_short_html():
+def test_article_full_and_short_html():
 
     RESULT_FULL = "<article><p>Don't hide(hidden)</p></article><footer>footer</footer>"
     RESULT_SHORT = "<article><p>Don't hide</p><a href='test-number-seven.html'>Read more</a></article>"
 
-    blogpost = Blogpost(test_website)
-    blogpost.read('007-test-number-seven.md')
+    article = Article(test_website)
+    article.read('007-test-number-seven.md')
 
-    assert blogpost.html_full == RESULT_FULL
-    assert blogpost.html == RESULT_SHORT
+    assert article.html_full == RESULT_FULL
+    assert article.html == RESULT_SHORT
 
 
-def test_blogpost_link_from_h1_on_first_row():
+def test_article_link_from_h1_on_first_row():
 
     RESULT_FULL = "<article><h1>This is a heading</h1>\n<p>This is the text</p></article><footer>footer</footer>"
     RESULT_SHORT = "<article><h1><a href='test-number-eight.html'>This is a heading</a></h1>\n<p>This is the text</p></article>"
 
-    blogpost = Blogpost(test_website)
-    blogpost.read('008-test-number-eight.md')
+    article = Article(test_website)
+    article.read('008-test-number-eight.md')
 
-    assert blogpost.html_full == RESULT_FULL
-    assert blogpost.html == RESULT_SHORT
+    assert article.html_full == RESULT_FULL
+    assert article.html == RESULT_SHORT
 
 
-def test_blogpost_filename_from_source_file():
+def test_article_filename_from_source_file():
 
     RESULT = "test-number-one.html"
 
-    blogpost = Blogpost(test_website)
-    blogpost.read('001-test-number-one.md')
+    article = Article(test_website)
+    article.read('001-test-number-one.md')
 
-    assert blogpost.filename == RESULT
+    assert article.filename == RESULT
 
 
-def test_blogpost_with_date():
+def test_article_with_date():
 
     COMMENT = '<!-- 1/8/1998 -->'
     RESULT_NO_LINK = "<date class='magnetizer-date'>1 August 1998</date>"
-    RESULT_WITH_LINK = "<date class='magnetizer-date'><a href='blogpost-with-date.html'>1 August 1998</a></date>"
+    RESULT_WITH_LINK = "<date class='magnetizer-date'><a href='article-with-date.html'>1 August 1998</a></date>"
 
-    blogpost = Blogpost(test_website)
-    blogpost.read('009-blogpost-with-date.md')
+    article = Article(test_website)
+    article.read('009-article-with-date.md')
 
-    #blogpost should have the correct date
-    assert blogpost.date == "1 August 1998"
+    #article should have the correct date
+    assert article.date == "1 August 1998"
 
-    #blogpost full html should have date (not link)
-    assert blogpost.html_full.count(RESULT_WITH_LINK) == 0
-    assert blogpost.html_full.count(RESULT_NO_LINK) == 1
+    #article full html should have date (not link)
+    assert article.html_full.count(RESULT_WITH_LINK) == 0
+    assert article.html_full.count(RESULT_NO_LINK) == 1
 
-    #blogpost short html should have date with link
-    assert blogpost.html.count(RESULT_WITH_LINK) == 1
+    #article short html should have date with link
+    assert article.html.count(RESULT_WITH_LINK) == 1
 
 
-def test_webpage_filename_from_blogpost_filename():
+def test_webpage_filename_from_article_filename():
 
-    blogpost = Blogpost(test_website)
-    blogpost.read('001-test-number-one.md')
+    article = Article(test_website)
+    article.read('001-test-number-one.md')
 
     webpage = Webpage(test_website)
     webpage.read('001-test-number-one.md')
 
-    assert webpage.filename == blogpost.filename
+    assert webpage.filename == article.filename
 
 
 def test_webpage_write():
@@ -181,24 +181,24 @@ def test_webpage_write_multiple_from_filenames():
     test_website.wipe()
 
 
-def test_blogpost_title_from_first_row_of_file():
+def test_article_title_from_first_row_of_file():
 
     RESULT = "This is blog post number four"
 
-    blogpost = Blogpost(test_website)
-    blogpost.read('004-test-number-four.md')
+    article = Article(test_website)
+    article.read('004-test-number-four.md')
 
-    assert blogpost.title == RESULT
+    assert article.title == RESULT
 
 
-def test_blogpost_title_from_other_row_of_file():
+def test_article_title_from_other_row_of_file():
 
     RESULT = "This is blog post number five"
 
-    blogpost = Blogpost(test_website)
-    blogpost.read('005-test-number-five.md')
+    article = Article(test_website)
+    article.read('005-test-number-five.md')
 
-    assert blogpost.title == RESULT
+    assert article.title == RESULT
 
 
 def test_webpage_title_in_html():

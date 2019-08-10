@@ -1,4 +1,4 @@
-# This is my third blogpost!
+# This is my third article!
 
 It is not as nice.
 

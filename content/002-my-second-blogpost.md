@@ -1,4 +1,4 @@
-# This is my second blogpost!
+# This is my second article!
 
 It is also very nice.
 
