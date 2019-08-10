@@ -11,6 +11,7 @@ test_website.refresh()
 
 def test_article_basic():
 
+    # post starts with a h2 tag, so there shouldn't be a link
     expected = '<article><h2>This is the heading</h2>\n'
     expected += '<p>And here is some text...</p></article>'
 
@@ -32,8 +33,8 @@ def test_article_basic():
 
 def test_article_with_h1_and_break_and_date():
 
-#   ![alt text](resources/image.png)
 #   # This should be the title
+#   ![alt text](resources/image.png)
 #   This text should always be here
 #   <!-- BREAK -->
 #   Don't show this bit on the index page
@@ -54,12 +55,10 @@ def test_article_with_h1_and_break_and_date():
     assert article.html.count(read_more) == 1
     assert article.html_full.count(read_more) == 0
 
-    # The short html should have a link in the h1, but not the full html
-    h1_link = "<h1><a href='article-with-h1-break-and-date.html'>This should be the title</a></h1>"
-    
-    # todo - this assertion is genuinely failing
-    # assert article.html.count(h1_link) == 1
-    assert article.html_full.count(h1_link) == 0
+    # The short html should contain a link around the title, but not the full html
+    img_link = "<a href='article-with-h1-break-and-date.html'><h1>This should be the title</h1></a>"
+    assert article.html.count(img_link) == 1
+    assert article.html_full.count(img_link) == 0
 
     # The article should have the correct date
     assert article.date == "1 August 1998"

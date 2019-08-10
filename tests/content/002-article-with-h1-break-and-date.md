@@ -1,6 +1,6 @@
-![alt text](resources/image.png)
-
 # This should be the title
+
+![alt text](resources/image.png)
 
 This text should always be here
 
