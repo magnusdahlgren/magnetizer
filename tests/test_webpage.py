@@ -237,9 +237,32 @@ def test_resources_copy_to_public():
     test_website.move_out()
     test_website.copy_resources()
 
-    assert path.isfile(test_website.config.value('output_path') + "resource.txt")
-    assert path.isfile(test_website.config.value('output_path') + "resource.jpg")
-    assert not path.isfile(test_website.config.value('output_path') + "resource.xxx")
+    assert path.isfile(test_website.config.value('output_path') + 'resource.txt')
+    assert path.isfile(test_website.config.value('output_path') + 'resource.jpg')
+    assert not path.isfile(test_website.config.value('output_path') + 'resource.xxx')
+
+
+def test_wipe_output_directory():
+
+    files_to_delete = ['wipe_me.html', 'wipe_me_2.html', 'wipe_me.jpg', 'wipe_me.pdf']
+    files_to_leave_in_place = ['leave_me.xxx']
+
+    # create some test files
+    for filename in files_to_delete + files_to_leave_in_place:
+        with open(test_website.config.value('output_path') + filename, 'w') as myfile:
+                myfile.write('test file content')
+
+    # testing the test - remove once working
+    assert path.isfile(test_website.config.value('output_path') + 'wipe_me.html')
+
+    test_website.wipe()
+
+    for filename in files_to_delete:
+        assert not path.isfile(test_website.config.value('output_path') + filename)
+
+    for filename in files_to_leave_in_place:
+        assert path.isfile(test_website.config.value('output_path') + filename)
+
 
 
 
