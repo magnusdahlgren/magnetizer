@@ -13,7 +13,7 @@ class Website:
         'content'        : '<!-- MAGNETIZER_CONTENT -->',
         'title'          : '<!-- MAGNETIZER_TITLE -->',
         'index_header'   : '<!-- MAGNETIZER_INDEX_HEADER -->',
-        'article_footer': '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
+        'article_footer' : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
         'date'           : '<!-- MAGNETIZER_DATE -->',
         'break'          : '<!-- BREAK -->'
     }
