@@ -15,7 +15,8 @@ class Website:
         'index_header'   : '<!-- MAGNETIZER_INDEX_HEADER -->',
         'article_footer' : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
         'date'           : '<!-- MAGNETIZER_DATE -->',
-        'break'          : '<!-- BREAK -->'
+        'break'          : '<!-- BREAK -->',
+        'page_class'     : '<!-- MAGNETIZER_PAGE_CLASS -->'
     }
 
     def refresh(self):

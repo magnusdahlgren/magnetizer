@@ -26,6 +26,7 @@ class Webpage:
         self.html = self.template.template.replace(self.website.tag['content'], article.html_full, 1)
         self.html = self.html.replace(self.website.tag['index_header'], '')
         self.html = self.html.replace(self.website.tag['title'], self.title, 1)
+        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-article', 1)
 
 
     def read_multiple(self, filenames):
@@ -41,6 +42,7 @@ class Webpage:
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['title'], self.title, 1)
         self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
+        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-index', 1)
 
 
     def write(self):
