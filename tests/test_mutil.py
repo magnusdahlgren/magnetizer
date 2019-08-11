@@ -12,8 +12,11 @@ def test_link_first_tag():
     more_html = "\n<p>text</p>\n<img src='image.png'>\n<h1>no link</h1>"
     linked = "<a href='/link.html'>"
 
-    # h1 should be wrapped in <a>, no other links should be added
-    assert MUtil.link_first_tag("<h1>link</h1>" + more_html, url) == linked + "<h1>link</h1></a>" + more_html
+    # h1 should contain <a>, the rest of the html should be unchanged
+    assert MUtil.link_first_tag("<h1>link</h1>" + more_html, url) == "<h1><a href='/link.html'>link</a></h1>" + more_html
+
+    # img should be wrapped in <a>, the rest of the html should be unchanged
+    assert MUtil.link_first_tag("<img src='link.jpg'>" + more_html, url) == "<a href='/link.html'><img src='link.jpg'></a>" + more_html
 
     # all the positive examples should be linked
     for example in examples_link:

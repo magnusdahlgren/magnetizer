@@ -56,7 +56,7 @@ def test_article_with_h1_and_break_and_date():
     assert article.html_full.count(read_more) == 0
 
     # The short html should contain a link around the title, but not the full html
-    img_link = "<a href='article-with-h1-break-and-date.html'><h1>This should be the title</h1></a>"
+    img_link = "<h1><a href='article-with-h1-break-and-date.html'>This should be the title</a></h1>"
     assert article.html.count(img_link) == 1
     assert article.html_full.count(img_link) == 0
 
