@@ -18,7 +18,7 @@ class Article:
         self.footer_html = website.article_footer_html
         self.html = None
         self.html_full = None
-        self.date = None
+        self.date_html = None
 
 
     def read(self, filename):
@@ -28,7 +28,7 @@ class Article:
 
         self.filename  = filename.split('-', 1)[1].split('.', 1)[0] + '.html'
         self.title     = self.title_from_markdown_source(self.md)
-        self.date = self.date_from_markdown_source()
+        self.date_html = self.date_html_from_markdown_source()
 
         self.html_full = self.template.render(self.website, markdown(self.md))
         self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer_html, 1)
@@ -47,12 +47,12 @@ class Article:
         self.html = self.template.render(self.website, self.html)
         self.html = self.html.replace(self.website.tag['article_footer'], '', 1)
 
-        if self.date is not None:
+        if self.date_html is not None:
 
-            self.html_full = self.html_full.replace(self.website.tag['date'], "<date class='magnetizer-date'>" + self.date + "</date>", 1)
+            self.html_full = self.html_full.replace(self.website.tag['date'], self.date_html, 1)
 
             # date in short html should be a link
-            self.html = self.html.replace(self.website.tag['date'], "<date class='magnetizer-date'>" + MUtil.wrap_it_in_a_link(self.date, self.filename) + "</date>", 1)
+            self.html = self.html.replace(self.website.tag['date'], MUtil.wrap_it_in_a_link(self.date_html, self.filename), 1)
 
         # Remove all remaining comment tags from html
         self.html = sub(r'<!--(.*?)-->', '', self.html)
@@ -73,13 +73,18 @@ class Article:
 
         return 'Untitled'
 
- 
-    def date_from_markdown_source(self):
+    
+    def date_html_from_markdown_source(self):
+
+        # e.g. "<time datetime='2019-08-03'>3 August 2019</time>"
 
         match = search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.md)
 
         if match:
-            date = datetime.strptime(match[1], '%d/%m/%Y')
-            return date.strftime('%-d %B %Y')
+            article_date = datetime.strptime(match[1], '%d/%m/%Y').date()
+            result = "<time datetime='" + article_date.isoformat() + "'>"
+            result += article_date.strftime('%-d %B %Y')
+            result += "</time>"
+            return result
         else:
             return None

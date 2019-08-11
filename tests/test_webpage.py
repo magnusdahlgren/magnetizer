@@ -38,6 +38,7 @@ def test_article_with_h1_and_break_and_date():
 #   This text should always be here
 #   <!-- BREAK -->
 #   Don't show this bit on the index page
+#   <!-- 1/8/1998 -->
 
     article = Article(test_website)
     article.read('002-article-with-h1-break-and-date.md')
@@ -61,15 +62,15 @@ def test_article_with_h1_and_break_and_date():
     assert article.html_full.count(img_link) == 0
 
     # The article should have the correct date
-    assert article.date == "1 August 1998"
+    assert article.date_html == "<time datetime='1998-08-01'>1 August 1998</time>"
 
-    # The full html should not have a link around the date
-    date_without_link = "<date class='magnetizer-date'>1 August 1998</date>"
-    assert article.html.count(date_without_link) == 0
-    assert article.html_full.count(date_without_link) == 1
+    # The article should have a date in the html
+    date = "<time datetime='1998-08-01'>1 August 1998</time>"
+    assert article.html.count(date) == 1
+    assert article.html_full.count(date) == 1
 
-    # The short html should show the date with a link
-    date_with_link = "<date class='magnetizer-date'><a href='article-with-h1-break-and-date.html'>1 August 1998</a></date>"
+    # Only the short html should show the date with a link
+    date_with_link = "<a href='article-with-h1-break-and-date.html'><time datetime='1998-08-01'>1 August 1998</time></a>"
     assert article.html.count(date_with_link) == 1
     assert article.html_full.count(date_with_link) == 0
 
