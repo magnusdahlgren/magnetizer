@@ -30,3 +30,22 @@ def test_link_first_tag():
 def test_wrap_it_in_a_link():
 
     assert MUtil.wrap_it_in_a_link('<b>text</b>', 'my_url') == "<a href='my_url'><b>text</b></a>"
+
+
+def test_downgrade_headings():
+
+    input = '<h1>heading 1</h1>\n'
+    input += '<p>Some text</p>\n'
+    input += '<h2>heading 2</h2>\n'
+    input += '<p>Some text</p>\n'
+    input += '<h3>heading 3</h3>\n'
+    input += '<p>Some text</p>\n'
+
+    expected = '<h2>heading 1</h2>\n'
+    expected += '<p>Some text</p>\n'
+    expected += '<h3>heading 2</h3>\n'
+    expected += '<p>Some text</p>\n'
+    expected += '<h4>heading 3</h4>\n'
+    expected += '<p>Some text</p>\n'
+
+    assert MUtil.downgrade_headings(input) == expected

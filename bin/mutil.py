@@ -21,3 +21,18 @@ class MUtil:
     def wrap_it_in_a_link(html, url):
 
         return "<a href='" + url + "'>" + html + "</a>"
+
+
+    @staticmethod
+    def downgrade_headings(html):
+
+        html = html.replace('<h3','<h4')
+        html = html.replace('</h3','</h4')
+
+        html = html.replace('<h2','<h3')
+        html = html.replace('</h2','</h3')
+
+        html = html.replace('<h1','<h2')
+        html = html.replace('</h1','</h2')
+
+        return html

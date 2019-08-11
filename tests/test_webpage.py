@@ -11,9 +11,13 @@ test_website.refresh()
 
 def test_article_basic():
 
-    # post starts with a h2 tag, so there shouldn't be a link
-    expected = '<article><h2>This is the heading</h2>\n'
+    # post starts with a h2 tag (downgraded to h3), so there shouldn't be a link
+    expected = '<article><h3>This is the heading</h3>\n'
     expected += '<p>And here is some text...</p></article>'
+
+    expected_full = '<article><h2>This is the heading</h2>\n'
+    expected_full += '<p>And here is some text...</p></article>'
+    expected_full += '<footer>footer</footer>'
 
     article = Article(test_website)
     article.read('001-basic-article-with-h2.md')
@@ -28,7 +32,7 @@ def test_article_basic():
     assert article.html == expected
 
     # full html (for article page) should have a footer
-    assert article.html_full == expected + '<footer>footer</footer>'
+    assert article.html_full == expected_full
 
 
 def test_article_with_h1_and_break_and_date():
@@ -56,10 +60,10 @@ def test_article_with_h1_and_break_and_date():
     assert article.html.count(read_more) == 1
     assert article.html_full.count(read_more) == 0
 
-    # The short html should contain a link around the title, but not the full html
-    img_link = "<h1><a href='article-with-h1-break-and-date.html'>This should be the title</a></h1>"
-    assert article.html.count(img_link) == 1
-    assert article.html_full.count(img_link) == 0
+    # The short html should contain a link around the heading, but not the full html
+    heading_link = "<h2><a href='article-with-h1-break-and-date.html'>This should be the title</a></h2>"
+    assert article.html.count(heading_link) == 1
+    assert article.html_full.count("<a href='article-with-h1-break-and-date.html'>") == 0
 
     # The article should have the correct date
     assert article.date_html == "<time datetime='1998-08-01'>1 August 1998</time>"
@@ -96,6 +100,9 @@ def test_webpage_from_single_article():
     article.read('001-basic-article-with-h2.md')
     assert webpage.filename == article.filename
 
+    # Body should have class='magnetizer-article'
+    assert webpage.html.count("<body class='magnetizer-article'>") == 1
+
 
 def test_index_page():
 
@@ -113,6 +120,9 @@ def test_index_page():
 
     # Don't show article footers on index 
     assert webpage.html.count('<footer>footer</footer>') == 0
+
+    # Body should have class='magnetizer-index'
+    assert webpage.html.count("<body class='magnetizer-index'>") == 1
 
 
 def test_write_index_page():
