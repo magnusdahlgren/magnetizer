@@ -19,14 +19,19 @@ class Webpage:
     def read(self, filename):
 
         article = Article(self.website)
-        article.read(filename)
+        
+        if article.read(filename):
 
-        self.filename = article.filename
-        self.title = article.title + ' - ' + self.website.config.value('website_name')
-        self.html = self.template.template.replace(self.website.tag['content'], article.html_full, 1)
-        self.html = self.html.replace(self.website.tag['index_header'], '')
-        self.html = self.html.replace(self.website.tag['title'], self.title, 1)
-        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-article', 1)
+            self.filename = article.filename
+            self.title = article.title + ' - ' + self.website.config.value('website_name')
+            self.html = self.template.template.replace(self.website.tag['content'], article.html_full, 1)
+            self.html = self.html.replace(self.website.tag['index_header'], '')
+            self.html = self.html.replace(self.website.tag['title'], self.title, 1)
+            self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-article', 1)
+            return True
+
+        else:
+            return False
 
 
     def read_multiple(self, filenames):
@@ -35,8 +40,10 @@ class Webpage:
         html = ''
 
         for filename in filenames:
-            article.read(filename)
-            html += article.html
+
+            if filename.split('-', 1)[0].isdigit():
+                if article.read(filename):
+                    html += article.html
 
         self.title = self.website.config.value('website_name') + ' - ' + self.website.config.value('website_tagline')
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
@@ -47,8 +54,12 @@ class Webpage:
 
     def write(self):
 
-        with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
-            myfile.write(self.html)
+        if self.filename is not None:
+            with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
+                myfile.write(self.html)
+                print('Generated ' + self.filename)
+        else:
+            print('Did not write file.')
 
 
     @staticmethod
@@ -61,8 +72,6 @@ class Webpage:
             webpage = Webpage(website)
             webpage.read(filename)
             webpage.write()
-
-            print('  Generated: ' + webpage.filename) 
 
 
     @staticmethod

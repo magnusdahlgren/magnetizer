@@ -107,7 +107,7 @@ def test_webpage_from_single_article():
 def test_index_page():
 
     webpage = Webpage(test_website)
-    webpage.read_multiple(['001-basic-article-with-h2.md', '002-article-with-h1-break-and-date.md', '003-another-article.md'])
+    webpage.read_multiple(['001-basic-article-with-h2.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'] )
 
     # Index header should be present
     assert webpage.html.count('<div>header</div>') == 1
@@ -156,11 +156,25 @@ def test_webpage_write_multiple_from_filenames():
 
     test_website.wipe()
 
-    filenames = ['001-basic-article-with-h2.md', '002-article-with-h1-break-and-date.md', '003-another-article.md']
-
+    filenames = ['001-basic-article-with-h2.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-index-this-article.md']
     Webpage.write_webpages_from_filenames(test_website, filenames)
 
-    assert len(filenames) == len([name for name in listdir(test_website.config.value('output_path')) if path.isfile(path.join(test_website.config.value('output_path'), name))])
+    written_filenames = listdir(test_website.config.value('output_path'))
+
+    # All the normal articles should have been written
+    assert 'basic-article-with-h2.html' in written_filenames
+    assert 'article-with-h1-break-and-date.html' in written_filenames
+    assert 'another-article.html' in written_filenames
+
+    # The un-indexed article should have been written too
+    assert 'dont-index-this-article.html' in written_filenames
+
+    # The file not ending in .md should not have been written
+    assert 'ignore-this.html' not in written_filenames
+    assert '100-ignore-this.txt' not in written_filenames
+
+    # ... so in total, 4 files should have been written
+    assert len([name for name in written_filenames if path.isfile(path.join(test_website.config.value('output_path'), name))]) == 4
 
     test_website.wipe()
 
