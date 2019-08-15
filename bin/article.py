@@ -70,7 +70,7 @@ class Article:
             return True
 
         else:
-            print("Ignored '%s' (not a .md file)" % filename)
+            print("  !  WARNING: Ignored '%s' (not a .md file)" % filename)
             return False
 
  

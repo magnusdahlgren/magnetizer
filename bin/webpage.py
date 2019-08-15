@@ -57,15 +57,15 @@ class Webpage:
         if self.filename is not None:
             with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
                 myfile.write(self.html)
-                print('Generated %s' % self.filename)
+                print('  W  %s' % self.filename)
         else:
-            print('Did not write file.')
+            print('  !  WARNING: Did not write file.')
 
 
     @staticmethod
     def write_article_pages_from_md_filenames(website, filenames):
 
-        print('### Generating files: %s --> %s' % (website.config.value('source_path'), website.config.value('output_path')))
+        print('Generating article pages --> %s' % website.config.value('output_path'))
 
         for filename in filenames: 
 
@@ -91,7 +91,8 @@ class Webpage:
         webpage.filename = 'index.html'
         webpage.write()
 
-        print('  Generated: %s (index)' % webpage.filename)
+        print('Generating index pages --> %s' % website.config.value('output_path'))
+        print('  W  %s (index)' % webpage.filename)
 
 
     @staticmethod

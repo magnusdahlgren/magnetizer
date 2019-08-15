@@ -26,7 +26,7 @@ class Website:
 
     def copy_resources(self):
 
-        print("### Copying resources: %s --> %s" % (self.config.value('resources_path'), self.config.value('output_path')))
+        print("Copying resources --> %s" % self.config.value('output_path'))
         for filename in listdir(self.config.value('resources_path')):
 
             if path.isfile(self.config.value('resources_path') + filename):
@@ -35,14 +35,14 @@ class Website:
 
                 if '.' + extension in self.config.value('approved_filetypes'):
                     shutil.copyfile(self.config.value('resources_path') + filename , self.config.value('output_path') + filename)
-                    print ('  copied: %s' % filename)
+                    print ('  C  %s' % filename)
                 else:
-                    print ('  ignored: %s (filetype %s not allowed)' % (filename, extension))
+                    print ('  -  %s (filetype %s not allowed)' % (filename, extension))
 
 
     def wipe(self):
 
-        print('### Deleting previous files from ' + self.config.value('output_path'))
+        print('Deleting previous files from ' + self.config.value('output_path'))
         for filename in listdir(self.config.value('output_path')):
             
             if path.isfile(self.config.value('output_path') + filename):
@@ -50,9 +50,9 @@ class Website:
 
                 if extension == '.html' or extension in self.config.value('approved_filetypes'):
                     remove(self.config.value('output_path') + filename)
-                    print ('  deleted: %s' % filename)
+                    print ('  X  %s' % filename)
                 else:
-                    print ('  ignored: %s (filetype %s)' % (filename, extension))
+                    print ('  -  %s (filetype %s)' % (filename, extension))
 
                 
     @staticmethod
