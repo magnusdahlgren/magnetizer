@@ -45,7 +45,7 @@ class Webpage:
                 if article.read(filename):
                     html += article.html
 
-        self.title = self.website.config.value('website_name') + ' - ' + self.website.config.value('website_tagline')
+        self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['title'], self.title, 1)
         self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
@@ -57,7 +57,7 @@ class Webpage:
         if self.filename is not None:
             with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
                 myfile.write(self.html)
-                print('Generated ' + self.filename)
+                print('Generated %s' % self.filename)
         else:
             print('Did not write file.')
 
@@ -65,7 +65,7 @@ class Webpage:
     @staticmethod
     def write_webpages_from_filenames(website, filenames):
 
-        print('### Generating files: ' + website.config.value('source_path') + ' --> ' + website.config.value('output_path'))
+        print('### Generating files: %s --> %s' % (website.config.value('source_path'), website.config.value('output_path')))
 
         for filename in filenames: 
 
@@ -91,7 +91,7 @@ class Webpage:
         webpage.filename = 'index.html'
         webpage.write()
 
-        print('  Generated: ' + webpage.filename + ' (index)')
+        print('  Generated: %s (index)' % webpage.filename)
 
 
     @staticmethod

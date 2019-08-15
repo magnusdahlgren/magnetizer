@@ -46,7 +46,7 @@ class Article:
 
             # Show 'read more' if post has been abbreviated  
             if s != self.md:
-                readmore = "<a href='" + self.filename + "'>Read more</a>"
+                readmore = "<a href='%s'>Read more</a>" % (self.filename)
             else:
                 readmore = ""
 
@@ -70,7 +70,7 @@ class Article:
             return True
 
         else:
-            print('Ignored ' + filename + ' (not a .md file)')
+            print("Ignored '%s' (not a .md file)" % filename)
             return False
 
  
@@ -97,7 +97,7 @@ class Article:
 
         if match:
             article_date = datetime.strptime(match[1], '%d/%m/%Y').date()
-            result = "<time datetime='" + article_date.isoformat() + "'>"
+            result = "<time datetime='%s'>" % article_date.isoformat()
             result += article_date.strftime('%-d %B %Y')
             result += "</time>"
             return result
