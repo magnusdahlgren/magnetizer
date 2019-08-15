@@ -23,7 +23,7 @@ class Webpage:
         if article.from_md_filename(filename):
 
             self.filename = article.filename
-            self.title = article.title + ' - ' + self.website.config.value('website_name')
+            self.title = '%s - %s' % (article.title, self.website.config.value('website_name'))
             self.html = self.template.template.replace(self.website.tag['content'], article.html_full, 1)
             self.html = self.html.replace(self.website.tag['index_header'], '')
             self.html = self.html.replace(self.website.tag['title'], self.title, 1)
