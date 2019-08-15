@@ -16,7 +16,7 @@ class Webpage:
         self.title    = None
 
     
-    def from_md_filename(self, filename):
+    def article_from_md_filename(self, filename):
 
         article = Article(self.website)
         
@@ -34,7 +34,7 @@ class Webpage:
             return False
 
 
-    def read_multiple(self, filenames):
+    def index_from_md_filenames(self, filenames):
 
         article = Article(self.website)
         html = ''
@@ -63,22 +63,22 @@ class Webpage:
 
 
     @staticmethod
-    def write_webpages_from_filenames(website, filenames):
+    def write_article_pages_from_md_filenames(website, filenames):
 
         print('### Generating files: %s --> %s' % (website.config.value('source_path'), website.config.value('output_path')))
 
         for filename in filenames: 
 
             webpage = Webpage(website)
-            webpage.from_md_filename(filename)
+            webpage.article_from_md_filename(filename)
             webpage.write()
 
 
     @staticmethod
-    def write_webpages_from_directory(website, directory):
+    def write_article_pages_from_directory(website, directory):
 
         filenames = Webpage.filenames_from_directory(directory)        
-        Webpage.write_webpages_from_filenames(website, filenames)
+        Webpage.write_article_pages_from_md_filenames(website, filenames)
 
 
     @staticmethod
@@ -87,7 +87,7 @@ class Webpage:
         filenames = Webpage.filenames_from_directory(directory)        
         webpage = Webpage(website)
 
-        webpage.read_multiple(filenames)
+        webpage.index_from_md_filenames(filenames)
         webpage.filename = 'index.html'
         webpage.write()
 
