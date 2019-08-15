@@ -16,11 +16,11 @@ class Webpage:
         self.title    = None
 
     
-    def read(self, filename):
+    def from_md_filename(self, filename):
 
         article = Article(self.website)
         
-        if article.read(filename):
+        if article.from_md_filename(filename):
 
             self.filename = article.filename
             self.title = article.title + ' - ' + self.website.config.value('website_name')
@@ -42,7 +42,7 @@ class Webpage:
         for filename in filenames:
 
             if filename.split('-', 1)[0].isdigit():
-                if article.read(filename):
+                if article.from_md_filename(filename):
                     html += article.html
 
         self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
@@ -70,7 +70,7 @@ class Webpage:
         for filename in filenames: 
 
             webpage = Webpage(website)
-            webpage.read(filename)
+            webpage.from_md_filename(filename)
             webpage.write()
 
 

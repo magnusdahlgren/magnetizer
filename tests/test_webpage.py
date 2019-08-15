@@ -20,7 +20,7 @@ def test_article_basic():
     expected_full += '<footer>footer</footer>'
 
     article = Article(test_website)
-    article.read('001-basic-article-with-h2.md')
+    article.from_md_filename('001-basic-article-with-h2.md')
 
     # filename should be without number and .html instead of .md
     assert article.filename == 'basic-article-with-h2.html'
@@ -45,7 +45,7 @@ def test_article_with_h1_and_break_and_date():
 #   <!-- 1/8/1998 -->
 
     article = Article(test_website)
-    article.read('002-article-with-h1-break-and-date.md')
+    article.from_md_filename('002-article-with-h1-break-and-date.md')
 
     # The title should be the first usable row (so not the image)
     assert article.title == "This should be the title"
@@ -82,7 +82,7 @@ def test_article_with_h1_and_break_and_date():
 def test_webpage_from_single_article():
 
     webpage = Webpage(test_website)
-    webpage.read('001-basic-article-with-h2.md')
+    webpage.from_md_filename('001-basic-article-with-h2.md')
 
     # Page title should be "Article title - Website name"
     title = 'This is the heading - Test website name'
@@ -97,7 +97,7 @@ def test_webpage_from_single_article():
 
     # Filename for webpage should be based on the article
     article = Article(test_website)
-    article.read('001-basic-article-with-h2.md')
+    article.from_md_filename('001-basic-article-with-h2.md')
     assert webpage.filename == article.filename
 
     # Body should have class='magnetizer-article'

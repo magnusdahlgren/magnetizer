@@ -21,7 +21,7 @@ class Article:
         self.date_html = None
 
 
-    def read(self, filename):
+    def from_md_filename(self, filename):
 
         if filename.split('.', 1)[1] == 'md':
 
