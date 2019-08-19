@@ -112,14 +112,14 @@ class Article:
     def cc_license(self):
 
         cc_license = '<p class="magntetizer-license">'
-        cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">'
-        cc_license += '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />'
+        cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">'
+        cc_license += '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
         cc_license += '</a><br />This work by <a xmlns:cc="http://creativecommons.org/ns#" href="'
         cc_license += self.website.config.value('website_base_url') + '/' + self.filename
         cc_license += '" property="cc:attributionName" rel="cc:attributionURL">'
         cc_license += self.website.config.value('website_author')
-        cc_license += '</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">'
-        cc_license += 'Creative Commons Attribution-ShareAlike 4.0 International License</a>.'
+        cc_license += '</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">'
+        cc_license += 'Creative Commons Attribution 4.0 International License</a>.'
         cc_license += '</p>'
 
         return cc_license

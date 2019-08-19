@@ -85,7 +85,7 @@ def test_article_with_h1_and_break_and_date_and_cc():
     assert article.html_full.count(date_with_link) == 0
 
     # Only the full html should have a CC license
-    cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />'
+    cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
     assert article.html.count(cc_license) == 0
     assert article.html_full.count(cc_license) == 1
 
@@ -96,13 +96,13 @@ def test_article_cc():
     article.filename = 'test_filename.html'
 
     cc_license = '<p class="magntetizer-license">'
-    cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">'
-    cc_license += '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />'
+    cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">'
+    cc_license += '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
     cc_license += '</a><br />This work by <a xmlns:cc="http://creativecommons.org/ns#" href="'
     cc_license += 'https://example.com/' + article.filename
     cc_license += '" property="cc:attributionName" rel="cc:attributionURL">'
     cc_license += 'Test Author</a> is licensed under a '
-    cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.'
+    cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.'
     cc_license += '</p>'
 
     assert article.cc_license() == cc_license
