@@ -40,7 +40,11 @@ class Article:
 
             self.html_full = self.template.render(self.website, markdown(self.md))
             self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer_html, 1)
-            self.html_full = self.html_full.replace(self.website.tag['break'], '', 1)
+            self.html_full = self.html_full.replace(self.website.tag['break'], '')
+
+            if self.html_full.count(self.website.tag['creative_commons']) > 0:
+                self.html_full = self.html_full.replace(self.website.tag['cc_here'], self.cc_license(), 1)
+                self.html_full = self.html_full.replace(self.website.tag['creative_commons'], '')
 
             s = self.md.split(self.website.tag['break'], maxsplit=1)[0]
 
@@ -103,3 +107,19 @@ class Article:
             return result
         else:
             return None
+
+    
+    def cc_license(self):
+
+        cc_license = '<p class="magntetizer-license">'
+        cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">'
+        cc_license += '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />'
+        cc_license += '</a><br />This work by <a xmlns:cc="http://creativecommons.org/ns#" href="'
+        cc_license += self.website.config.value('website_base_url') + '/' + self.filename
+        cc_license += '" property="cc:attributionName" rel="cc:attributionURL">'
+        cc_license += self.website.config.value('website_author')
+        cc_license += '</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">'
+        cc_license += 'Creative Commons Attribution-ShareAlike 4.0 International License</a>.'
+        cc_license += '</p>'
+
+        return cc_license

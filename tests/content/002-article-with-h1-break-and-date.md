@@ -2,6 +2,8 @@
 
 ![alt text](resources/image.png)
 
+<!-- CC -->
+
 This text should always be here
 
 <!-- BREAK -->

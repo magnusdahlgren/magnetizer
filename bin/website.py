@@ -10,13 +10,15 @@ class Website:
         self.refresh()
                 
     tag = {
-        'content'        : '<!-- MAGNETIZER_CONTENT -->',
-        'title'          : '<!-- MAGNETIZER_TITLE -->',
-        'index_header'   : '<!-- MAGNETIZER_INDEX_HEADER -->',
-        'article_footer' : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
-        'date'           : '<!-- MAGNETIZER_DATE -->',
-        'break'          : '<!-- BREAK -->',
-        'page_class'     : '<!-- MAGNETIZER_PAGE_CLASS -->'
+        'content'          : '<!-- MAGNETIZER_CONTENT -->',
+        'title'            : '<!-- MAGNETIZER_TITLE -->',
+        'index_header'     : '<!-- MAGNETIZER_INDEX_HEADER -->',
+        'article_footer'   : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
+        'date'             : '<!-- MAGNETIZER_DATE -->',
+        'page_class'       : '<!-- MAGNETIZER_PAGE_CLASS -->',
+        'cc_here'          : '<!-- MAGNETIZER_CC -->',
+        'break'            : '<!-- BREAK -->',
+        'creative_commons' : '<!-- CC -->'
     }
 
     def refresh(self):
