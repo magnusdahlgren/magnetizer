@@ -23,10 +23,10 @@ class Webpage:
         if article.from_md_filename(filename):
 
             self.filename = article.filename
-            self.title = '%s - %s' % (article.title, self.website.config.value('website_name'))
+            self.title = article.title
             self.html = self.template.template.replace(self.website.tag['content'], article.html_full, 1)
             self.html = self.html.replace(self.website.tag['index_header'], '')
-            self.html = self.html.replace(self.website.tag['title'], self.title, 1)
+            self.html = self.html.replace(self.website.tag['meta'], article.meta(), 1)
             self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-article', 1)
             return True
 
@@ -47,7 +47,7 @@ class Webpage:
 
         self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
-        self.html = self.html.replace(self.website.tag['title'], self.title, 1)
+        self.html = self.html.replace(self.website.tag['meta'], '<title>%s</title>' % self.title, 1)
         self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
         self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-index', 1)
 

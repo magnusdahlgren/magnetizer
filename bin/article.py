@@ -35,7 +35,7 @@ class Article:
                 filename  = filename.split('-', 1)[1]
 
             self.filename  = filename
-            self.title     = self.title_from_markdown_source(self.md)
+            self.title     = '%s - %s' % (self.title_from_markdown_source(self.md), self.website.config.value('website_name'))
             self.date_html = self.date_html_from_markdown_source()
 
             self.html_full = self.template.render(self.website, markdown(self.md))
@@ -50,7 +50,7 @@ class Article:
 
             # Show 'read more' if post has been abbreviated  
             if s != self.md:
-                readmore = "<a href='%s'>Read more</a>" % (self.filename)
+                readmore = "<a href='%s' class='magnetizer-more'>Read more</a>" % (self.filename)
             else:
                 readmore = ""
 
@@ -92,6 +92,13 @@ class Article:
 
         return 'Untitled'
 
+
+    def meta(self):
+
+        m = '<title>%s</title>' % self.title
+        m += self.twitter_card()
+        return m
+
     
     def date_html_from_markdown_source(self):
 
@@ -123,3 +130,34 @@ class Article:
         cc_license += '</p>'
 
         return cc_license
+
+    
+    def twitter_card(self):
+
+        # <meta name="twitter:card" content="summary" />
+        # <meta name="twitter:site" content="@flickr" />
+        # <meta name="twitter:title" content="Small Island Developing States Photo Submission" />
+        # <meta name="twitter:description" content="View the album on Flickr." />
+        # <meta name="twitter:image" content="https://farm6.staticflickr.com/5510/14338202952_93595258ff_z.jpg" />
+
+        card = '<meta name="twitter:card" content="summary" />'
+        card += '<meta name="twitter:site" content="%s" />' % self.website.config.value('website_twitter')
+        card += '<meta name="twitter:title" content="%s" />' % self.title
+
+        img_url = MUtil.first_image_url_from_html(self.html_full)
+
+        card += '<meta name="twitter:description" content="%s" />' % self.abstract()
+
+        if img_url:
+
+            if not img_url.startswith('http'):
+                img_url = self.website.config.value('website_base_url') + '/' + img_url
+
+            card += '<meta name="twitter:image" content="%s" />' % img_url
+
+        return card
+
+
+    def abstract(self):
+
+        return MUtil.abstract_from_html(self.html_full)

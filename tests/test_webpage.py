@@ -26,7 +26,10 @@ def test_article_basic():
     assert article.filename == 'basic-article-with-h2.html'
 
     # title should be first row of file
-    assert article.title == 'This is the heading'
+    assert article.title == 'This is the heading - Test website name'
+
+    # title should be present in article meta data
+    assert '<title>This is the heading - Test website name</title>' in article.meta()
 
     # short html (for index) should NOT include a footer
     assert article.html == expected
@@ -54,7 +57,7 @@ def test_article_with_h1_and_break_and_date_and_cc():
     article.from_md_filename('002-article-with-h1-break-and-date.md')
 
     # The title should be the first usable row (so not the image)
-    assert article.title == "This should be the title"
+    assert article.title == "This should be the title - Test website name"
 
     # The bit after the break tag should only show in the full html
     dont_show = "Don't show this bit on the index page"
@@ -62,7 +65,7 @@ def test_article_with_h1_and_break_and_date_and_cc():
     assert article.html_full.count(dont_show) == 1
 
     # The short html should have a 'read more' link, but not the full html
-    read_more = "<a href='article-with-h1-break-and-date.html'>Read more</a>"
+    read_more = "<a href='article-with-h1-break-and-date.html' class='magnetizer-more'>Read more</a>"
     assert article.html.count(read_more) == 1
     assert article.html_full.count(read_more) == 0
 
@@ -132,6 +135,9 @@ def test_webpage_from_single_article():
     # Body should have class='magnetizer-article'
     assert webpage.html.count("<body class='magnetizer-article'>") == 1
 
+    # Twitter card should be present
+    assert '<meta name="twitter:card" content="summary" />' in webpage.html
+
 
 def test_index_page():
 
@@ -152,6 +158,10 @@ def test_index_page():
 
     # Body should have class='magnetizer-index'
     assert webpage.html.count("<body class='magnetizer-index'>") == 1
+
+    # Twitter card should *not* be present (todo: yet!)
+    assert '<meta name="twitter:card" content="summary" />' not in webpage.html
+   
 
 
 def test_write_index_page():

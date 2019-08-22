@@ -11,7 +11,7 @@ class Website:
                 
     tag = {
         'content'          : '<!-- MAGNETIZER_CONTENT -->',
-        'title'            : '<!-- MAGNETIZER_TITLE -->',
+        'meta'             : '<!-- MAGNETIZER_META -->',
         'index_header'     : '<!-- MAGNETIZER_INDEX_HEADER -->',
         'article_footer'   : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
         'date'             : '<!-- MAGNETIZER_DATE -->',

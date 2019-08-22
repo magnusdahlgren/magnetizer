@@ -1,3 +1,5 @@
+import re
+
 class MUtil:
 
     @staticmethod
@@ -36,3 +38,47 @@ class MUtil:
         html = html.replace('</h1','</h2')
 
         return html
+
+
+    @staticmethod
+    def abstract_from_html(html):
+
+        s = MUtil.strip_tags_from_html(MUtil.strip_leading_h1_from_html(html)).strip()
+        s = re.sub(r'\n', ' ', s)
+        s = re.sub(r'\s\s+',' ', s)
+
+        if len(s) > 300:
+            s = s[0:300] + '…'
+        return s
+
+
+    @staticmethod
+    def first_image_url_from_html(html):
+
+        pattern = "<img .*?src=['\"](.*?)['\"].*?>"
+        match = re.search(pattern, html)
+        
+        if match:
+            return match.group(1)
+        else:
+            return None
+
+
+    @staticmethod
+    def strip_tags_from_html(html):
+
+        tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
+        return tag_re.sub('', html)
+
+
+    @staticmethod
+    def strip_leading_h1_from_html(html):
+
+        s = html.strip()
+        if s.startswith('<h1'):
+
+            return s.split('</h1>', 1)[1]
+
+        else:
+
+            return html
