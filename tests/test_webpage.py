@@ -183,8 +183,6 @@ def test_webpage_write():
     webpage.filename = 'my-post.html'
     webpage.write()
 
-    print(test_website.config.value('output_path') + webpage.filename)
-
     with open(test_website.config.value('output_path') + webpage.filename, 'r') as myfile:
         assert myfile.read() == RESULT
 

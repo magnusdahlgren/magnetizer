@@ -1,4 +1,5 @@
 from webpage import *
+from atom import *
 from sys import argv
 
 def main():
@@ -17,6 +18,9 @@ def main():
     Webpage.write_index_page_from_directory(website, website.config.value('source_path'))
 
     website.copy_resources()
+
+    atom = Atom(website)
+    atom.write()
 
 if __name__ == "__main__":
     main()
