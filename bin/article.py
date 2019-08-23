@@ -144,7 +144,7 @@ class Article:
         card += '<meta name="twitter:site" content="%s" />' % self.website.config.value('website_twitter')
         card += '<meta name="twitter:title" content="%s" />' % self.title
 
-        img_url = MUtil.first_image_url_from_html(self.html_full)
+        img_url = MUtil.first_image_url_from_html(markdown(self.md))
 
         card += '<meta name="twitter:description" content="%s" />' % self.abstract()
 
@@ -160,4 +160,4 @@ class Article:
 
     def abstract(self):
 
-        return MUtil.abstract_from_html(self.html_full)
+        return MUtil.abstract_from_html(markdown(self.md))

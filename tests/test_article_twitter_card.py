@@ -10,7 +10,8 @@ def test_twitter_card_meta_data():
     test_article = Article(test_website)
 
     test_article.title = 'test title'
-    test_article.html_full = '<h1>Heading</h1>Some text\n<img src="http://example.com/first_image.jpg">\n\n<img src="http://example.com/second_image.jpg"><p>Some text\nSome more text</p>'
+    test_article.md = '# Heading\n\nSome text\n\n![alt text](http://example.com/first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
+    # test_article.html_full = '<h1>Heading</h1>Some text\n<img src="http://example.com/first_image.jpg">\n\n<img src="http://example.com/second_image.jpg"><p>Some text\nSome more text</p>'
     test_article.url = 'https://example.com/test.html'
 
     card = test_article.twitter_card()
@@ -38,7 +39,8 @@ def test_twitter_card_relative_image_url():
     test_article = Article(test_website)
 
     test_article.title = 'test title'
-    test_article.html_full = '<h1>Heading</h1>Some text\n<img src="first_image.jpg">\n\n<img src="http://example.com/second_image.jpg"><p>Some text\nSome more text</p>'
+    test_article.md = '# Heading\n\nSome text\n\n![alt text](first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
+    # test_article.html_full = '<h1>Heading</h1>Some text\n<img src="first_image.jpg">\n\n<img src="http://example.com/second_image.jpg"><p>Some text\nSome more text</p>'
     test_article.url = 'https://example.com/test.html'
 
     card = test_article.twitter_card()
@@ -52,7 +54,7 @@ def test_twitter_card_no_image_url():
     test_article = Article(test_website)
 
     test_article.title = 'test title'
-    test_article.html_full = '<h1>Heading</h1><p>Some text\nSome more text</p>'
+    test_article.md = '# Heading\n\nSome text\n\nSome more text'
     test_article.url = 'https://example.com/test.html'
 
     card = test_article.twitter_card()
@@ -61,5 +63,12 @@ def test_twitter_card_no_image_url():
     assert '<meta name="twitter:image"' not in card
 
 
+def test_twitter_card_from_article_from_file():
 
+    test_article = Article(test_website)
+    test_article.from_md_filename('002-article-with-h1-break-and-date.md')
 
+    card = test_article.twitter_card()
+
+    # h1 tag should be stripped out
+    assert '<meta name="twitter:description" content="This text should always be here' in card
