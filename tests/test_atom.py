@@ -43,8 +43,8 @@ def test_feed():
     # XML namespace should be Atom
     assert '<feed xmlns="http://www.w3.org/2005/Atom">' in feed
 
-    # Title should be website name
-    assert '<title>Test website name</title>' in feed
+    # Title should be website name - tagline
+    assert '<title>Test website name - test tag line</title>' in feed
     
     # Author should be site author
     assert '<author><name>Test Author</name></author>' in feed

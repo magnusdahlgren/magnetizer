@@ -158,12 +158,6 @@ class Article:
     
     def twitter_card(self):
 
-        # <meta name="twitter:card" content="summary" />
-        # <meta name="twitter:site" content="@flickr" />
-        # <meta name="twitter:title" content="Small Island Developing States Photo Submission" />
-        # <meta name="twitter:description" content="View the album on Flickr." />
-        # <meta name="twitter:image" content="https://farm6.staticflickr.com/5510/14338202952_93595258ff_z.jpg" />
-
         card = '<meta name="twitter:card" content="summary" />'
         card += '<meta name="twitter:site" content="%s" />' % self.website.config.value('website_twitter')
         card += '<meta name="twitter:title" content="%s" />' % self.title
