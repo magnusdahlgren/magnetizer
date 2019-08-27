@@ -1,3 +1,4 @@
+import html
 from template import *
 from markdown import markdown
 from re import sub
@@ -99,6 +100,7 @@ class Article:
 
         m = '<title>%s</title>' % self.title
         m += self.twitter_card()
+        m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />' % self.website.config.value('website_base_url')
         return m
 
 
@@ -107,11 +109,11 @@ class Article:
         full_url = '%s/%s' % (self.website.config.value('website_base_url'),self.filename)
 
         f = '<entry>'
-        f += '<title>%s</title>' % self.title
+        f += '<title>%s</title>' % html.escape(self.title, False)
         f += '<link href="%s"/>' % full_url
         f += '<id>%s</id>' % full_url
         f += '<updated>%sT00:00:01Z</updated>' % self.date
-        f += '<summary>%s</summary>' % self.abstract()
+        f += '<summary>%s</summary>' % html.escape(self.abstract(), False)
         f += '</entry>'
 
         return f

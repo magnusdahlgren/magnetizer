@@ -35,6 +35,9 @@ def test_webpage_from_single_article():
     # Twitter card should be present
     assert '<meta name="twitter:card" content="summary" />' in webpage.html
 
+    # Link to Atom feed should be present
+    assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
+
 
 def test_index_page():
 
@@ -48,7 +51,7 @@ def test_index_page():
     assert webpage.html.count('<article>') == 3
 
     # Index title = "Website Name - Tag Line"
-    assert webpage.title == "Test website name - test tag line"
+    assert webpage.title == "Test website name - test tag & line"
 
     # Don't show article footers on index 
     assert webpage.html.count('<footer>footer</footer>') == 0
@@ -58,7 +61,10 @@ def test_index_page():
 
     # Twitter card should *not* be present (todo: yet!)
     assert '<meta name="twitter:card" content="summary" />' not in webpage.html
-   
+
+    # Link to Atom feed should be present
+    assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
+
 
 def test_write_index_page():
 

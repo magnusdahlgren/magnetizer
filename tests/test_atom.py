@@ -33,7 +33,7 @@ test_website = Website('../tests/config/test_magnetizer.cfg')
 test_website.refresh()
 
 atom = Atom(test_website)
-feed = atom.feed(['001-basic-article-with-h2.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'])
+feed = atom.feed(['003-another-article.md', '002-article-with-h1-break-and-date.md', '001-basic-article-with-h2.md', 'dont-index-this-article.md', '100-ignore-this.txt'])
 
 def test_feed():
 
@@ -43,8 +43,8 @@ def test_feed():
     # XML namespace should be Atom
     assert '<feed xmlns="http://www.w3.org/2005/Atom">' in feed
 
-    # Title should be website name - tagline
-    assert '<title>Test website name - test tag line</title>' in feed
+    # Title should be website name - tagline (amps must be escaped)
+    assert '<title>Test website name - test tag &amp; line</title>' in feed
     
     # Author should be site author
     assert '<author><name>Test Author</name></author>' in feed
@@ -53,7 +53,11 @@ def test_feed():
     assert '<generator uri="https://github.com/magnusdahlgren/magnetizer">Magnetizer</generator>' in feed
 
     # Id should be site URL
-    assert '<id>https://example.com</id>' in feed
+    assert '<id>https://example.com/</id>' in feed
+
+    # Updated should be when the latest post was updated
+    assert '<updated>1998-08-02T00:00:02Z</updated>' in feed
+    # todo
 
     # Feed should have 3 entries
     assert feed.count('<entry>') == 3
@@ -83,7 +87,8 @@ def test_feed_entry():
     # Updated should be date of the article
     assert '<updated>1998-08-01T00:00:01Z</updated>' in entry
 
-    # Summary should be article abstract
+    # Summary should be article abstract (amps must be escaped)
+    # todo
     assert "<summary>This text should always be here Don't show this bit on the index page</summary>" in entry
 
 

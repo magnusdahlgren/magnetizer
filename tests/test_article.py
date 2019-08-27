@@ -31,10 +31,11 @@ def test_article_basic():
     assert '<title>This is the heading - Test website name</title>' in article.meta()
 
     # short html (for index) should NOT include a footer
-    assert article.html == expected
+    assert '<h3>This is the heading</h3>\n<p>And here is some text...</p>' in article.html
+    assert '<footer>footer</footer>' not in article.html
 
     # full html (for article page) should have a footer
-    assert article.html_full.count('<footer>footer</footer>') == 1
+    assert '<footer>footer</footer>' in article.html_full
 
     # article should NOT have a CC license
     cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />'

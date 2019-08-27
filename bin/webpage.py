@@ -47,9 +47,16 @@ class Webpage:
 
         self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
-        self.html = self.html.replace(self.website.tag['meta'], '<title>%s</title>' % self.title, 1)
+        self.html = self.html.replace(self.website.tag['meta'], self.meta(), 1)
         self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
         self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-index', 1)
+
+
+    def meta(self):
+
+        m = '<title>%s</title>' % self.title
+        m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />' % self.website.config.value('website_base_url')
+        return m
 
 
     def write(self):
