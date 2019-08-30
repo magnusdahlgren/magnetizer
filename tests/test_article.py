@@ -8,21 +8,34 @@ import shutil
 test_website = Website('../tests/config/test_magnetizer.cfg')
 test_website.refresh()
 
-def test_article_basic():
 
-    # post starts with a h2 tag (downgraded to h3), so there shouldn't be a link
-    expected = '<article><h3>This is the heading</h3>\n'
-    expected += '<p>And here is some text...</p></article>'
-
-    expected_full = '<article><h2>This is the heading</h2>\n'
-    expected_full += '<p>And here is some text...</p></article>'
-    expected_full += '<footer>footer</footer>'
+def test_article_is_valid():
 
     article = Article(test_website)
-    article.from_md_filename('001-basic-article-with-h2.md')
+
+    article.md = 'Just some text'
+    assert not article.is_valid()
+
+    article.md = '# Starting with heading\nBut no date'
+    assert not article.is_valid()
+
+    article.md = 'Date but not starting with heading\n# Heading\n<!-- 1/1/1980 -->'
+    assert not article.is_valid()
+
+    article.md = '# Both heading and date\n<!-- 1/1/1980 -->'
+    assert article.is_valid()
+
+    # Article without heading or date should be rejected
+    assert not article.from_md_filename('004-invalid-article.md')
+
+
+def test_article_basic():
+
+    article = Article(test_website)
+    article.from_md_filename('001-basic-article.md')
 
     # filename should be without number and .html instead of .md
-    assert article.filename == 'basic-article-with-h2.html'
+    assert article.filename == 'basic-article.html'
 
     # title should be first row of file
     assert article.title == 'This is the heading - Test website name'
@@ -31,7 +44,6 @@ def test_article_basic():
     assert '<title>This is the heading - Test website name</title>' in article.meta()
 
     # short html (for index) should NOT include a footer
-    assert '<h3>This is the heading</h3>\n<p>And here is some text...</p>' in article.html
     assert '<footer>footer</footer>' not in article.html
 
     # full html (for article page) should have a footer

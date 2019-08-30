@@ -11,7 +11,7 @@ test_website.refresh()
 def test_webpage_from_single_article():
 
     webpage = Webpage(test_website)
-    webpage.article_from_md_filename('001-basic-article-with-h2.md')
+    webpage.article_from_md_filename('001-basic-article.md')
 
     # Page title should be "Article title - Website name"
     title = 'This is the heading - Test website name'
@@ -26,7 +26,7 @@ def test_webpage_from_single_article():
 
     # Filename for webpage should be based on the article
     article = Article(test_website)
-    article.from_md_filename('001-basic-article-with-h2.md')
+    article.from_md_filename('001-basic-article.md')
     assert webpage.filename == article.filename
 
     # Body should have class='magnetizer-article'
@@ -42,7 +42,7 @@ def test_webpage_from_single_article():
 def test_index_page():
 
     webpage = Webpage(test_website)
-    webpage.index_from_md_filenames(['001-basic-article-with-h2.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'] )
+    webpage.index_from_md_filenames(['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'] )
 
     # Index header should be present
     assert webpage.html.count('<div>header</div>') == 1
@@ -95,13 +95,13 @@ def test_webpage_write_multiple_from_filenames():
 
     test_website.wipe()
 
-    filenames = ['001-basic-article-with-h2.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-index-this-article.md']
+    filenames = ['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-index-this-article.md']
     Webpage.write_article_pages_from_md_filenames(test_website, filenames)
 
     written_filenames = listdir(test_website.config.value('output_path'))
 
     # All the normal articles should have been written
-    assert 'basic-article-with-h2.html' in written_filenames
+    assert 'basic-article.html' in written_filenames
     assert 'article-with-h1-break-and-date.html' in written_filenames
     assert 'another-article.html' in written_filenames
 

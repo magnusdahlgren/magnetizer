@@ -1,4 +1,4 @@
-## This is the heading
+# This is the heading
 
 And here is some text...
 

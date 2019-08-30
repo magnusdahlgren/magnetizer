@@ -65,8 +65,6 @@ class Webpage:
             with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
                 myfile.write(self.html)
                 print('  W  %s' % self.filename)
-        else:
-            print('  !  WARNING: Did not write file.')
 
 
     @staticmethod

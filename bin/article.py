@@ -29,52 +29,58 @@ class Article:
 
             with open(self.website.config.value('source_path') + filename, 'r') as myfile:
                 self.md = myfile.read()
+
+            if self.is_valid():
     
-            filename = filename.split('.', 1)[0] + '.html'
+                filename = filename.split('.', 1)[0] + '.html'
 
-            # Remove first part of filename if it is a number
-            if filename.split('-', 1)[0].isdigit():
-                filename  = filename.split('-', 1)[1]
+                # Remove first part of filename if it is a number
+                if filename.split('-', 1)[0].isdigit():
+                    filename  = filename.split('-', 1)[1]
 
-            self.filename  = filename
-            self.title     = '%s - %s' % (self.title_from_markdown_source(self.md), self.website.config.value('website_name'))
-            self.date      = self.date_from_markdown_source()
-            self.date_html = self.date_html_from_date()
+                self.filename  = filename
+                self.title     = '%s - %s' % (self.title_from_markdown_source(self.md), self.website.config.value('website_name'))
+                self.date      = self.date_from_markdown_source()
+                self.date_html = self.date_html_from_date()
 
-            self.html_full = self.template.render(self.website, markdown(self.md))
-            self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer_html, 1)
-            self.html_full = self.html_full.replace(self.website.tag['break'], '')
+                self.html_full = self.template.render(self.website, markdown(self.md))
+                self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer_html, 1)
+                self.html_full = self.html_full.replace(self.website.tag['break'], '')
 
-            if self.html_full.count(self.website.tag['creative_commons']) > 0:
-                self.html_full = self.html_full.replace(self.website.tag['cc_here'], self.cc_license(), 1)
-                self.html_full = self.html_full.replace(self.website.tag['creative_commons'], '')
+                if self.html_full.count(self.website.tag['creative_commons']) > 0:
+                    self.html_full = self.html_full.replace(self.website.tag['cc_here'], self.cc_license(), 1)
+                    self.html_full = self.html_full.replace(self.website.tag['creative_commons'], '')
 
-            s = self.md.split(self.website.tag['break'], maxsplit=1)[0]
+                s = self.md.split(self.website.tag['break'], maxsplit=1)[0]
 
-            # Show 'read more' if post has been abbreviated  
-            if s != self.md:
-                readmore = "<a href='%s' class='magnetizer-more'>Read more</a>" % (self.filename)
+                # Show 'read more' if post has been abbreviated  
+                if s != self.md:
+                    readmore = "<a href='%s' class='magnetizer-more'>Read more</a>" % (self.filename)
+                else:
+                    readmore = ""
+
+                self.html = markdown(s) + readmore
+                self.html = MUtil.link_first_tag(self.html, self.filename)
+                self.html = MUtil.downgrade_headings(self.html)
+                self.html = self.template.render(self.website, self.html)
+                self.html = self.html.replace(self.website.tag['article_footer'], '', 1)
+
+                if self.date_html is not None:
+
+                    self.html_full = self.html_full.replace(self.website.tag['date'], self.date_html, 1)
+
+                    # date in short html should be a link
+                    self.html = self.html.replace(self.website.tag['date'], MUtil.wrap_it_in_a_link(self.date_html, self.filename), 1)
+
+                # Remove all remaining comment tags from html
+                self.html = sub(r'<!--(.*?)-->', '', self.html)
+                self.html_full = sub(r'<!--(.*?)-->', '', self.html_full)
+
+                return True
+
             else:
-                readmore = ""
-
-            self.html = markdown(s) + readmore
-            self.html = MUtil.link_first_tag(self.html, self.filename)
-            self.html = MUtil.downgrade_headings(self.html)
-            self.html = self.template.render(self.website, self.html)
-            self.html = self.html.replace(self.website.tag['article_footer'], '', 1)
-
-            if self.date_html is not None:
-
-                self.html_full = self.html_full.replace(self.website.tag['date'], self.date_html, 1)
-
-                # date in short html should be a link
-                self.html = self.html.replace(self.website.tag['date'], MUtil.wrap_it_in_a_link(self.date_html, self.filename), 1)
-
-            # Remove all remaining comment tags from html
-            self.html = sub(r'<!--(.*?)-->', '', self.html)
-            self.html_full = sub(r'<!--(.*?)-->', '', self.html_full)
-
-            return True
+                print("  !  ERROR: '%s' doesn't start with h1 and/or misses date)" % filename)
+                return False
 
         else:
             print("  !  WARNING: Ignored '%s' (not a .md file)" % filename)
@@ -181,3 +187,11 @@ class Article:
     def abstract(self):
 
         return MUtil.abstract_from_html(markdown(self.md))
+
+
+    def is_valid(self):
+
+        if self.md.startswith('# ') and search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.md):
+            return True
+        else:
+            return False
