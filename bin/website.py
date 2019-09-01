@@ -28,7 +28,10 @@ class Website:
 
     def copy_resources(self):
 
-        print("Copying resources --> %s" % self.config.value('output_path'))
+        print("Copying resources --> %s " % self.config.value('output_path'))
+        copied = 0
+        ignored = 0
+
         for filename in listdir(self.config.value('resources_path')):
 
             if path.isfile(self.config.value('resources_path') + filename):
@@ -37,14 +40,21 @@ class Website:
 
                 if '.' + extension in self.config.value('approved_filetypes'):
                     shutil.copyfile(self.config.value('resources_path') + filename , self.config.value('output_path') + filename)
-                    print ('  C  %s' % filename)
+                    copied += 1
                 else:
-                    print ('  -  %s (filetype %s not allowed)' % (filename, extension))
+                    ignored += 1
+                    # sys.stdout.write('-')
+                    # print ('  -  %s (filetype %s not allowed)' % (filename, extension), end = '')
+
+        print (' --> Copied %s files, ignored %s' % (copied, ignored) )
 
 
     def wipe(self):
 
-        print('Deleting previous files from ' + self.config.value('output_path'))
+        print('Deleting previous files from %s ' % self.config.value('output_path'))
+        deleted = 0
+        ignored = 0
+
         for filename in listdir(self.config.value('output_path')):
             
             if path.isfile(self.config.value('output_path') + filename):
@@ -52,9 +62,11 @@ class Website:
 
                 if extension == '.html' or extension in self.config.value('approved_filetypes'):
                     remove(self.config.value('output_path') + filename)
-                    print ('  X  %s' % filename)
+                    deleted += 1
                 else:
-                    print ('  -  %s (filetype %s)' % (filename, extension))
+                    ignored += 1
+
+        print (' --> Deleted %s files, ignored %s' % (deleted, ignored) )
 
                 
     @staticmethod

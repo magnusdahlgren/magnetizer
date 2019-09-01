@@ -79,11 +79,10 @@ class Article:
                 return True
 
             else:
-                print("  !  ERROR: '%s' doesn't start with h1 and/or misses date)" % filename)
+                print (" (!) '%s' doesn't start with h1 and/or misses date)" % filename)
                 return False
 
         else:
-            print("  !  WARNING: Ignored '%s' (not a .md file)" % filename)
             return False
 
  

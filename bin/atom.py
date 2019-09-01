@@ -47,4 +47,4 @@ class Atom:
 
         with open(self.website.config.value('output_path') + 'atom.xml', 'w') as myfile:
             myfile.write(self.feed_data)
-            print('  W  %s' % 'atom.xml')
+            print(' --> atom.xml')
