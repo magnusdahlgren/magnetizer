@@ -1,6 +1,7 @@
 from os import listdir, path, remove, mkdir, rename
 from config import *
 import shutil
+from mutil import *
 
 class Website:
 
@@ -43,10 +44,8 @@ class Website:
                     copied += 1
                 else:
                     ignored += 1
-                    # sys.stdout.write('-')
-                    # print ('  -  %s (filetype %s not allowed)' % (filename, extension), end = '')
 
-        print (' --> Copied %s files, ignored %s' % (copied, ignored) )
+        print (colours.OK + ' --> ' + colours.END + 'Copied %s files, ignored %s' % (copied, ignored) )
 
 
     def wipe(self):
@@ -66,7 +65,7 @@ class Website:
                 else:
                     ignored += 1
 
-        print (' --> Deleted %s files, ignored %s' % (deleted, ignored) )
+        print (colours.OK + ' --> ' + colours.END + 'Deleted %s files, ignored %s' % (deleted, ignored) )
 
                 
     @staticmethod

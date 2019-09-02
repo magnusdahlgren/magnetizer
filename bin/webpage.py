@@ -82,7 +82,7 @@ class Webpage:
             else:
                 ignored +=1
 
-        print (' --> Generated %s articles, ignored %s files' % (generated, ignored))
+        print (colours.OK + ' --> ' + colours.END + 'Generated %s articles, ignored %s files' % (generated, ignored))
 
 
     @staticmethod
@@ -103,7 +103,7 @@ class Webpage:
         webpage.write()
 
         print('Generating index pages --> %s' % website.config.value('output_path'))
-        print(' --> %s' % webpage.filename)
+        print(colours.OK + ' --> ' + colours.END + '%s' % webpage.filename)
 
 
     @staticmethod

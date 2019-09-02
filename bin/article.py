@@ -79,7 +79,7 @@ class Article:
                 return True
 
             else:
-                print (" (!) '%s' doesn't start with h1 and/or misses date)" % filename)
+                print (colours.ERROR + ' (!) ' + colours.END + "'%s' doesn't start with h1 and/or misses date)" % filename)
                 return False
 
         else:
