@@ -23,7 +23,11 @@ def test_sitemap():
         sitemap_txt = myfile.read()
 
     # Sitemap should contain all the files we just created
-    for filename in filenames:     
+    for filename in filenames:
+
+        if filename == 'index.html':
+            filename = '\n'
+
         assert 'https://example.com/' + filename in sitemap_txt
 
     # Sitemap should only contain the files we just created

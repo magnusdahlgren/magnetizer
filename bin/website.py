@@ -79,6 +79,10 @@ class Website:
                 extension = '.' + filename.split('.')[-1]
 
                 if extension == '.html':
+
+                    if filename == 'index.html':
+                        filename = ''
+                        
                     sitemap.append(self.config.value('website_base_url') + '/' + filename)
 
         with open(self.config.value('output_path') + 'sitemap.txt', 'w') as myfile:
