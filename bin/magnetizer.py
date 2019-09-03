@@ -18,6 +18,7 @@ def main():
     Webpage.write_index_page_from_directory(website, website.config.value('source_path'))
 
     website.copy_resources()
+    website.generate_sitemap()
 
     atom = Atom(website)
     atom.write()

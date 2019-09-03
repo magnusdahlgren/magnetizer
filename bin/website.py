@@ -67,7 +67,26 @@ class Website:
 
         print (colours.OK + ' --> ' + colours.END + 'Deleted %s files, ignored %s' % (deleted, ignored) )
 
-                
+
+    def generate_sitemap(self):
+
+        print('Generating sitemap in %s' % self.config.value('output_path'))
+        sitemap = []
+
+        for filename in listdir(self.config.value('output_path')):
+            
+            if path.isfile(self.config.value('output_path') + filename):
+                extension = '.' + filename.split('.')[-1]
+
+                if extension == '.html':
+                    sitemap.append(self.config.value('website_base_url') + '/' + filename)
+
+        with open(self.config.value('output_path') + 'sitemap.txt', 'w') as myfile:
+            myfile.write('\n'.join(sitemap))
+
+        print (colours.OK + ' --> ' + colours.END + 'sitemap.txt (%s links)' %  len(sitemap))
+
+
     @staticmethod
     def read_file(directory, filename):
 
