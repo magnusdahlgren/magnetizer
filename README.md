@@ -1,7 +1,7 @@
 # Magnetizer
 Magnetizer is a simple tool to render static blog pages using html templates and Markdown. It was created by me, [Magnus Dahlgren](https://magnusd.cc) to cater for my personal web needs but I've released it as open source for Github-technical reasons.
 
-⚠️ **Note:** Magnetizer does exactly what I need it to do. It may not do what you need it to do.
+⚠️ **Note:** Magnetizer does exactly what I need it to do. It may not do what you need it to do. 💁‍
 
 ## How it works
 
@@ -63,6 +63,8 @@ The following configuration parameters are available:
 | ----------|----------------------------------------------------------------------------------------|
 | `website_name`    | The name of the website. Used for meta titles.                                 |
 | `website_tagline` | A tagline, included in the page title on the homepage                          |
+| `website_base_url` | The address where the site is published, e.g. `https://example.com`. No trailing `/`. |
+| `website_author`  | The name of the author of the website (used in feeds). e.g. `Magnus Dahlgren`  |
 | `source_path`     | The directory containing the source files. Please update to an absolute path.  |
 | `resources_path`  | Where to look for images etc. These files will be included as-is when generating the site. Please update to an absolute path. |
 | `output_path`    | Where the resulting files will be written. Please update to an absolute path.   |
@@ -72,7 +74,7 @@ The following configuration parameters are available:
 | `article_footer_template_filename` | Template used for each article. This parameter usually doesn't need changing |
 | `index_header_template_filename`   | Template for the header on the index page. This parameter usually doesn't need changing |
 
-⚠️ **Note:** All these configuration parameters are mandatory. Do not remove any of them from the configuration file.
+⚠️ **Note:** All these configuration parameters are mandatory. Do not remove any of them from the configuration file. 👮‍♂️
 
 ### Write some content
 
@@ -84,11 +86,16 @@ Create a new article in the `content` folder using [Markdown](https://github.com
 I'm writing it in Markdown.
 ```
 
+⚠️ **Note:** Every article must start with a h1 heading (`# some text`). Articles not starting with a heading will be ignored.
+
 ### File naming convention
 
-Source `.md` files must be named on the format `nnn-filename.md` where `nnn` is a unique, 3-digit incremental number, for example `001-my-first-article.md`. The number and the dash will be removed from the output filename (so our example becomes `my-first-article.html`).
+| Type of article | Filename | Example | 
+| ----- | ----- | ----- |
+| Normal article <br> (will show on listings page) | `nnn-filename.md` <br> whenre `nnn-` is a 3-digit incremental number | `001-my-first-article.md` <br> (rendered as `my-first-article.html`) |
+| Special article <br> (will not show on listings page) | `filename.md` | `about.md` <br> (rendered as `about.html`) |
 
-**⚠️ NOTE:** Files in the `source` directory that don't follow this naming convention will be ignored.
+**⚠️ NOTE:** Make sure to name your files in a way that ensures the rendered filenames will be unique. `001-article.md` and `002-article.md` will both be rendered as `article.html`, meaning one will overwrite the other. 🤦
 
 On listings pages, article are sorted in reverse order, based on the source file name.
 
@@ -148,10 +155,12 @@ Magnetizer templates use html comment tags to indicate where dynamic content wil
 | Tag | Usage | 
 | --- | ----- |
 | `<!-- MAGNETIZER_CONTENT -->`| This is where the rendered content will show, either on the index page or for individual article pages    | 
-| `<!-- MAGNETIZER_TITLE -->`  | The page meta title will show here, e.g. `<title><!-- MAGNETIZER_TITLE --></title>` |
-| `MAGNETIZER_INDEX_HEADER`    | On the index page, this is where `_index_header.html` will show |
+| `<!-- MAGNETIZER_META -->`   | The page meta data, e.g. title, will show here. This tag must be included somewhere between `<head>` and `</head>`. |
+| `<!-- MAGNETIZER_PAGE_CLASS -->` | Will be `magnetizer-index` on listing page and `magnetizer-article` on article page. Example use: `<body class='<!-- MAGNETIZER_PAGE_CLASS -->'>` |
+| `<!-- MAGNETIZER_INDEX_HEADER -->` | On the index page, this is where `_index_header.html` will show |
 | `<!-- MAGNETIZER_ARTICLE_FOOTER -->` | On article pages, this is where `_article_footer.html` will show  |
 | `<!-- MAGNETIZER_DATE -->`    | The date an article was published. See [Article dates](#article-dates) |
+| `<!-- MAGNETIZER_CC -->` | Where to show the Creative Commons license, if there is one | 
 
 Typically, `_page.html` will be a mix of html and calls to other templates, e.g.
 
@@ -177,6 +186,19 @@ Typically, `_page.html` will be a mix of html and calls to other templates, e.g.
 </html>
 ```
 
+### CSS
+
+Most css structure is entirely up to you and depends on how you structure your templates. However, the following special css classes exist to allow styling of machine genarated html.
+
+| Class | Use  | 
+| ----- | -----|
+| body.magnetizer-index   | Set on listings pages             |
+| body.magnetizer-article | Set on article pages              |
+| p.magntetizer-license   | Creative Commons license          |
+| a.magnetizer-more       | 'Read more' link on listings page |
+
+**⚠️ NOTE:** On listings pages, headings are _downgraded_ one step, so that `<h1>` becomes `<h2>`, etc. You may want to style `.magnetizer-index h2` as `.magnetizer-index h1`, and so on.
+
 ## Special features
 
 ### Displaying article extracts on the index page
@@ -195,9 +217,9 @@ Page titles are generated automatically for each page and are available in the `
 
 ### Article dates
 
-A article's publication date can be included in the `.md` file as a html comment tag with UK date format (d/m/YYYY). The date can then be displayed by including `<!-- MAGNETIZER_DATE -->` in the article template.
+An article's publication date must be included in the `.md` file as a html comment tag with UK date format (d/m/YYYY). The date can then be displayed by including `<!-- MAGNETIZER_DATE -->` in the article template.
 
-Dates are not mandatory. If a date is not provided for a article, `<!-- MAGNETIZER_DATE -->` will simply be empty.
+**⚠️ NOTE:** Dates are mandatory. Articles without dates will be ignored.
 
 Example:
 
@@ -207,6 +229,10 @@ Example:
 (Will be displayed as 6 February 2019)
 
 **⚠️ NOTE:** Article dates do not affect the sorting of articles.
+
+### Creative commons
+
+Include `<!-- CREATIVE COMMONS -->` anywhere in an article `.md` file to show a Creative Commons license.
 
 ### Article order
 
@@ -225,4 +251,5 @@ Article are sorted in reverse order, based on their source file names, e.g.
 ## History
 
 **4 August 2019** - Started development of Magnetizer.
+
 **10 August 2019** - First release, including all the features I believe I need for my blog.
