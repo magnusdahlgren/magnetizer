@@ -7,3 +7,5 @@ I created Magnetizer to cater for my own website needs. It does what I need it t
 ![alt text](image.jpg)
 
 Photo by [Squared.one](https://unsplash.com/@squared_one) on [Unsplash](https://unsplash.com)
+
+<!-- 9/8/2019 -->
