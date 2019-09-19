@@ -197,7 +197,7 @@ Most css structure is entirely up to you and depends on how you structure your t
 | p.magntetizer-license   | Creative Commons license          |
 | a.magnetizer-more       | 'Read more' link on listings page |
 
-**⚠️ NOTE:** On listings pages, headings are _downgraded_ one step, so that `<h1>` becomes `<h2>`, etc. You may want to style `.magnetizer-index h2` as `.magnetizer-index h1`, and so on.
+**⚠️ NOTE:** On listings pages, headings are _downgraded_ one step, so that `<h1>` becomes `<h2>`, etc. You may want to style `.magnetizer-index h2` as `.magnetizer-article h1`, and so on.
 
 ## Special features
 
