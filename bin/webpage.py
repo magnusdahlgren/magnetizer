@@ -62,6 +62,9 @@ class Webpage:
     def write(self):
 
         if self.filename is not None:
+            if path.isfile(path.join(self.website.config.value('output_path'), self.filename)):
+                print (colours.ERROR + ' (!) ' + colours.END + "'%s' already exists and will be overwritten" % self.filename)
+
             with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
                 myfile.write(self.html)
 
