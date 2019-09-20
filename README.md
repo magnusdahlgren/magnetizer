@@ -65,6 +65,7 @@ The following configuration parameters are available:
 | `website_tagline` | A tagline, included in the page title on the homepage                          |
 | `website_base_url` | The address where the site is published, e.g. `https://example.com`. No trailing `/`. |
 | `website_author`  | The name of the author of the website (used in feeds). e.g. `Magnus Dahlgren`  |
+| `website_twitter` | The Twitter handle of the author (used in Twitter cards). e.g. `@magnusdahlgren` |
 | `source_path`     | The directory containing the source files. Please update to an absolute path.  |
 | `resources_path`  | Where to look for images etc. These files will be included as-is when generating the site. Please update to an absolute path. |
 | `output_path`    | Where the resulting files will be written. Please update to an absolute path.   |
