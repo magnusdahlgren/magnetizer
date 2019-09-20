@@ -165,22 +165,29 @@ class Article:
     
     def twitter_card(self):
 
-        card = '<meta name="twitter:card" content="summary" />'
-        card += '<meta name="twitter:site" content="%s" />' % self.website.config.value('website_twitter')
-        card += '<meta name="twitter:title" content="%s" />' % self.title
+        try:
+            twitter_handle = self.website.config.value('website_twitter')
 
-        img_url = MUtil.first_image_url_from_html(markdown(self.md))
+            card = '<meta name="twitter:card" content="summary" />'
+            card += '<meta name="twitter:site" content="%s" />' % twitter_handle
+            card += '<meta name="twitter:title" content="%s" />' % self.title
 
-        card += '<meta name="twitter:description" content="%s" />' % self.abstract()
+            img_url = MUtil.first_image_url_from_html(markdown(self.md))
 
-        if img_url:
+            card += '<meta name="twitter:description" content="%s" />' % self.abstract()
 
-            if not img_url.startswith('http'):
-                img_url = self.website.config.value('website_base_url') + '/' + img_url
+            if img_url:
 
-            card += '<meta name="twitter:image" content="%s" />' % img_url
+                if not img_url.startswith('http'):
+                    img_url = self.website.config.value('website_base_url') + '/' + img_url
 
-        return card
+                card += '<meta name="twitter:image" content="%s" />' % img_url
+
+            return card
+
+        except:
+            print(colours.ERROR + ' (!) ' + colours.END + "'website_twitter' not defined in config. Twitter cards will be disabled.")
+            return ''
 
 
     def abstract(self):
