@@ -49,6 +49,9 @@ def test_article_basic():
     # full html (for article page) should have a footer
     assert '<footer>footer</footer>' in article.html_full
 
+    # full html should have a link back to the homepage
+    assert '<a href="/" class="magnetizer-nav-back">Back to homepage</a>' in article.html_full
+
     # article should NOT have a CC license
     cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />'
     assert article.html.count(cc_license) == 0
@@ -103,6 +106,21 @@ def test_article_with_h1_and_break_and_date_and_cc():
     cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
     assert article.html.count(cc_license) == 0
     assert article.html_full.count(cc_license) == 1
+
+
+def test_special_article():
+
+    article = Article(test_website)
+    article.from_md_filename('dont-index-this-article.md')
+
+    # Special article should not have a date
+    assert '<time datetime' not in article.html_full
+
+    # Special article should not have a footer
+    assert '<footer>footer</footer>' not in article.html_full
+
+    # Special article should still have a link back to the homepage
+    assert '<a href="/" class="magnetizer-nav-back">Back to homepage</a>' in article.html_full
 
 
 def test_article_cc():

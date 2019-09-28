@@ -31,20 +31,31 @@ class Article:
                 self.md = myfile.read()
 
             if self.is_valid():
-    
+
                 filename = filename.split('.', 1)[0] + '.html'
+                back_link = '<a href="/" class="magnetizer-nav-back">Back to homepage</a>'
 
                 # Remove first part of filename if it is a number
                 if filename.split('-', 1)[0].isdigit():
                     filename  = filename.split('-', 1)[1]
+                    is_special_article = False
+                else:
+                    is_special_article = True
 
                 self.filename  = filename
                 self.title     = '%s - %s' % (self.title_from_markdown_source(self.md), self.website.config.value('website_name'))
-                self.date      = self.date_from_markdown_source()
-                self.date_html = self.date_html_from_date()
-
                 self.html_full = self.template.render(self.website, markdown(self.md))
-                self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer_html, 1)
+
+                if is_special_article:
+                    self.date = None
+                    self.date_html = None
+                    self.html_full = self.html_full.replace(self.website.tag['article_footer'], '', 1)
+                else:
+                    self.date      = self.date_from_markdown_source()
+                    self.date_html = self.date_html_from_date()
+                    self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer_html, 1)
+
+                self.html_full = self.html_full.replace(self.website.tag['article_back_link'], back_link)
                 self.html_full = self.html_full.replace(self.website.tag['break'], '')
 
                 if self.html_full.count(self.website.tag['creative_commons']) > 0:

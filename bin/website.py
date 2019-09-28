@@ -11,15 +11,16 @@ class Website:
         self.refresh()
                 
     tag = {
-        'content'          : '<!-- MAGNETIZER_CONTENT -->',
-        'meta'             : '<!-- MAGNETIZER_META -->',
-        'index_header'     : '<!-- MAGNETIZER_INDEX_HEADER -->',
-        'article_footer'   : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
-        'date'             : '<!-- MAGNETIZER_DATE -->',
-        'page_class'       : '<!-- MAGNETIZER_PAGE_CLASS -->',
-        'cc_here'          : '<!-- MAGNETIZER_CC -->',
-        'break'            : '<!-- BREAK -->',
-        'creative_commons' : '<!-- CC -->'
+        'content'           : '<!-- MAGNETIZER_CONTENT -->',
+        'meta'              : '<!-- MAGNETIZER_META -->',
+        'index_header'      : '<!-- MAGNETIZER_INDEX_HEADER -->',
+        'article_footer'    : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
+        'article_back_link' : '<!-- MAGNETIZER_ARTICLE_BACK_LINK -->',
+        'date'              : '<!-- MAGNETIZER_DATE -->',
+        'page_class'        : '<!-- MAGNETIZER_PAGE_CLASS -->',
+        'cc_here'           : '<!-- MAGNETIZER_CC -->',
+        'break'             : '<!-- BREAK -->',
+        'creative_commons'  : '<!-- CC -->'
     }
 
     def refresh(self):
