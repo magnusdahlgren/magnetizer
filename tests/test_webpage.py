@@ -33,7 +33,7 @@ def test_webpage_from_single_article():
     assert webpage.html.count("<body class='magnetizer-article'>") == 1
 
     # Twitter card should be present
-    assert '<meta name="twitter:card" content="summary" />' in webpage.html
+    assert '<meta name="twitter:card" content="summary_large_image" />' in webpage.html
 
     # Link to Atom feed should be present
     assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html

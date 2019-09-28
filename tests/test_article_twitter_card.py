@@ -16,8 +16,8 @@ def test_twitter_card_meta_data():
 
     card = test_article.twitter_card()
 
-    # Twitter card should be of type "Summary"
-    assert '<meta name="twitter:card" content="summary" />' in card
+    # Twitter card should be of type "summary_large_image"
+    assert '<meta name="twitter:card" content="summary_large_image" />' in card
 
     # Site should be @magnusdahlgren_test_1234
     assert '<meta name="twitter:site" content="@magnusdahlgren_test_1234" />' in card

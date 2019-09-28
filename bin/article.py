@@ -179,7 +179,7 @@ class Article:
         try:
             twitter_handle = self.website.config.value('website_twitter')
 
-            card = '<meta name="twitter:card" content="summary" />'
+            card = '<meta name="twitter:card" content="summary_large_image" />'
             card += '<meta name="twitter:site" content="%s" />' % twitter_handle
             card += '<meta name="twitter:title" content="%s" />' % self.title
 
