@@ -116,3 +116,15 @@ def test_strip_leading_h1_from_html():
     html2 = "<p>Some text</p><h1>Heading first</h1><p>The rest of the post</p>"
     assert MUtil.strip_leading_h1_from_html(html2) == html2
     
+
+def test_filter_out_non_article_filenames():
+
+    filenames = ['001-article-1.md', '002-article-2.md', 'non-article.md', '003-image.gif', '123-article-3.md']
+
+    filtered_filenames = MUtil.filter_out_non_article_filenames(filenames)
+
+    assert len(filtered_filenames) == 3
+    assert '001-article-1.md' in filtered_filenames
+    assert '002-article-2.md' in filtered_filenames
+    assert '123-article-3.md' in filtered_filenames
+

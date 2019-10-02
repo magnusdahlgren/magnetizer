@@ -83,6 +83,18 @@ class MUtil:
 
             return html
 
+
+    @staticmethod
+    def filter_out_non_article_filenames(filenames):
+
+        result = []
+
+        for filename in filenames:
+            if re.search(r'^\d+-\S+\.md$', filename):
+                result.append(filename)
+
+        return result
+
 class colours:
     OK      = '\033[92m'
     WARNING = '\033[93m'

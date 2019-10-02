@@ -39,10 +39,10 @@ def test_webpage_from_single_article():
     assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
 
 
-def test_index_page():
+def test_home_page():
 
     webpage = Webpage(test_website)
-    webpage.index_from_md_filenames(['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'] )
+    webpage.homepage_from_md_filenames(['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'] )
 
     # Index header should be present
     assert webpage.html.count('<div>header</div>') == 1
@@ -56,8 +56,8 @@ def test_index_page():
     # Don't show article footers on index 
     assert webpage.html.count('<footer>footer</footer>') == 0
 
-    # Body should have class='magnetizer-index'
-    assert webpage.html.count("<body class='magnetizer-index'>") == 1
+    # Body should have class='magnetizer-homepage'
+    assert webpage.html.count("<body class='magnetizer-homepage'>") == 1
 
     # Twitter card should *not* be present (todo: yet!)
     assert '<meta name="twitter:card" content="summary" />' not in webpage.html
@@ -66,9 +66,9 @@ def test_index_page():
     assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
 
 
-def test_write_index_page():
+def test_write_homepage():
 
-    Webpage.write_index_page_from_directory(test_website, test_website.config.value('source_path'))
+    Webpage.write_homepage_from_directory(test_website, test_website.config.value('source_path'))
 
     with open(test_website.config.value('output_path') + 'index.html', 'r') as myfile:
         assert myfile.read().count('<html>') == 1

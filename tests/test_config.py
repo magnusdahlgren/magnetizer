@@ -10,6 +10,7 @@ def test_basic_config():
     assert config.value('variable_number_two') == '2'
     assert config.value('variable_number_three') == 'number = 3'
 
+
 def test_array_in_config():
 
     expected = ['value 1','value 2', 'Value 3']
@@ -26,3 +27,9 @@ def test_exception_when_key_undefined():
     assert False
 
     # todo: check for key error
+
+
+def test_set_config():
+
+    config.set('my_key', 'my_value')
+    assert config.value('my_key') == 'my_value'

@@ -27,4 +27,5 @@ class Config:
         return self.config[key]
         
 
-
+    def set(self, key, value):
+        self.config[key] = value

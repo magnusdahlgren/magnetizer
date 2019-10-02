@@ -3,6 +3,7 @@ from template import *
 from article import *
 from markdown import markdown
 from os import listdir
+from math import ceil
 
 
 class Webpage:
@@ -34,7 +35,7 @@ class Webpage:
             return False
 
 
-    def index_from_md_filenames(self, filenames):
+    def homepage_from_md_filenames(self, filenames):
 
         article = Article(self.website)
         html = ''
@@ -49,7 +50,24 @@ class Webpage:
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['meta'], self.meta(), 1)
         self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
-        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-index', 1)
+        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-homepage', 1)
+
+
+    def list_page_from_md_filenames(self, filenames):
+
+        article = Article(self.website)
+        html = ''
+
+        for filename in filenames:
+
+            if filename.split('-', 1)[0].isdigit():
+                if article.from_md_filename(filename):
+                    html += article.html
+
+        self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
+        self.html = self.template.template.replace(self.website.tag['content'], html, 1)
+        self.html = self.html.replace(self.website.tag['meta'], self.meta(), 1)
+        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-homepage', 1)
 
 
     def meta(self):
@@ -96,14 +114,36 @@ class Webpage:
 
 
     @staticmethod
-    def write_index_page_from_directory(website, directory):
+    def write_homepage_from_directory(website, directory):
 
         filenames = Webpage.filenames_from_directory(directory)        
         webpage = Webpage(website)
 
-        webpage.index_from_md_filenames(filenames)
+        webpage.homepage_from_md_filenames(filenames)
         webpage.filename = 'index.html'
         webpage.write()
+
+        print('Generating homepage --> %s' % website.config.value('output_path'))
+        print(colours.OK + ' --> ' + colours.END + '%s' % webpage.filename)
+
+
+    @staticmethod
+    def write_list_pages_from_directory(website, directory):
+
+        articles_per_page = int(website.config.value('articles_per_page'))
+
+        filenames = MUtil.filter_out_non_article_filenames(Webpage.filenames_from_directory(directory))       
+        webpage = Webpage(website)
+
+        print('Generating %s index pages...' % str(ceil (len(filenames) / articles_per_page)))
+
+        for n in range (1, 1 + ceil (len(filenames) / articles_per_page)):
+            page_filenames = filenames[articles_per_page * (n - 1 ) : articles_per_page * n]
+            webpage.list_page_from_md_filenames(page_filenames)
+            webpage.filename = 'blog-%s.html' % str(n)
+            webpage.write()
+
+            print("Wrote blog-%s.html" % str(n))
 
         print('Generating index pages --> %s' % website.config.value('output_path'))
         print(colours.OK + ' --> ' + colours.END + '%s' % webpage.filename)
@@ -113,3 +153,5 @@ class Webpage:
     def filenames_from_directory(directory):
 
         return sorted(listdir(directory), reverse=True)
+
+
