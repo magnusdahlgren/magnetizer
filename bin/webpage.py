@@ -55,7 +55,13 @@ class Webpage:
         self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-homepage', 1)
 
 
-    def list_page_from_md_filenames(self, filenames, page_no):
+    def list_page_from_md_filenames(self, filenames, page_no, total_no_of_pages):
+
+        if page_no < total_no_of_pages:
+            self.url_next = 'blog-%s.html' % str(page_no + 1)
+
+        if page_no > 1:
+            self.url_previous = 'blog-%s.html' % str(page_no - 1)
 
         article = Article(self.website)
         html = ''
@@ -70,6 +76,9 @@ class Webpage:
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['meta'], self.meta(), 1)
         self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-homepage', 1)
+
+        if self.pagination_html() is not None:
+            self.html = self.html.replace(self.website.tag['pagination'], self.pagination_html(), 1)
 
 
     def meta(self):
@@ -86,13 +95,13 @@ class Webpage:
         end = '</ul></nav>'
 
         if self.url_previous is not None:
-            items += '<li class="magnetizer-previous">'
-            items += '<a href="%s">Newer posts</a>' % self.url_previous
+            items += '<li>'
+            items += '<a href="%s" class="magnetizer-previous">Newer posts</a>' % self.url_previous
             items += '</li>'
 
         if self.url_next is not None:
-            items += '<li class="magnetizer-next">'
-            items += '<a href="%s">Older posts</a>' % self.url_next
+            items += '<li>'
+            items += '<a href="%s" class="magnetizer-next">Older posts</a>' % self.url_next
             items += '</li>'
 
         if self.url_previous is not None or self.url_next is not None:
@@ -157,13 +166,15 @@ class Webpage:
         articles_per_page = int(website.config.value('articles_per_page'))
 
         filenames = MUtil.filter_out_non_article_filenames(Webpage.filenames_from_directory(directory))       
-        webpage = Webpage(website)
 
-        print('Generating %s list pages --> %s' % (str(ceil (len(filenames) / articles_per_page)), website.config.value('output_path')))
+        total_no_of_pages = ceil (len(filenames) / articles_per_page)
 
-        for n in range (1, 1 + ceil (len(filenames) / articles_per_page)):
+        print('Generating %s list pages --> %s' % (str(total_no_of_pages), website.config.value('output_path')))
+
+        for n in range (1, 1 + total_no_of_pages):
+            webpage = Webpage(website)
             page_filenames = filenames[articles_per_page * (n - 1 ) : articles_per_page * n]
-            webpage.list_page_from_md_filenames(page_filenames, n)
+            webpage.list_page_from_md_filenames(page_filenames, n, total_no_of_pages)
             webpage.filename = 'blog-%s.html' % str(n)
             webpage.write()
 

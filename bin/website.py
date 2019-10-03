@@ -18,6 +18,7 @@ class Website:
         'article_back_link' : '<!-- MAGNETIZER_ARTICLE_BACK_LINK -->',
         'date'              : '<!-- MAGNETIZER_DATE -->',
         'page_class'        : '<!-- MAGNETIZER_PAGE_CLASS -->',
+        'pagination'        : '<!-- MAGNETIZER_PAGINATION -->',
         'cc_here'           : '<!-- MAGNETIZER_CC -->',
         'break'             : '<!-- BREAK -->',
         'creative_commons'  : '<!-- CC -->'

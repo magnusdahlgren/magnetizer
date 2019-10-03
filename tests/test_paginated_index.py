@@ -51,9 +51,9 @@ def test_single_list_page():
     assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in blog_1_content
 
     # No links previous/next page should be present
-    # assert 'class="magnetizer-pagination"' not in blog_1_content
-    # assert 'class="magnetizer-newer"' not in blog_1_content
-    # assert 'class="magnetizer-older"' not in blog_1_content
+    assert 'class="magnetizer-pagination"' not in blog_1_content
+    assert 'class="magnetizer-previous"' not in blog_1_content
+    assert 'class="magnetizer-next"' not in blog_1_content
 
 
 def test_three_paginated_list_pages():
@@ -101,16 +101,16 @@ def test_three_paginated_list_pages():
     assert '<title>Test website name - Page 3</title>' in blog_3_content
 
     # First page should have link to older posts but not newer
-    # assert '<a href="blog-2.html" class="magnetizer-older">Older posts</a>' in blog_1_content
-    # assert 'class="magnetizer-newer"' not in blog_1_content
+    assert '<a href="blog-2.html" class="magnetizer-next">Older posts</a>' in blog_1_content
+    assert 'class="magnetizer-previous"' not in blog_1_content
 
     # Middle page should have link to older posts and newer
-    # assert '<a href="blog-3.html" class="magnetizer-older">Older posts</a>' in blog_2_content
-    # assert '<a href="blog-1.html" class="magnetizer-newer">Newer posts</a>' in blog_2_content
+    assert '<a href="blog-3.html" class="magnetizer-next">Older posts</a>' in blog_2_content
+    assert '<a href="blog-1.html" class="magnetizer-previous">Newer posts</a>' in blog_2_content
 
     # Last page should have link to newer posts but not older
-    # assert 'class="magnetizer-older"' not in blog_2_content
-    # assert '<a href="blog-2.html" class="magnetizer-newer">Newer posts</a>' in blog_2_content
+    assert 'class="magnetizer-next"' not in blog_3_content
+    assert '<a href="blog-2.html" class="magnetizer-previous">Newer posts</a>' in blog_3_content
 
 def test_pagination_none():
 
@@ -123,7 +123,7 @@ def test_pagination_next_only():
     webpage.url_next = 'page-2.html'
 
     result = '<nav class="magnetizer-pagination"><ul>'
-    result += '<li class="magnetizer-next"><a href="page-2.html">Older posts</a></li>'
+    result += '<li><a href="page-2.html" class="magnetizer-next">Older posts</a></li>'
     result += '</ul></nav>'
 
     assert webpage.pagination_html() == result
@@ -134,7 +134,7 @@ def test_pagination_previous_only():
     webpage.url_previous = 'page-1.html'
 
     result = '<nav class="magnetizer-pagination"><ul>'
-    result += '<li class="magnetizer-previous"><a href="page-1.html">Newer posts</a></li>'
+    result += '<li><a href="page-1.html" class="magnetizer-previous">Newer posts</a></li>'
     result += '</ul></nav>'
 
     assert webpage.pagination_html() == result
@@ -146,8 +146,8 @@ def test_pagination_previous_and_next():
     webpage.url_next = 'page-5.html'
 
     result = '<nav class="magnetizer-pagination"><ul>'
-    result += '<li class="magnetizer-previous"><a href="page-3.html">Newer posts</a></li>'
-    result += '<li class="magnetizer-next"><a href="page-5.html">Older posts</a></li>'
+    result += '<li><a href="page-3.html" class="magnetizer-previous">Newer posts</a></li>'
+    result += '<li><a href="page-5.html" class="magnetizer-next">Older posts</a></li>'
     result += '</ul></nav>'
 
     assert webpage.pagination_html() == result
