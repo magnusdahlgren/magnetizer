@@ -75,7 +75,7 @@ class Webpage:
         self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['meta'], self.meta(), 1)
-        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-homepage', 1)
+        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-list', 1)
 
         if self.pagination_html() is not None:
             self.html = self.html.replace(self.website.tag['pagination'], self.pagination_html(), 1)

@@ -42,7 +42,7 @@ def test_single_list_page():
     assert '<footer>footer</footer>' not in blog_1_content
 
     # Body should have class='magnetizer-list'
-    assert "<body class='magnetizer-homepage'>" in blog_1_content
+    assert "<body class='magnetizer-list'>" in blog_1_content
 
     # Twitter card should *not* be present (todo: yet!)
     assert '<meta name="twitter:card" content="summary" />' not in blog_1_content
