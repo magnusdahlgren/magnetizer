@@ -53,7 +53,7 @@ class Webpage:
         self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-homepage', 1)
 
 
-    def list_page_from_md_filenames(self, filenames):
+    def list_page_from_md_filenames(self, filenames, page_no):
 
         article = Article(self.website)
         html = ''
@@ -64,7 +64,7 @@ class Webpage:
                 if article.from_md_filename(filename):
                     html += article.html
 
-        self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
+        self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
         self.html = self.template.template.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['meta'], self.meta(), 1)
         self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-homepage', 1)
@@ -135,18 +135,15 @@ class Webpage:
         filenames = MUtil.filter_out_non_article_filenames(Webpage.filenames_from_directory(directory))       
         webpage = Webpage(website)
 
-        print('Generating %s index pages...' % str(ceil (len(filenames) / articles_per_page)))
+        print('Generating %s list pages --> %s' % (str(ceil (len(filenames) / articles_per_page)), website.config.value('output_path')))
 
         for n in range (1, 1 + ceil (len(filenames) / articles_per_page)):
             page_filenames = filenames[articles_per_page * (n - 1 ) : articles_per_page * n]
-            webpage.list_page_from_md_filenames(page_filenames)
+            webpage.list_page_from_md_filenames(page_filenames, n)
             webpage.filename = 'blog-%s.html' % str(n)
             webpage.write()
 
-            print("Wrote blog-%s.html" % str(n))
-
-        print('Generating index pages --> %s' % website.config.value('output_path'))
-        print(colours.OK + ' --> ' + colours.END + '%s' % webpage.filename)
+        print(colours.OK + ' --> ' + colours.END + '%s etc' % webpage.filename)
 
 
     @staticmethod
