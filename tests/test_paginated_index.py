@@ -113,16 +113,44 @@ def test_three_paginated_list_pages():
     # assert '<a href="blog-2.html" class="magnetizer-newer">Newer posts</a>' in blog_2_content
 
 def test_pagination_none():
-    pass
+
+    webpage = Webpage(test_website)
+    assert webpage.pagination_html() == None
 
 def test_pagination_next_only():
-    pass
+
+    webpage = Webpage(test_website)
+    webpage.url_next = 'page-2.html'
+
+    result = '<nav class="magnetizer-pagination"><ul>'
+    result += '<li class="magnetizer-next"><a href="page-2.html">Older posts</a></li>'
+    result += '</ul></nav>'
+
+    assert webpage.pagination_html() == result
 
 def test_pagination_previous_only():
-    pass
+
+    webpage = Webpage(test_website)
+    webpage.url_previous = 'page-1.html'
+
+    result = '<nav class="magnetizer-pagination"><ul>'
+    result += '<li class="magnetizer-previous"><a href="page-1.html">Newer posts</a></li>'
+    result += '</ul></nav>'
+
+    assert webpage.pagination_html() == result
 
 def test_pagination_previous_and_next():
-    pass
+
+    webpage = Webpage(test_website)
+    webpage.url_previous = 'page-3.html'
+    webpage.url_next = 'page-5.html'
+
+    result = '<nav class="magnetizer-pagination"><ul>'
+    result += '<li class="magnetizer-previous"><a href="page-3.html">Newer posts</a></li>'
+    result += '<li class="magnetizer-next"><a href="page-5.html">Older posts</a></li>'
+    result += '</ul></nav>'
+
+    assert webpage.pagination_html() == result
 
 
 def generate_non_indexable_test_articles_md():

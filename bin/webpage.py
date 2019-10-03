@@ -10,11 +10,13 @@ class Webpage:
 
     def __init__(self, website):
         
-        self.website  = website
-        self.template = Template(website, website.config.value('template_path') + website.config.value('webpage_template_filename'))
-        self.filename = None
-        self.html     = None
-        self.title    = None
+        self.website      = website
+        self.template     = Template(website, website.config.value('template_path') + website.config.value('webpage_template_filename'))
+        self.filename     = None
+        self.html         = None
+        self.title        = None
+        self.url_previous = None
+        self.url_next     = None
 
     
     def article_from_md_filename(self, filename):
@@ -75,6 +77,28 @@ class Webpage:
         m = '<title>%s</title>' % self.title
         m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />' % self.website.config.value('website_base_url')
         return m
+
+
+    def pagination_html(self):
+
+        start = '<nav class="magnetizer-pagination"><ul>'
+        items = ''
+        end = '</ul></nav>'
+
+        if self.url_previous is not None:
+            items += '<li class="magnetizer-previous">'
+            items += '<a href="%s">Newer posts</a>' % self.url_previous
+            items += '</li>'
+
+        if self.url_next is not None:
+            items += '<li class="magnetizer-next">'
+            items += '<a href="%s">Older posts</a>' % self.url_next
+            items += '</li>'
+
+        if self.url_previous is not None or self.url_next is not None:
+            return start + items + end
+        else:
+            return None
 
 
     def write(self):
