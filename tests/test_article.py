@@ -40,9 +40,6 @@ def test_article_basic():
     # title should be first row of file
     assert article.title == 'This is the heading - Test website name'
 
-    # title should be present in article meta data
-    assert '<title>This is the heading - Test website name</title>' in article.meta()
-
     # short html (for index) should NOT include a footer
     assert '<footer>footer</footer>' not in article.html
 

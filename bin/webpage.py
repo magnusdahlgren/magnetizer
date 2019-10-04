@@ -15,6 +15,7 @@ class Webpage:
         self.filename     = None
         self.html         = None
         self.title        = None
+        self.twitter_card = None
         self.url_previous = None
         self.url_next     = None
 
@@ -27,10 +28,8 @@ class Webpage:
 
             self.filename = article.filename
             self.title = article.title
-            self.html = self.template.template.replace(self.website.tag['content'], article.html_full, 1)
-            self.html = self.html.replace(self.website.tag['index_header'], '')
-            self.html = self.html.replace(self.website.tag['meta'], article.meta(), 1)
-            self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-article', 1)
+            self.twitter_card = article.twitter_card()
+            self.populate_html(article.html_full, 'magnetizer-article')
             return True
 
         else:
@@ -49,22 +48,19 @@ class Webpage:
                     html += article.html
 
         self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
-        self.html = self.template.template.replace(self.website.tag['content'], html, 1)
-        self.html = self.html.replace(self.website.tag['meta'], self.meta(), 1)
-        self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
-        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-homepage', 1)
+        self.populate_html(html, 'magnetizer-homepage')
 
 
     def list_page_from_md_filenames(self, filenames, page_no, total_no_of_pages):
+
+        article = Article(self.website)
+        html = ''
 
         if page_no < total_no_of_pages:
             self.url_next = 'blog-%s.html' % str(page_no + 1)
 
         if page_no > 1:
             self.url_previous = 'blog-%s.html' % str(page_no - 1)
-
-        article = Article(self.website)
-        html = ''
 
         for filename in filenames:
 
@@ -73,9 +69,23 @@ class Webpage:
                     html += article.html
 
         self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
-        self.html = self.template.template.replace(self.website.tag['content'], html, 1)
-        self.html = self.html.replace(self.website.tag['meta'], self.meta(), 1)
-        self.html = self.html.replace(self.website.tag['page_class'], 'magnetizer-list', 1)
+        self.populate_html(html, 'magnetizer-list')
+
+
+    def populate_html(self, html, page_class):
+
+        if self.twitter_card is not None:
+            meta = self.meta() + self.twitter_card
+        else:
+            meta = self.meta()
+
+        self.html = self.template.template
+        self.html = self.html.replace(self.website.tag['content'], html, 1)
+        self.html = self.html.replace(self.website.tag['page_class'], page_class, 1)
+        self.html = self.html.replace(self.website.tag['meta'], meta, 1)
+
+        if page_class == 'magnetizer-homepage':
+            self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
 
         if self.pagination_html() is not None:
             self.html = self.html.replace(self.website.tag['pagination'], self.pagination_html(), 1)

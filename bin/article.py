@@ -112,14 +112,6 @@ class Article:
         return 'Untitled'
 
 
-    def meta(self):
-
-        m = '<title>%s</title>' % self.title
-        m += self.twitter_card()
-        m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />' % self.website.config.value('website_base_url')
-        return m
-
-
     def feed_entry(self):
 
         full_url = '%s/%s' % (self.website.config.value('website_base_url'),self.filename)
