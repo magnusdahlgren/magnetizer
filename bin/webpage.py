@@ -38,6 +38,7 @@ class Webpage:
 
     def homepage_from_md_filenames(self, filenames):
 
+        filenames = MUtil.filter_out_non_article_filenames(filenames)[0:3]
         html = Article.html_contents_from_multiple_md_files(self.website, filenames)
 
         self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
@@ -148,9 +149,9 @@ class Webpage:
     @staticmethod
     def write_homepage_from_directory(website, directory):
 
-        filenames = Webpage.filenames_from_directory(directory)        
-        webpage = Webpage(website)
+        filenames = Webpage.filenames_from_directory(directory)
 
+        webpage = Webpage(website)
         webpage.homepage_from_md_filenames(filenames)
         webpage.filename = 'index.html'
         webpage.write()

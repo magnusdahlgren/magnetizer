@@ -44,7 +44,7 @@ def test_webpage_from_single_article():
 def test_home_page():
 
     webpage = Webpage(test_website)
-    webpage.homepage_from_md_filenames(['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'] )
+    webpage.homepage_from_md_filenames(['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt', '005-simple-article-1.md', '006-simple-article-2.md'] )
 
     # Index header should be present
     assert webpage.html.count('<div>header</div>') == 1
