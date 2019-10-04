@@ -73,6 +73,7 @@ class Webpage:
 
         if page_class == 'magnetizer-homepage':
             self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
+            self.html = self.html.replace(self.website.tag['index_footer'], self.website.index_footer_html)
 
         if self.pagination_html() is not None:
             self.html = self.html.replace(self.website.tag['pagination'], self.pagination_html(), 1)
