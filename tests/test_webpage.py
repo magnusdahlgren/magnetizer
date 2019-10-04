@@ -18,6 +18,12 @@ def test_webpage_from_single_article():
     assert webpage.title == title
     assert webpage.html.count('<title>' + title + '</title>') == 1
 
+    # Homepage header should not be present
+    assert webpage.html.count('<div>header</div>') == 0
+
+    # List page header should be present
+    assert webpage.html.count('<div>list page header</div>') == 1
+
     # Webpage should contain the text from the article
     assert webpage.html.count('<p>And here is some text...</p>') == 1
 
@@ -40,6 +46,46 @@ def test_webpage_from_single_article():
 
     # No html comments should be left in page
     assert '<!--' not in webpage.html
+
+def test_special_page():
+
+    webpage = Webpage(test_website)
+    webpage.article_from_md_filename('dont-index-this-article.md')
+
+    # Page title should be "Article title - Website name"
+    title = 'This post should not be in the index - Test website name'
+    assert webpage.title == title
+    assert webpage.html.count('<title>' + title + '</title>') == 1
+
+    # Homepage header should NOT be present
+    assert webpage.html.count('<div>header</div>') == 0
+
+    # List page header should NOT present
+    assert webpage.html.count('<div>list page header</div>') == 0
+
+    # Webpage should contain the text from the article
+    assert webpage.html.count("<p>That's why it doesn't start with") == 1
+
+    # Article footer should NOT be present
+    assert webpage.html.count('<footer>footer</footer>') == 0
+
+    # Filename for webpage should be based on the article
+    article = Article(test_website)
+    article.from_md_filename('dont-index-this-article.md')
+    assert webpage.filename == article.filename
+
+    # Body should have class='magnetizer-special'
+    assert webpage.html.count("<body class='magnetizer-special'>") == 1
+
+    # Twitter card should be present
+    assert '<meta name="twitter:card" content="summary_large_image" />' in webpage.html
+
+    # Link to Atom feed should be present
+    assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
+
+    # No html comments should be left in page
+    assert '<!--' not in webpage.html
+
 
 def test_home_page():
 

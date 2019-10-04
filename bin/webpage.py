@@ -29,7 +29,7 @@ class Webpage:
             self.filename = article.filename
             self.title = article.title
             self.twitter_card = article.twitter_card()
-            self.populate_html(article.html_full, 'magnetizer-article')
+            self.populate_html(article.html_full, article.type)
             return True
 
         else:
@@ -75,7 +75,7 @@ class Webpage:
             self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
             self.html = self.html.replace(self.website.tag['index_footer'], self.website.index_footer_html)
 
-        if page_class == 'magnetizer-list':
+        if page_class == 'magnetizer-list' or page_class == 'magnetizer-article':
             self.html = self.html.replace(self.website.tag['list_page_header'], self.website.list_page_header_html)
 
         if self.pagination_html() is not None:

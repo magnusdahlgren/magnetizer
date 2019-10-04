@@ -21,6 +21,7 @@ class Article:
         self.html_full = None
         self.date_html = None
         self.date = None
+        self.type = 'magnetizer-article'
 
 
     def from_md_filename(self, filename):
@@ -33,7 +34,6 @@ class Article:
             if self.is_valid():
 
                 filename = filename.split('.', 1)[0] + '.html'
-                back_link = '<a href="/" class="magnetizer-nav-back">Back to homepage</a>'
 
                 # Remove first part of filename if it is a number
                 if filename.split('-', 1)[0].isdigit():
@@ -47,10 +47,13 @@ class Article:
                 self.html_full = self.template.render(self.website, markdown(self.md))
 
                 if is_special_article:
+                    back_link = '<a href="/" class="magnetizer-nav-back">Back to homepage</a>'
+                    self.type = 'magnetizer-special'
                     self.date = None
                     self.date_html = None
                     self.html_full = self.html_full.replace(self.website.tag['article_footer'], '', 1)
                 else:
+                    back_link = '<a href="blog-1.html" class="magnetizer-nav-back">Back to blog</a>'
                     self.date      = self.date_from_markdown_source()
                     self.date_html = self.date_html_from_date()
                     self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer_html, 1)

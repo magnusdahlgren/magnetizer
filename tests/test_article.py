@@ -46,8 +46,8 @@ def test_article_basic():
     # full html (for article page) should have a footer
     assert '<footer>footer</footer>' in article.html_full
 
-    # full html should have a link back to the homepage
-    assert '<a href="/" class="magnetizer-nav-back">Back to homepage</a>' in article.html_full
+    # full html should have a link back to the blog
+    assert '<a href="blog-1.html" class="magnetizer-nav-back">Back to blog</a>' in article.html_full
 
     # article should NOT have a CC license
     cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />'
