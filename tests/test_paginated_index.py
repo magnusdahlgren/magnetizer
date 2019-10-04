@@ -35,6 +35,9 @@ def test_single_list_page():
     # Homepage header should not be present
     assert '<div>header</div>' not in blog_1_content
 
+    # List page header should be present
+    assert '<div>list page header</div>' in blog_1_content
+
     # Index title = "Website Name - Page 1"
     assert '<title>Test website name - Page 1</title>' in blog_1_content
 
@@ -84,16 +87,21 @@ def test_three_paginated_list_pages():
     assert 'Article 9.' in blog_1_content 
     assert 'Article 8.' in blog_1_content
     assert 'Article 7.' in blog_1_content
+    assert '<div>list page header</div>' in blog_1_content
+
 
     assert blog_2_content.count('<article>') == 4
     assert 'Article 6.' in blog_2_content 
     assert 'Article 5.' in blog_2_content 
     assert 'Article 4.' in blog_2_content
     assert 'Article 3.' in blog_2_content
+    assert '<div>list page header</div>' in blog_2_content
 
     assert blog_3_content.count('<article>') == 2
     assert 'Article 2.' in blog_3_content 
     assert 'Article 1.' in blog_3_content 
+    assert '<div>list page header</div>' in blog_3_content
+
 
     # Page title = "Website Name - Page n"
     assert '<title>Test website name - Page 1</title>' in blog_1_content
