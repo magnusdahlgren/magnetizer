@@ -38,14 +38,7 @@ class Webpage:
 
     def homepage_from_md_filenames(self, filenames):
 
-        article = Article(self.website)
-        html = ''
-
-        for filename in filenames:
-
-            if filename.split('-', 1)[0].isdigit():
-                if article.from_md_filename(filename):
-                    html += article.html
+        html = Article.html_contents_from_multiple_md_files(self.website, filenames)
 
         self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
         self.populate_html(html, 'magnetizer-homepage')
@@ -53,8 +46,7 @@ class Webpage:
 
     def list_page_from_md_filenames(self, filenames, page_no, total_no_of_pages):
 
-        article = Article(self.website)
-        html = ''
+        self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
 
         if page_no < total_no_of_pages:
             self.url_next = 'blog-%s.html' % str(page_no + 1)
@@ -62,13 +54,7 @@ class Webpage:
         if page_no > 1:
             self.url_previous = 'blog-%s.html' % str(page_no - 1)
 
-        for filename in filenames:
-
-            if filename.split('-', 1)[0].isdigit():
-                if article.from_md_filename(filename):
-                    html += article.html
-
-        self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
+        html = Article.html_contents_from_multiple_md_files(self.website, filenames)
         self.populate_html(html, 'magnetizer-list')
 
 

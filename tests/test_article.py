@@ -137,3 +137,14 @@ def test_article_cc():
 
     assert article.cc_license() == cc_license
 
+
+def test_html_contents_from_multiple_md_files():
+
+    filenames = ['005-simple-article-1.md', '006-simple-article-2.md', '007-simple-article-3.md',]
+
+    html = Article.html_contents_from_multiple_md_files(test_website, filenames)
+
+    assert html.count('<article>') == 3
+    assert 'Article 5' in html
+    assert 'Article 6' in html
+    assert 'Article 7' in html

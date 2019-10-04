@@ -204,3 +204,18 @@ class Article:
             return True
         else:
             return False
+
+
+    @staticmethod
+    def html_contents_from_multiple_md_files(website, filenames):
+
+        article = Article(website)
+        html = ''
+
+        for filename in filenames:
+
+            if filename.split('-', 1)[0].isdigit():
+                if article.from_md_filename(filename):
+                    html += article.html
+
+        return html
