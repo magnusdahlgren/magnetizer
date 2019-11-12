@@ -54,6 +54,10 @@ def test_article_basic():
     assert article.html.count(cc_license) == 0
     assert article.html_full.count(cc_license) == 0
 
+    # comments should be left in the article html
+    assert '<!-- Comment -->' in article.html
+    assert '<!-- Comment -->' in article.html_full
+
 
 def test_article_with_h1_and_break_and_date_and_cc():
 

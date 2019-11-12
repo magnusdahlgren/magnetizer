@@ -86,10 +86,6 @@ class Article:
                     # date in short html should be a link
                     self.html = self.html.replace(self.website.tag['date'], MUtil.wrap_it_in_a_link(self.date_html, self.filename), 1)
 
-                # Remove all remaining comment tags from html
-                self.html = sub(r'<!--(.*?)-->', '', self.html)
-                self.html_full = sub(r'<!--(.*?)-->', '', self.html_full)
-
                 return True
 
             else:
