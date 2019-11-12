@@ -47,6 +47,9 @@ def test_webpage_from_single_article():
     # Link to CSS should be present
     assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in webpage.html
 
+    # Announcement should be included twice, as per the .md file
+    assert webpage.html.count("<div class='announcement'>Announcement</div>") == 2
+
     # No html comments should be left in page
     assert '<!--' not in webpage.html
 

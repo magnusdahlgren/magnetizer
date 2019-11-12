@@ -70,6 +70,7 @@ class Webpage:
         self.html = self.html.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['page_class'], page_class, 1)
         self.html = self.html.replace(self.website.tag['meta'], meta, 1)
+        self.html = self.html.replace(self.website.tag['announcement'], self.website.announcement_html)
 
         if page_class == 'magnetizer-homepage':
             self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)

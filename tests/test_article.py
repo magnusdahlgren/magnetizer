@@ -54,6 +54,10 @@ def test_article_basic():
     assert article.html.count(cc_license) == 0
     assert article.html_full.count(cc_license) == 0
 
+    # announcements should be stripped, from the short html only
+    assert '<!-- ANNOUNCEMENT -->' in article.html_full
+    assert '<!-- ANNOUNCEMENT -->' not in article.html
+
     # comments should be left in the article html
     assert '<!-- Comment -->' in article.html
     assert '<!-- Comment -->' in article.html_full
