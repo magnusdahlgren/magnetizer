@@ -31,6 +31,7 @@ class Website:
         self.index_header_html = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
         self.index_footer_html = Website.read_file(self.config.value('template_path'), self.config.value('index_footer_template_filename'))
         self.list_page_header_html = Website.read_file(self.config.value('template_path'), self.config.value('list_page_header_template_filename'))
+        self.css_filename = self.config.value('website_css_filename')
 
 
     def copy_resources(self):
