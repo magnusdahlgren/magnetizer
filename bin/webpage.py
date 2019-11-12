@@ -87,9 +87,9 @@ class Webpage:
 
     def meta(self):
 
-        m = '<title>%s</title>' % self.title
-        m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />' % self.website.config.value('website_base_url')
-        m += '<link rel="stylesheet" type="text/css" href="%s">' % self.website.config.value('website_css_filename')
+        m = '<title>%s</title>\n' % self.title
+        m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />\n' % self.website.config.value('website_base_url')
+        m += '<link rel="stylesheet" type="text/css" href="%s">\n' % self.website.config.value('website_css_filename')
         return m
 
 
