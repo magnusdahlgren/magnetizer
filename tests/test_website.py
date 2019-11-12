@@ -8,3 +8,8 @@ test_website.refresh()
 def test_website_css_filename():
 
     assert test_website.css_filename == "test-stylesheet.css?c2459f7c370ffd41171a4265a4132352"
+
+
+def test_website_announcement_html():
+
+    assert test_website.announcement_html == "<div class='announcement'>Announcement</div>"
