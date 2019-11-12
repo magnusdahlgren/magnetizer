@@ -44,6 +44,9 @@ def test_webpage_from_single_article():
     # Link to Atom feed should be present
     assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
 
+    # Link to CSS should be present
+    assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in webpage.html
+
     # No html comments should be left in page
     assert '<!--' not in webpage.html
 
@@ -83,6 +86,9 @@ def test_special_page():
     # Link to Atom feed should be present
     assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
 
+    # Link to CSS should be present
+    assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in webpage.html
+
     # No html comments should be left in page
     assert '<!--' not in webpage.html
 
@@ -112,6 +118,9 @@ def test_home_page():
 
     # Twitter card should *not* be present (todo: yet!)
     assert '<meta name="twitter:card" content="summary" />' not in webpage.html
+
+    # Link to CSS should be present
+    assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in webpage.html
 
     # Link to Atom feed should be present
     assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
