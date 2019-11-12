@@ -104,6 +104,9 @@ def test_home_page():
     # Homepage header should be present
     assert webpage.html.count('<div>header</div>') == 1
 
+    # Announcement (from homepage header) should be present
+    assert "<div class='announcement'>Announcement</div>" in webpage.html
+
     # Homepage footer should be present
     assert webpage.html.count('<div>homepage footer</div>') == 1
 
