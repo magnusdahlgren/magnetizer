@@ -2,13 +2,13 @@
 
 ![alt text](resources/image.png)
 
-# First h2
+## First h2
 
 Some text
 
 <!-- BREAK -->
 
-# Second h2 (after break)
+## Second h2 (after break)
 
 Some more text
 

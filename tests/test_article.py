@@ -12,21 +12,26 @@ test_website.refresh()
 def test_article_is_valid():
 
     article = Article(test_website)
+    article.template = Template(article.website, article.website.config.value('template_path') + article.website.config.value('article_template_filename'))
 
     article.md = 'Just some text'
     assert not article.is_valid()
 
-    article.md = '# Starting with heading\nBut no date'
+    article.md = '# Starting with h1\nBut no date'
     assert not article.is_valid()
 
-    article.md = 'Date but not starting with heading\n# Heading\n<!-- 1/1/1980 -->'
-    assert not article.is_valid()
-
-    article.md = '# Both heading and date\n<!-- 1/1/1980 -->'
+    article.md = 'Date but not starting with h1\n# Heading\n<!-- 1/1/1980 -->'
     assert article.is_valid()
 
-    #article.md = '<!-- Some random comment -->\n\n# Both heading and date\n<!-- 1/1/1980 -->'
-    #assert article.is_valid()
+    article.md = '# Both h1 and date\n<!-- 1/1/1980 -->\n# But more than one h1'
+    print (article.html_full)
+    assert not article.is_valid()
+
+    article.md = '# Both h1 and date\n<!-- 1/1/1980 -->'
+    assert article.is_valid()
+
+    article.md = '<!-- Some random comment -->\n\n# Both heading and date\n<!-- 1/1/1980 -->'
+    assert article.is_valid()
 
     # Article without heading or date should be rejected
     assert not article.from_md_filename('004-invalid-article.md')

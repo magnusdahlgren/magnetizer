@@ -212,7 +212,7 @@ class Article:
 
     def is_valid(self):
 
-        if self.md.startswith('# ') and search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.md):
+        if markdown(self.md).count("<h1>") == 1 and search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.md):
             return True
         else:
             return False
