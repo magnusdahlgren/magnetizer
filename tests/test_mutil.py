@@ -98,16 +98,12 @@ def test_strip_tags_from_html():
     # assert MUtil.strip_tags_from_html(html2) == "In other news Fact:\n\nants < giraffes and hippos > mice"
 
 
-def test_strip_leading_h1_from_html():
+def test_strip_anything_before_h1_from_html():
 
-    # Leading h1 should be stripped
-    html1 = "<h1>Heading first</h1><p>Some text</p><h1>Heading</h1><p>The rest of the post</p>"
-    assert MUtil.strip_leading_h1_from_html(html1) == "<p>Some text</p><h1>Heading</h1><p>The rest of the post</p>"
-
-    # Don't strip h1 if it's not the first thing
+    # Strip anything before </h1>
     html2 = "<p>Some text</p><h1>Heading first</h1><p>The rest of the post</p>"
-    assert MUtil.strip_leading_h1_from_html(html2) == html2
-    
+    assert MUtil.strip_anything_before_h1_from_html(html2) == "<p>The rest of the post</p>"
+
 
 def test_filter_out_non_article_filenames():
 

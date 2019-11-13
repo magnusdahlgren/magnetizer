@@ -56,7 +56,7 @@ class MUtil:
     @staticmethod
     def abstract_from_html(html):
 
-        s = MUtil.strip_tags_from_html(MUtil.strip_leading_h1_from_html(html)).strip()
+        s = MUtil.strip_tags_from_html(MUtil.strip_anything_before_h1_from_html(html)).strip()
         s = re.sub(r'\n', ' ', s)
         s = re.sub(r'\s\s+',' ', s)
 
@@ -85,15 +85,12 @@ class MUtil:
 
 
     @staticmethod
-    def strip_leading_h1_from_html(html):
+    def strip_anything_before_h1_from_html(html):
 
         s = html.strip()
-        if s.startswith('<h1'):
-
+        if '</h1>' in s:
             return s.split('</h1>', 1)[1]
-
         else:
-
             return html
 
 

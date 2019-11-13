@@ -88,7 +88,7 @@ class Article:
                 return True
 
             else:
-                print (colours.ERROR + ' (!) ' + colours.END + "'%s' doesn't start with h1 and/or misses date)" % filename)
+                print (colours.ERROR + ' (!) ' + colours.END + "'%s' must include exactly one h1 and a date)" % filename)
                 return False
 
         else:

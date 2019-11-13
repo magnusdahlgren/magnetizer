@@ -9,7 +9,7 @@ def test_twitter_card_meta_data():
 
     test_article = Article(test_website)
 
-    test_article.md = '# Heading\n\nSome text\n\n![alt text](http://example.com/first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
+    test_article.md = '<!-- comment -->\n# Heading\n\nSome text\n\n![alt text](http://example.com/first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
     test_article.html_full = '<h1>Heading</h1><p>Some text ...</p>'
     test_article.url = 'https://example.com/test.html'
 
