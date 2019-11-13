@@ -97,18 +97,18 @@ class Article:
             return False
 
  
-    def new_title(self):
+    def title_from_html(self):
 
-        if self.html_full is None:
-            return "Untitled"
-        else:
+        title = "Untitled"
+        
+        if self.html_full is not None:
 
             match = re.search(r"<h1>(.*?)<\/h1>", self.html_full)
             
             if match:
-                return MUtil.strip_tags_from_html(match.group(1))
-            else:
-                return "Untitled"
+                title = MUtil.strip_tags_from_html(match.group(1))
+
+        return '%s - %s' % (title, self.website.config.value('website_name'))
 
     
     def title_from_markdown_source(self, md):

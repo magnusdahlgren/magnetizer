@@ -38,19 +38,19 @@ def test_article_title():
 
     # Title should be 'Untitled' if article contains no html
     article.html_full = None
-    assert article.new_title() == "Untitled"
+    assert article.title_from_html() == "Untitled - Test website name"
     
     # Title should be 'Untitled' if article contains no <h1>
     article.html_full = "Blah <h2>Blah</h2> Blah"
-    assert article.new_title() == "Untitled"
+    assert article.title_from_html() == "Untitled - Test website name"
 
     # Title should be the (first) <h1> if the article contains at least one <h1>
     article.html_full = 'Blah <h1>Article title!</h1> Blah <h1>Not article title</h1> Blah'
-    assert article.new_title() == "Article title!"
+    assert article.title_from_html() == "Article title! - Test website name"
 
     # Any html tags should be stripped from the title
     article.html_full = 'Blah <h1>Article title <em>emphasis</em></h1> Blah'
-    assert article.new_title() == "Article title emphasis"
+    assert article.title_from_html() == "Article title emphasis - Test website name"
 
 
 def test_article_basic():
