@@ -119,21 +119,6 @@ class Article:
             return None
 
     
-    def title_from_markdown_source(self, md):
-
-        rows = md.split('\n')
-
-        for row in rows:
-            candidate = row
-            candidate = markdown(candidate)
-            candidate = sub('<[^>]*>', '', candidate)
-            candidate = candidate.strip()
-            if candidate != '':
-                return candidate
-
-        return 'Untitled'
-
-
     def feed_entry(self):
 
         full_url = '%s/%s' % (self.website.config.value('website_base_url'),self.filename)
