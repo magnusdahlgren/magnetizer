@@ -53,6 +53,9 @@ def test_webpage_from_single_article():
     # No html comments should be left in page
     assert '<!--' not in webpage.html
 
+    # Meta description should not yet be present
+    assert '<meta name="description"' not in webpage.html
+
 def test_special_page():
 
     webpage = Webpage(test_website)
@@ -130,6 +133,9 @@ def test_home_page():
 
     # Link to Atom feed should be present
     assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
+
+    # Meta description from config file should be present
+    assert '<meta name="description" content="Meta \\"description\\" from config">' in webpage.html
 
 
 def test_write_homepage():

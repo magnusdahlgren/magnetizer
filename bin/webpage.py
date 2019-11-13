@@ -18,6 +18,7 @@ class Webpage:
         self.twitter_card = None
         self.url_previous = None
         self.url_next     = None
+        self.meta_description = None
 
     
     def article_from_md_filename(self, filename):
@@ -42,6 +43,7 @@ class Webpage:
         html = Article.html_contents_from_multiple_md_files(self.website, filenames)
 
         self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
+        self.meta_description = self.website.config.value('homepage_meta_description')
         self.populate_html(html, 'magnetizer-homepage')
 
 
@@ -90,6 +92,10 @@ class Webpage:
     def meta(self):
 
         m = '<title>%s</title>\n' % self.title
+
+        if self.meta_description is not None:
+            m += '<meta name="description" content="%s">\n' % self.meta_description.replace('"','\\"')
+
         m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />\n' % self.website.config.value('website_base_url')
         m += '<link rel="stylesheet" type="text/css" href="%s">\n' % self.website.css_filename
         return m
