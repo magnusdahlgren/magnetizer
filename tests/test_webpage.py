@@ -53,8 +53,8 @@ def test_webpage_from_single_article():
     # No html comments should be left in page
     assert '<!--' not in webpage.html
 
-    # Meta description should not yet be present
-    assert '<meta name="description"' not in webpage.html
+    # Meta description should be pulled in from article
+    assert '<meta name="description" content="Meta description from article">' in webpage.html 
 
 def test_special_page():
 

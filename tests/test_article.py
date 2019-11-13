@@ -69,6 +69,9 @@ def test_article_basic():
     # title should be the contents from <h1M
     assert article.title() == 'This is the heading - Test website name'
 
+    # meta description should be pulled in from article
+    assert article.meta_description() == 'Meta description from article'
+
     # short html (for index) should NOT include a footer
     assert '<footer>footer</footer>' not in article.html
 
@@ -107,6 +110,9 @@ def test_article_with_h1_and_break_and_date_and_cc():
 
     # The title should be the <h1> contents
     assert article.title() == "This should be the title - Test website name"
+
+    # Meta data should be None (not set in article)
+    assert article.meta_description() is None
 
     # The bit after the break tag should only show in the full html
     dont_show = "Don't show this bit on the index page"

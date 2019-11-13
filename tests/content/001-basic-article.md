@@ -10,4 +10,6 @@ More text...
 
 <!-- ANNOUNCEMENT -->
 
+<!-- META_DESCRIPTION = Meta description from article -->
+
 <!-- 7/7/1998 -->

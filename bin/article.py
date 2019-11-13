@@ -108,6 +108,16 @@ class Article:
 
         return '%s - %s' % (title, self.website.config.value('website_name'))
 
+
+    def meta_description(self):
+
+        match = re.search(r"<!-- *META_DESCRIPTION *= *(.*?) *-->", self.md)
+
+        if match:
+            return match.group(1)
+        else:
+            return None
+
     
     def title_from_markdown_source(self, md):
 

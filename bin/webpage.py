@@ -29,6 +29,7 @@ class Webpage:
 
             self.filename = article.filename
             self.title = article.title()
+            self.meta_description = article.meta_description()
             self.twitter_card = article.twitter_card()
             self.populate_html(article.html_full, article.type)
             return True
