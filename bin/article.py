@@ -15,7 +15,6 @@ class Article:
         self.template = Template(website, website.config.value('template_path') + website.config.value('article_template_filename'))
         self.md = None
         self.filename = None
-        self.title = None
         self.footer_html = website.article_footer_html
         self.html = None
         self.html_full = None
@@ -43,7 +42,6 @@ class Article:
                     is_special_article = True
 
                 self.filename  = filename
-                self.title     = '%s - %s' % (self.title_from_markdown_source(self.md), self.website.config.value('website_name'))
                 self.html_full = self.template.render(self.website, markdown(self.md))
 
                 if is_special_article:
@@ -97,7 +95,7 @@ class Article:
             return False
 
  
-    def title_from_html(self):
+    def title(self):
 
         title = "Untitled"
         
@@ -131,7 +129,7 @@ class Article:
         full_url = '%s/%s' % (self.website.config.value('website_base_url'),self.filename)
 
         f = '<entry>'
-        f += '<title>%s</title>' % html.escape(self.title, False)
+        f += '<title>%s</title>' % html.escape(self.title(), False)
         f += '<link href="%s"/>' % full_url
         f += '<id>%s</id>' % full_url
         f += '<updated>%sT00:00:01Z</updated>' % self.date

@@ -27,7 +27,7 @@ class Webpage:
         if article.from_md_filename(filename):
 
             self.filename = article.filename
-            self.title = article.title
+            self.title = article.title()
             self.twitter_card = article.twitter_card()
             self.populate_html(article.html_full, article.type)
             return True

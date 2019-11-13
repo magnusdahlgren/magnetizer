@@ -38,19 +38,19 @@ def test_article_title():
 
     # Title should be 'Untitled' if article contains no html
     article.html_full = None
-    assert article.title_from_html() == "Untitled - Test website name"
+    assert article.title() == "Untitled - Test website name"
     
     # Title should be 'Untitled' if article contains no <h1>
     article.html_full = "Blah <h2>Blah</h2> Blah"
-    assert article.title_from_html() == "Untitled - Test website name"
+    assert article.title() == "Untitled - Test website name"
 
     # Title should be the (first) <h1> if the article contains at least one <h1>
     article.html_full = 'Blah <h1>Article title!</h1> Blah <h1>Not article title</h1> Blah'
-    assert article.title_from_html() == "Article title! - Test website name"
+    assert article.title() == "Article title! - Test website name"
 
     # Any html tags should be stripped from the title
     article.html_full = 'Blah <h1>Article title <em>emphasis</em></h1> Blah'
-    assert article.title_from_html() == "Article title emphasis - Test website name"
+    assert article.title() == "Article title emphasis - Test website name"
 
 
 def test_article_basic():
@@ -61,8 +61,8 @@ def test_article_basic():
     # filename should be without number and .html instead of .md
     assert article.filename == 'basic-article.html'
 
-    # title should be first row of file
-    assert article.title == 'This is the heading - Test website name'
+    # title should be the contents from <h1M
+    assert article.title() == 'This is the heading - Test website name'
 
     # short html (for index) should NOT include a footer
     assert '<footer>footer</footer>' not in article.html
@@ -100,8 +100,8 @@ def test_article_with_h1_and_break_and_date_and_cc():
     article = Article(test_website)
     article.from_md_filename('002-article-with-h1-break-and-date.md')
 
-    # The title should be the first usable row (so not the image)
-    assert article.title == "This should be the title - Test website name"
+    # The title should be the <h1> contents
+    assert article.title() == "This should be the title - Test website name"
 
     # The bit after the break tag should only show in the full html
     dont_show = "Don't show this bit on the index page"
