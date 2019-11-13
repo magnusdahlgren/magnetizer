@@ -25,8 +25,32 @@ def test_article_is_valid():
     article.md = '# Both heading and date\n<!-- 1/1/1980 -->'
     assert article.is_valid()
 
+    #article.md = '<!-- Some random comment -->\n\n# Both heading and date\n<!-- 1/1/1980 -->'
+    #assert article.is_valid()
+
     # Article without heading or date should be rejected
     assert not article.from_md_filename('004-invalid-article.md')
+
+
+def test_article_title():
+
+    article = Article(test_website)
+
+    # Title should be 'Untitled' if article contains no html
+    article.html_full = None
+    assert article.new_title() == "Untitled"
+    
+    # Title should be 'Untitled' if article contains no <h1>
+    article.html_full = "Blah <h2>Blah</h2> Blah"
+    assert article.new_title() == "Untitled"
+
+    # Title should be the (first) <h1> if the article contains at least one <h1>
+    article.html_full = 'Blah <h1>Article title!</h1> Blah <h1>Not article title</h1> Blah'
+    assert article.new_title() == "Article title!"
+
+    # Any html tags should be stripped from the title
+    article.html_full = 'Blah <h1>Article title <em>emphasis</em></h1> Blah'
+    assert article.new_title() == "Article title emphasis"
 
 
 def test_article_basic():

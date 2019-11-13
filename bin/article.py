@@ -97,6 +97,20 @@ class Article:
             return False
 
  
+    def new_title(self):
+
+        if self.html_full is None:
+            return "Untitled"
+        else:
+
+            match = re.search(r"<h1>(.*?)<\/h1>", self.html_full)
+            
+            if match:
+                return MUtil.strip_tags_from_html(match.group(1))
+            else:
+                return "Untitled"
+
+    
     def title_from_markdown_source(self, md):
 
         rows = md.split('\n')

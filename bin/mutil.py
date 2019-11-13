@@ -3,6 +3,11 @@ import re
 class MUtil:
 
     @staticmethod
+    def link_first_h1(html, url):
+
+        return html
+
+    @staticmethod
     def link_first_tag(html, url):
 
         html_rows = html.split('\n',1)

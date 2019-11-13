@@ -1,6 +1,23 @@
 import pytest
 from mutil import *
 
+@pytest.mark.skip(reason="Not implemented")
+def test_link_first_h1():
+
+    url = '/link.html'
+
+    leading_html = "<img src=''><p>Hello</p>"
+    trailing_html = "\n<p>text</p>\n<img src='image.png'>\n<h1>no link</h1>"
+
+    # If there's no <h1>, nothing should change
+    assert MUtil.link_first_h1(leading_html, url) == leading_html
+
+    # Leading <h1> should get a link, the rest of the html should be unchanged
+    assert MUtil.link_first_h1("<h1>link</h1>" + trailing_html, url) == "<h1><a href='/link.html'>link</a></h1>" + trailing_html
+
+    # Any other html before the <h1> should be ignored but h1 should still get a link
+    assert MUtil.link_first_h1(leading_html + "<h1>link</h1>" + trailing_html, url) == leading_html + "<h1><a href='/link.html'>link</a></h1>" + trailing_html
+
 
 def test_link_first_tag():
 
