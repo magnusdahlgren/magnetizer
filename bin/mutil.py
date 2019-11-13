@@ -3,12 +3,20 @@ import re
 class MUtil:
 
     @staticmethod
-    def link_first_h1(html, url):
+    def link_h1(html, url):
 
-        return html
+        match = re.search(r"<h1>(.*?)<\/h1>", html)
+            
+        if match:
+            h1 = match.group()
+            h1_content = match.group(1)
+            return html.replace(h1, "<h1>" + MUtil.wrap_it_in_a_link(h1_content, url) + "</h1>", 1)
+        else:
+            return html
+
 
     @staticmethod
-    def link_first_tag(html, url):
+    def link_first_tag_no_more(html, url):
 
         html_rows = html.split('\n',1)
         first_row = html_rows[0]
