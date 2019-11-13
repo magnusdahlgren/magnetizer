@@ -9,9 +9,8 @@ def test_twitter_card_meta_data():
 
     test_article = Article(test_website)
 
-    test_article.title = 'test title'
     test_article.md = '# Heading\n\nSome text\n\n![alt text](http://example.com/first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
-    # test_article.html_full = '<h1>Heading</h1>Some text\n<img src="http://example.com/first_image.jpg">\n\n<img src="http://example.com/second_image.jpg"><p>Some text\nSome more text</p>'
+    test_article.html_full = '<h1>Heading</h1><p>Some text ...</p>'
     test_article.url = 'https://example.com/test.html'
 
     card = test_article.twitter_card()
@@ -23,7 +22,7 @@ def test_twitter_card_meta_data():
     assert '<meta name="twitter:site" content="@magnusdahlgren_test_1234" />' in card
 
     # Title should be article title
-    assert '<meta name="twitter:title" content="test title" />' in card
+    assert '<meta name="twitter:title" content="Heading - Test website name" />' in card
 
     # Image should be first image from article html_full
     # Image with absolute URL should keep the URL
@@ -38,9 +37,7 @@ def test_twitter_card_relative_image_url():
 
     test_article = Article(test_website)
 
-    test_article.title = 'test title'
     test_article.md = '# Heading\n\nSome text\n\n![alt text](first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
-    # test_article.html_full = '<h1>Heading</h1>Some text\n<img src="first_image.jpg">\n\n<img src="http://example.com/second_image.jpg"><p>Some text\nSome more text</p>'
     test_article.url = 'https://example.com/test.html'
 
     card = test_article.twitter_card()
@@ -53,7 +50,6 @@ def test_twitter_card_no_image_url():
 
     test_article = Article(test_website)
 
-    test_article.title = 'test title'
     test_article.md = '# Heading\n\nSome text\n\nSome more text'
     test_article.url = 'https://example.com/test.html'
 

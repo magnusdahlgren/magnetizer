@@ -185,7 +185,7 @@ class Article:
 
             card = '<meta name="twitter:card" content="summary_large_image" />'
             card += '<meta name="twitter:site" content="%s" />' % twitter_handle
-            card += '<meta name="twitter:title" content="%s" />' % self.title
+            card += '<meta name="twitter:title" content="%s" />' % self.title()
 
             img_url = MUtil.first_image_url_from_html(markdown(self.md))
 
