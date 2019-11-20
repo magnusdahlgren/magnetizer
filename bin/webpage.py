@@ -52,9 +52,11 @@ class Webpage:
 
         self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
 
+        # Show 'next' link if there is a next page
         if page_no < total_no_of_pages:
             self.url_next = 'blog-%s.html' % str(page_no + 1)
 
+        # Show 'previous' link if there is a previous page
         if page_no > 1:
             self.url_previous = 'blog-%s.html' % str(page_no - 1)
 

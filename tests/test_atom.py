@@ -33,7 +33,7 @@ test_website = Website('../tests/config/test_magnetizer.cfg')
 test_website.refresh()
 
 atom = Atom(test_website)
-feed = atom.feed(['004-invalid-article.md', '003-another-article.md', '002-article-with-h1-break-and-date.md', '001-basic-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'])
+feed = atom.feed(['000-unindexed-article.md', '004-invalid-article.md', '003-another-article.md', '002-article-with-h1-break-and-date.md', '001-basic-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'])
 
 def test_feed():
 

@@ -167,7 +167,7 @@ def test_webpage_write_multiple_from_filenames():
 
     test_website.wipe()
 
-    filenames = ['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-index-this-article.md']
+    filenames = ['000-unindexed-article.md', '001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-index-this-article.md']
     Webpage.write_article_pages_from_md_filenames(test_website, filenames)
 
     written_filenames = listdir(test_website.config.value('output_path'))
@@ -177,15 +177,16 @@ def test_webpage_write_multiple_from_filenames():
     assert 'article-with-h1-break-and-date.html' in written_filenames
     assert 'another-article.html' in written_filenames
 
-    # The un-indexed article should have been written too
+    # The un-indexed articles should have been written too
+    assert 'unindexed-article.html' in written_filenames
     assert 'dont-index-this-article.html' in written_filenames
 
     # The file not ending in .md should not have been written
     assert 'ignore-this.html' not in written_filenames
     assert '100-ignore-this.txt' not in written_filenames
 
-    # ... so in total, 4 files should have been written
-    assert len([name for name in written_filenames if path.isfile(path.join(test_website.config.value('output_path'), name))]) == 4
+    # ... so in total, 5 files should have been written
+    assert len([name for name in written_filenames if path.isfile(path.join(test_website.config.value('output_path'), name))]) == 5
 
     test_website.wipe()
 

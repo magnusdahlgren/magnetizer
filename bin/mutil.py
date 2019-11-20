@@ -100,7 +100,8 @@ class MUtil:
         result = []
 
         for filename in filenames:
-            if re.search(r'^\d+-\S+\.md$', filename):
+            # starts with a number and a dash, but not 000-
+            if re.search(r'^\d+-\S+\.md$', filename) and not re.search(r'^0+-\S+\.md$', filename):
                 result.append(filename)
 
         return result

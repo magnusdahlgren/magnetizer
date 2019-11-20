@@ -28,7 +28,7 @@ class Atom:
 
         for filename in filenames:
 
-            if filename.split('-', 1)[0].isdigit():
+            if filename.split('-', 1)[0].isdigit() and int(filename.split('-', 1)[0]) != 0:
                 if article.from_md_filename(filename):
                     f += article.feed_entry()
                     if first_article:
