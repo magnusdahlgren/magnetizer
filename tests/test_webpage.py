@@ -60,7 +60,7 @@ def test_webpage_from_single_article():
 def test_special_page():
 
     webpage = Webpage(test_website)
-    webpage.article_from_md_filename('dont-index-this-article.md')
+    webpage.article_from_md_filename('dont-show-on-list-page.md')
 
     # Page title should be "Article title - Website name"
     title = 'This post should not be in the index - Test website name'
@@ -81,7 +81,7 @@ def test_special_page():
 
     # Filename for webpage should be based on the article
     article = Article(test_website)
-    article.from_md_filename('dont-index-this-article.md')
+    article.from_md_filename('dont-show-on-list-page.md')
     assert webpage.filename == article.filename
 
     # Body should have class='magnetizer-special'
@@ -138,6 +138,24 @@ def test_home_page():
     # Meta description from config file should be present
     assert '<meta name="description" content="Meta \\"description\\" from config">' in webpage.html
 
+    # Noindex tag must not be present
+    assert '<meta name="robots" content="noindex">' not in webpage.html
+
+
+def test_page_indexability():
+
+    webpage_index = Webpage(test_website)
+    webpage_index.article_from_md_filename('001-basic-article.md')
+
+    webpage_dont_index = Webpage(test_website)
+    webpage_dont_index.article_from_md_filename('009-unindexed-article.md')
+
+    # Don't include noindex tag for article page that SHOULD be indexed
+    assert '<meta name="robots" content="noindex">' not in webpage_index.html
+
+    # Include noindex tag for article page that should NOT be indexed
+    assert '<meta name="robots" content="noindex">' in webpage_dont_index.html
+
 
 def test_write_homepage():
 
@@ -177,7 +195,7 @@ def test_webpage_write_multiple_from_filenames():
 
     test_website.wipe()
 
-    filenames = ['000-unindexed-article.md', '001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-index-this-article.md']
+    filenames = ['000-article-not-on-listing-page.md', '001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-show-on-list-page.md']
     Webpage.write_article_pages_from_md_filenames(test_website, filenames)
 
     written_filenames = listdir(test_website.config.value('output_path'))
@@ -188,8 +206,8 @@ def test_webpage_write_multiple_from_filenames():
     assert 'another-article.html' in written_filenames
 
     # The un-indexed articles should have been written too
-    assert 'unindexed-article.html' in written_filenames
-    assert 'dont-index-this-article.html' in written_filenames
+    assert 'article-not-on-listing-page.html' in written_filenames
+    assert 'dont-show-on-list-page.html' in written_filenames
 
     # The file not ending in .md should not have been written
     assert 'ignore-this.html' not in written_filenames
@@ -204,8 +222,8 @@ def test_webpage_write_multiple_from_filenames():
     assert 'https://example.com/basic-article.html' in test_website.sitemap.pages
     assert 'https://example.com/article-with-h1-break-and-date.html' in test_website.sitemap.pages
     assert 'https://example.com/another-article.html' in test_website.sitemap.pages
-    assert 'https://example.com/unindexed-article.html' in test_website.sitemap.pages
-    assert 'https://example.com/dont-index-this-article.html' in test_website.sitemap.pages
+    assert 'https://example.com/article-not-on-listing-page.html' in test_website.sitemap.pages
+    assert 'https://example.com/dont-show-on-list-page.html' in test_website.sitemap.pages
 
     # Ignored files should not be included in the sitemap
     assert 'https://example.com/ignore-this.html' not in test_website.sitemap.pages

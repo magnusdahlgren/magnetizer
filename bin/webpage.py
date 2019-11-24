@@ -19,6 +19,7 @@ class Webpage:
         self.url_previous = None
         self.url_next     = None
         self.meta_description = None
+        self.indexable    = True
 
     
     def article_from_md_filename(self, filename):
@@ -29,6 +30,7 @@ class Webpage:
 
             self.filename = article.filename
             self.title = article.title()
+            self.indexable = article.indexable
             self.meta_description = article.meta_description()
             self.twitter_card = article.twitter_card()
             self.populate_html(article.html_full, article.type)
@@ -98,6 +100,9 @@ class Webpage:
 
         if self.meta_description is not None:
             m += '<meta name="description" content="%s">\n' % self.meta_description.replace('"','\\"')
+
+        if not self.indexable:
+            m += '<meta name="robots" content="noindex">'
 
         m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />\n' % self.website.config.value('website_base_url')
         m += '<link rel="stylesheet" type="text/css" href="%s">\n' % self.website.css_filename

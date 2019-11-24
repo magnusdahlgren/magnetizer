@@ -27,6 +27,7 @@ class Website:
         'cc_here'           : '<!-- MAGNETIZER_CC -->',
         'announcement'      : '<!-- ANNOUNCEMENT -->',
         'break'             : '<!-- BREAK -->',
+        'noindex'           : '<!-- NOINDEX -->',
         'creative_commons'  : '<!-- CC -->'
     }
 

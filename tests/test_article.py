@@ -151,7 +151,7 @@ def test_article_with_h1_and_break_and_date_and_cc():
 def test_special_article():
 
     article = Article(test_website)
-    article.from_md_filename('dont-index-this-article.md')
+    article.from_md_filename('dont-show-on-list-page.md')
 
     # Special article should not have a date
     assert '<time datetime' not in article.html_full
@@ -161,6 +161,18 @@ def test_special_article():
 
     # Special article should still have a link back to the homepage
     assert '<a href="/" class="magnetizer-nav-back">Back to homepage</a>' in article.html_full
+
+
+def test_noindex_article():
+
+    article_index = Article(test_website)
+    article_dont_index = Article(test_website)
+
+    article_index.from_md_filename('001-basic-article.md')
+    article_dont_index.from_md_filename('009-unindexed-article.md')
+
+    assert article_index.indexable == True
+    assert article_dont_index.indexable == False
 
 
 def test_article_cc():

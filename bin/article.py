@@ -21,6 +21,7 @@ class Article:
         self.date_html = None
         self.date = None
         self.type = 'magnetizer-article'
+        self.indexable = True
 
 
     def from_md_filename(self, filename):
@@ -42,6 +43,10 @@ class Article:
                     is_special_article = True
 
                 self.filename  = filename
+
+                if self.website.tag['noindex'] in self.md:
+                    self.indexable = False
+
                 self.html_full = self.template.render(self.website, markdown(self.md))
 
                 if is_special_article:
