@@ -58,6 +58,9 @@ def test_single_list_page():
     assert 'class="magnetizer-previous"' not in blog_1_content
     assert 'class="magnetizer-next"' not in blog_1_content
 
+    # The blog-1 page should be present in the sitemap
+    assert 'https://example.com/blog-1.html' in test_website.sitemap.pages
+
 
 def test_three_paginated_list_pages():
 
@@ -119,6 +122,11 @@ def test_three_paginated_list_pages():
     # Last page should have link to newer posts but not older
     assert 'class="magnetizer-next"' not in blog_3_content
     assert '<a href="blog-2.html" class="magnetizer-previous">Newer posts</a>' in blog_3_content
+
+    # The blog-n pages should be present in the sitemap
+    assert 'https://example.com/blog-1.html' in test_website.sitemap.pages
+    assert 'https://example.com/blog-2.html' in test_website.sitemap.pages
+    assert 'https://example.com/blog-3.html' in test_website.sitemap.pages
 
 def test_pagination_none():
 

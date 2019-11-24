@@ -1,6 +1,7 @@
 import pytest
 from os import listdir, path, remove
 from website import *
+from random import *
 import shutil
 
 test_website = Website('../tests/config/test_magnetizer.cfg')
@@ -8,27 +9,46 @@ test_website.refresh()
 
 def test_sitemap():
 
-    test_website.wipe()
+    base_url = 'https://example.com'
 
-    filenames = ['index.html', 'page-1.html', 'page-2.html', 'page-3.html']
+    page1 = 'example-%s.html' % randint(0, 999999)
+    page2 = 'example-%s.html' % randint(0, 999999)
+    page3 = 'example-%s.html' % randint(0, 999999)
 
-    # Create a bunch of files
-    for filename in filenames:
-        with open(test_website.config.value('output_path') + filename, 'w') as myfile:
-            myfile.write('...')
+    sitemap = Sitemap(base_url)
 
-    test_website.generate_sitemap()
+    # New sitemap should include no pages
+    assert len(sitemap.pages) == 0
 
-    with open(test_website.config.value('output_path') + 'sitemap.txt', 'r') as myfile:
-        sitemap_txt = myfile.read()
+    sitemap.append(page1)
 
-    # Sitemap should contain all the files we just created
-    for filename in filenames:
+    # after appending one page, sitemap should contain that page and only that page
+    assert len(sitemap.pages) == 1
+    assert sitemap.pages[0] == "%s/%s" % (base_url, page1)
 
-        if filename == 'index.html':
-            filename = '\n'
+    sitemap.append(page2)
+    sitemap.append(page3)
 
-        assert 'https://example.com/' + filename in sitemap_txt
+    # after appebding two more pages, sitemap should contain 3 pages
+    assert len(sitemap.pages) == 3
+    assert sitemap.pages[0] == "%s/%s" % (base_url, page1)
+    assert sitemap.pages[1] == "%s/%s" % (base_url, page2)
+    assert sitemap.pages[2] == "%s/%s" % (base_url, page3)
 
-    # Sitemap should only contain the files we just created
-    assert len(sitemap_txt.splitlines()) == len(filenames)
+    sitemap.append('index.html')
+
+    # index.html should be included as '/', without 'index.html'
+    assert len(sitemap.pages) == 4
+    assert sitemap.pages[3] == "%s/" % base_url
+
+    sitemap.write(test_website.config.value('output_path'))
+
+    with open(test_website.config.value('output_path') + 'sitemap.txt', 'r') as f:
+        sitemap_from_file = f.read().splitlines()
+
+    # sitemap written to file should contain our 3 pages
+    assert len(sitemap.pages) == 4
+    assert sitemap_from_file[0] == "%s/%s" % (base_url, page1)
+    assert sitemap_from_file[1] == "%s/%s" % (base_url, page2)
+    assert sitemap_from_file[2] == "%s/%s" % (base_url, page3)
+    assert sitemap_from_file[3] == "%s/" % base_url

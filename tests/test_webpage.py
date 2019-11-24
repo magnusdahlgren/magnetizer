@@ -56,6 +56,7 @@ def test_webpage_from_single_article():
     # Meta description should be pulled in from article
     assert '<meta name="description" content="Meta description from article">' in webpage.html 
 
+
 def test_special_page():
 
     webpage = Webpage(test_website)
@@ -142,8 +143,12 @@ def test_write_homepage():
 
     Webpage.write_homepage_from_directory(test_website, test_website.config.value('source_path'))
 
+    # Homepage should contain some html content
     with open(test_website.config.value('output_path') + 'index.html', 'r') as myfile:
         assert myfile.read().count('<html>') == 1
+
+    # Homepage should be included in sitemap
+    assert 'https://example.com/' in test_website.sitemap.pages
 
     test_website.wipe()
 
@@ -157,8 +162,13 @@ def test_webpage_write():
     webpage.filename = 'my-post.html'
     webpage.write()
 
+    # File should have the correct contents
     with open(test_website.config.value('output_path') + webpage.filename, 'r') as myfile:
         assert myfile.read() == RESULT
+
+    # Page should be included in sitemap
+    assert 'https://example.com/my-post.html' in test_website.sitemap.pages
+
 
     test_website.wipe()
 
@@ -187,6 +197,18 @@ def test_webpage_write_multiple_from_filenames():
 
     # ... so in total, 5 files should have been written
     assert len([name for name in written_filenames if path.isfile(path.join(test_website.config.value('output_path'), name))]) == 5
+
+    print(test_website.sitemap.pages)
+
+    # The written files should be included in the sitemap
+    assert 'https://example.com/basic-article.html' in test_website.sitemap.pages
+    assert 'https://example.com/article-with-h1-break-and-date.html' in test_website.sitemap.pages
+    assert 'https://example.com/another-article.html' in test_website.sitemap.pages
+    assert 'https://example.com/unindexed-article.html' in test_website.sitemap.pages
+    assert 'https://example.com/dont-index-this-article.html' in test_website.sitemap.pages
+
+    # Ignored files should not be included in the sitemap
+    assert 'https://example.com/ignore-this.html' not in test_website.sitemap.pages
 
     test_website.wipe()
 
@@ -227,6 +249,8 @@ def test_wipe_output_directory():
 
         # Remove the test file
         remove(test_website.config.value('output_path') + filename)
+
+    assert test_website.sitemap.pages == []
 
 
 # run the tests from bin with $ python -m pytest ../tests/

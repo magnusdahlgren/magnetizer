@@ -3,12 +3,14 @@ from config import *
 import shutil
 import hashlib
 from mutil import *
+from sitemap import *
 
 class Website:
 
     def __init__(self, config_file_name):
 
         self.config = Config(config_file_name)
+        self.sitemap = Sitemap(self.config.value('website_base_url'))
         self.refresh()
                 
     tag = {
@@ -77,30 +79,9 @@ class Website:
                 else:
                     ignored += 1
 
+        self.sitemap.clear()
+
         print (colours.OK + ' --> ' + colours.END + 'Deleted %s files, ignored %s' % (deleted, ignored) )
-
-
-    def generate_sitemap(self):
-
-        print('Generating sitemap in %s' % self.config.value('output_path'))
-        sitemap = []
-
-        for filename in listdir(self.config.value('output_path')):
-            
-            if path.isfile(self.config.value('output_path') + filename):
-                extension = '.' + filename.split('.')[-1]
-
-                if extension == '.html':
-
-                    if filename == 'index.html':
-                        filename = ''
-                        
-                    sitemap.append(self.config.value('website_base_url') + '/' + filename)
-
-        with open(self.config.value('output_path') + 'sitemap.txt', 'w') as myfile:
-            myfile.write('\n'.join(sitemap))
-
-        print (colours.OK + ' --> ' + colours.END + 'sitemap.txt (%s links)' %  len(sitemap))
 
 
     @staticmethod

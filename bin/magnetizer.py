@@ -19,7 +19,7 @@ def main():
     Webpage.write_list_pages_from_directory(website, website.config.value('source_path'))
 
     website.copy_resources()
-    website.generate_sitemap()
+    website.sitemap.write(website.config.value('output_path'))
 
     atom = Atom(website)
     atom.write()
