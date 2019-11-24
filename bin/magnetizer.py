@@ -14,9 +14,9 @@ def main():
     website = Website(config_filename)
     website.wipe()
 
-    Webpage.write_article_pages_from_directory(website, website.config.value('source_path'))
     Webpage.write_homepage_from_directory(website, website.config.value('source_path'))
     Webpage.write_list_pages_from_directory(website, website.config.value('source_path'))
+    Webpage.write_article_pages_from_directory(website, website.config.value('source_path'))
 
     website.copy_resources()
     website.sitemap.write(website.config.value('output_path'))
