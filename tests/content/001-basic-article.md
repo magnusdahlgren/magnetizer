@@ -4,11 +4,11 @@ And here is some text...
 
 <!-- Comment -->
 
-<!-- ANNOUNCEMENT -->
+<!-- MAGNETIZER_INCLUDE _announcement.html -->
 
 More text...
 
-<!-- ANNOUNCEMENT -->
+<!-- MAGNETIZER_INCLUDE _announcement.html -->
 
 <!-- META_DESCRIPTION = Meta description from article -->
 

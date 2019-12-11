@@ -88,7 +88,7 @@ class Webpage:
         if self.pagination_html() is not None:
             self.html = self.html.replace(self.website.tag['pagination'], self.pagination_html(), 1)
 
-        self.html = self.html.replace(self.website.tag['announcement'], self.website.announcement_html)
+        self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE _announcement.html -->', self.website.announcement_html)
 
         # Remove all remaining comment tags
         self.html = sub(r'<!--(.*?)-->', '', self.html)
