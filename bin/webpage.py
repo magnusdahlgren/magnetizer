@@ -88,10 +88,8 @@ class Webpage:
         if self.pagination_html() is not None:
             self.html = self.html.replace(self.website.tag['pagination'], self.pagination_html(), 1)
 
-        partials = ['_announcement.html', '_contact.html']
-
-        for partial in partials:
-            self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE %s -->' % partial, self.website.partial_html(partial))
+        self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE _announcement.html -->', self.website.partial_html('_announcement.html'))
+        self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE _contact.html -->', self.website.partial_html('_contact.html'))
 
         # Remove all remaining comment tags
         self.html = sub(r'<!--(.*?)-->', '', self.html)
