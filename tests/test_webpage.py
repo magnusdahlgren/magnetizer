@@ -47,11 +47,10 @@ def test_webpage_from_single_article():
     # Link to CSS should be present
     assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in webpage.html
 
-    # Announcement should be included twice, as per the .md file
-    assert webpage.html.count("<div class='announcement'>Announcement</div>") == 2
-
-    # Contact include should be included, as per the .md file
-    assert "<div class='contact'>Contact</div>" in webpage.html
+    # Includes should be included, as per the .md file
+    assert webpage.html.count("<div class='include'>Include 1</div>") == 2
+    assert "<div class='include'>Include 2</div>" in webpage.html
+    assert "<div class='include'>Include 3</div>" in webpage.html
 
     # No html comments should be left in page
     assert '<!--' not in webpage.html
@@ -111,8 +110,8 @@ def test_home_page():
     # Homepage header should be present
     assert webpage.html.count('<div>header</div>') == 1
 
-    # Announcement (from homepage header) should be present
-    assert "<div class='announcement'>Announcement</div>" in webpage.html
+    # Include (from homepage header) should be present
+    assert "<div class='include'>Include 1</div>" in webpage.html
 
     # Homepage footer should be present
     assert webpage.html.count('<div>homepage footer</div>') == 1
@@ -272,6 +271,26 @@ def test_wipe_output_directory():
         remove(test_website.config.value('output_path') + filename)
 
     assert test_website.sitemap.pages == []
+
+
+def test_includes():
+
+    webpage = Webpage(test_website)
+    webpage.html = '<h1>Some html</h1>'
+    webpage.html += "<!-- MAGNETIZER_INCLUDE _include1.html -->"
+    webpage.html += "<!-- MAGNETIZER_INCLUDE _include2.html -->"
+    webpage.html += '<div>More html...</div>'
+    webpage.html += "<!-- MAGNETIZER_INCLUDE _include3.html -->"
+    webpage.html += "<!-- MAGNETIZER_INCLUDE _include1.html -->"
+
+    correct_includes = ['_include1.html', '_include2.html', '_include3.html']
+    includes = webpage.includes()
+
+    # Set should contain each include from the html 
+    for correct_include in correct_includes:
+        assert correct_include in includes
+
+    assert len(includes) == len(correct_includes)
 
 
 # run the tests from bin with $ python -m pytest ../tests/

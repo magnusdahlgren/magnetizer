@@ -12,4 +12,4 @@ def test_website_css_filename():
 
 def test_website_partial_html():
 
-    assert test_website.partial_html('_announcement.html') == "<div class='announcement'>Announcement</div>"
+    assert test_website.partial_html('_include_1.html') == "<div class='include'>Include 1</div>"

@@ -88,10 +88,10 @@ class Webpage:
         if self.pagination_html() is not None:
             self.html = self.html.replace(self.website.tag['pagination'], self.pagination_html(), 1)
 
-        partials = ['_announcement.html', '_contact.html']
+        includes = self.includes()
 
-        for partial in partials:
-            self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE %s -->' % partial, self.website.partial_html(partial))
+        for include in includes:
+            self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE %s -->' % include, self.website.partial_html(include))
 
         # Remove all remaining comment tags
         self.html = sub(r'<!--(.*?)-->', '', self.html)
@@ -110,6 +110,11 @@ class Webpage:
         m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />\n' % self.website.config.value('website_base_url')
         m += '<link rel="stylesheet" type="text/css" href="%s">\n' % self.website.css_filename
         return m
+
+
+    def includes(self):
+
+        return set(re.findall(r"<!-- *MAGNETIZER_INCLUDE *(.*?) *-->", self.html))
 
 
     def pagination_html(self):
