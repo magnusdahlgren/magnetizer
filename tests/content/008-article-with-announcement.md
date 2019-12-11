@@ -2,10 +2,10 @@
 
 Here is some text...
 
-<!-- ANNOUNCEMENT -->
+<!-- MAGNETIZER_INCLUDE _include_1.html -->
 
 More text
 
-<!-- ANNOUNCEMENT -->
+<!-- MAGNETIZER_INCLUDE _include_1.html -->
 
 <!-- 12/11/2019 -->

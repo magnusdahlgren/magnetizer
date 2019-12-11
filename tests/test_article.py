@@ -86,7 +86,7 @@ def test_article_basic():
     assert article.html.count(cc_license) == 0
     assert article.html_full.count(cc_license) == 0
 
-    # announcements should be stripped, from the short html only
+    # includes should be stripped, from the short html only
     assert '<!-- MAGNETIZER_INCLUDE' in article.html_full
     assert '<!-- MAGNETIZER_INCLUDE' not in article.html
 

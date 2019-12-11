@@ -25,7 +25,6 @@ class Website:
         'page_class'        : '<!-- MAGNETIZER_PAGE_CLASS -->',
         'pagination'        : '<!-- MAGNETIZER_PAGINATION -->',
         'cc_here'           : '<!-- MAGNETIZER_CC -->',
-        'announcement'      : '<!-- ANNOUNCEMENT -->',
         'break'             : '<!-- BREAK -->',
         'noindex'           : '<!-- NOINDEX -->',
         'creative_commons'  : '<!-- CC -->'
