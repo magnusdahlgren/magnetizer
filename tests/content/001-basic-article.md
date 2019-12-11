@@ -15,6 +15,8 @@ A bit more text...
 
 <!-- MAGNETIZER_INCLUDE _include_1.html -->
 
+<!-- MAGNETIZER_INCLUDE inexistent_file.html -->
+
 <!-- META_DESCRIPTION = Meta description from article -->
 
 <!-- 7/7/1998 -->

@@ -49,8 +49,9 @@ def test_webpage_from_single_article():
 
     # Includes should be included, as per the .md file
     assert webpage.html.count("<div class='include'>Include 1</div>") == 2
-    assert "<div class='include'>Include 2</div>" in webpage.html
-    assert "<div class='include'>Include 3</div>" in webpage.html
+    assert webpage.html.count("<div class='include'>Include 2</div>") == 1
+    assert webpage.html.count("<div class='include'>Include 3</div>") == 1
+    assert "[ ERROR: Include 'inexistent_file.html' does not exist! ]" in webpage.html
 
     # No html comments should be left in page
     assert '<!--' not in webpage.html

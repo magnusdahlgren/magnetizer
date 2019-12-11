@@ -40,9 +40,15 @@ class Website:
         css_hash = hashlib.md5(bytes(css_contents, encoding='utf-8')).hexdigest()
         self.css_filename = self.config.value('website_css_filename') + '?' + css_hash
 
+
     def partial_html(self, filename):
 
-        return Website.read_file(self.config.value('template_path'), filename)
+        if path.isfile(path.join(self.config.value('template_path'), filename)):
+            return Website.read_file(self.config.value('template_path'), filename)
+
+        else:
+            print (colours.ERROR + ' (!) ' + colours.END + "Include '%s' does not exist!" % filename)
+            return "[ ERROR: Include '%s' does not exist! ]" % filename
 
 
     def copy_resources(self):
