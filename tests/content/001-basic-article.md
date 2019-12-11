@@ -8,6 +8,10 @@ And here is some text...
 
 More text...
 
+<!-- MAGNETIZER_INCLUDE _contact.html -->
+
+A bit more text...
+
 <!-- MAGNETIZER_INCLUDE _announcement.html -->
 
 <!-- META_DESCRIPTION = Meta description from article -->

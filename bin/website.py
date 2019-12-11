@@ -36,11 +36,15 @@ class Website:
         self.index_header_html = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
         self.index_footer_html = Website.read_file(self.config.value('template_path'), self.config.value('index_footer_template_filename'))
         self.list_page_header_html = Website.read_file(self.config.value('template_path'), self.config.value('list_page_header_template_filename'))
-        self.announcement_html = Website.read_file(self.config.value('template_path'), '_announcement.html')
 
         css_contents = Website.read_file(self.config.value('resources_path'), self.config.value('website_css_filename'))
         css_hash = hashlib.md5(bytes(css_contents, encoding='utf-8')).hexdigest()
         self.css_filename = self.config.value('website_css_filename') + '?' + css_hash
+
+    def partial_html(self, filename):
+
+        return Website.read_file(self.config.value('template_path'), filename)
+
 
     def copy_resources(self):
 

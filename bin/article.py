@@ -81,7 +81,7 @@ class Article:
                 self.html = MUtil.downgrade_headings(self.html)
                 self.html = self.template.render(self.website, self.html)
                 self.html = self.html.replace(self.website.tag['article_footer'], '', 1)
-                self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE _announcement.html -->', '')
+                self.html = sub(r'<!-- MAGNETIZER_INCLUDE (.*?)-->', '', self.html)
 
                 if self.date_html is not None:
 

@@ -50,6 +50,9 @@ def test_webpage_from_single_article():
     # Announcement should be included twice, as per the .md file
     assert webpage.html.count("<div class='announcement'>Announcement</div>") == 2
 
+    # Contact include should be included, as per the .md file
+    assert "<div class='contact'>Contact</div>" in webpage.html
+
     # No html comments should be left in page
     assert '<!--' not in webpage.html
 
