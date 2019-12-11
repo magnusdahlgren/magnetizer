@@ -198,7 +198,7 @@ def test_webpage_write_multiple_from_filenames():
 
     test_website.wipe()
 
-    filenames = ['000-article-not-on-listing-page.md', '001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-show-on-list-page.md']
+    filenames = ['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-show-on-list-page.md']
     Webpage.write_article_pages_from_md_filenames(test_website, filenames)
 
     written_filenames = listdir(test_website.config.value('output_path'))
@@ -209,15 +209,14 @@ def test_webpage_write_multiple_from_filenames():
     assert 'another-article.html' in written_filenames
 
     # The un-indexed articles should have been written too
-    assert 'article-not-on-listing-page.html' in written_filenames
     assert 'dont-show-on-list-page.html' in written_filenames
 
     # The file not ending in .md should not have been written
     assert 'ignore-this.html' not in written_filenames
     assert '100-ignore-this.txt' not in written_filenames
 
-    # ... so in total, 5 files should have been written
-    assert len([name for name in written_filenames if path.isfile(path.join(test_website.config.value('output_path'), name))]) == 5
+    # ... so in total, 4 files should have been written
+    assert len([name for name in written_filenames if path.isfile(path.join(test_website.config.value('output_path'), name))]) == 4
 
     print(test_website.sitemap.pages)
 
@@ -225,7 +224,6 @@ def test_webpage_write_multiple_from_filenames():
     assert 'https://example.com/basic-article.html' in test_website.sitemap.pages
     assert 'https://example.com/article-with-h1-break-and-date.html' in test_website.sitemap.pages
     assert 'https://example.com/another-article.html' in test_website.sitemap.pages
-    assert 'https://example.com/article-not-on-listing-page.html' in test_website.sitemap.pages
     assert 'https://example.com/dont-show-on-list-page.html' in test_website.sitemap.pages
 
     # Ignored files should not be included in the sitemap
