@@ -35,8 +35,8 @@ def test_webpage_from_single_article():
     article.from_md_filename('001-basic-article.md')
     assert webpage.filename == article.filename
 
-    # Body should have class='magnetizer-article'
-    assert webpage.html.count("<body class='magnetizer-article'>") == 1
+    # Body should have class='magnetizer-article-item'
+    assert webpage.html.count("<body class='magnetizer-article-item'>") == 1
 
     # Twitter card should be present
     assert '<meta name="twitter:card" content="summary_large_image" />' in webpage.html
@@ -60,7 +60,7 @@ def test_webpage_from_single_article():
     assert '<meta name="description" content="Meta description from article">' in webpage.html 
 
 
-def test_special_page():
+def test_static_item_page():
 
     webpage = Webpage(test_website)
     webpage.item_from_md_filename('dont-show-on-list-page.md')
@@ -87,8 +87,8 @@ def test_special_page():
     article.from_md_filename('dont-show-on-list-page.md')
     assert webpage.filename == article.filename
 
-    # Body should have class='magnetizer-special'
-    assert webpage.html.count("<body class='magnetizer-special'>") == 1
+    # Body should have class='magnetizer-static-item'
+    assert webpage.html.count("<body class='magnetizer-static-item'>") == 1
 
     # Twitter card should be present
     assert '<meta name="twitter:card" content="summary_large_image" />' in webpage.html

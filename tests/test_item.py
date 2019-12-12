@@ -148,7 +148,7 @@ def test_article_with_h1_and_break_and_date_and_cc():
     assert article.html_full.count(cc_license) == 1
 
 
-def test_special_article():
+def test_static_item():
 
     article = Item(test_website)
     article.from_md_filename('dont-show-on-list-page.md')

@@ -9,6 +9,10 @@ from mutil import *
 
 class Item:
 
+    ARTICLE_ITEM = "magnetizer-article-item"
+    STATIC_ITEM = "magnetizer-static-item"
+
+
     def __init__(self, website):
         
         self.website = website
@@ -20,7 +24,7 @@ class Item:
         self.html_full = None
         self.date_html = None
         self.date = None
-        self.type = 'magnetizer-article'
+        self.type = None
         self.indexable = True
 
 
@@ -38,9 +42,11 @@ class Item:
                 # Remove first part of filename if it is a number
                 if filename.split('-', 1)[0].isdigit():
                     filename  = filename.split('-', 1)[1]
-                    is_special_article = False
+                    self.type = Item.ARTICLE_ITEM
+                    # is_special_article = False
                 else:
-                    is_special_article = True
+                    # is_special_article = True
+                    self.type = Item.STATIC_ITEM
 
                 self.filename  = filename
 
@@ -49,9 +55,9 @@ class Item:
 
                 self.html_full = self.template.render(self.website, markdown(self.md))
 
-                if is_special_article:
+                if self.type == Item.STATIC_ITEM:
                     back_link = '<a href="/" class="magnetizer-nav-back">Back to homepage</a>'
-                    self.type = 'magnetizer-special'
+                    # self.type = 'magnetizer-special'
                     self.date = None
                     self.date_html = None
                     self.html_full = self.html_full.replace(self.website.tag['article_footer'], '', 1)
