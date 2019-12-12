@@ -11,7 +11,7 @@ test_website.refresh()
 
 def test_article_is_valid():
 
-    article = Article(test_website)
+    article = Item(test_website)
     article.template = Template(article.website, article.website.config.value('template_path') + article.website.config.value('article_template_filename'))
 
     article.md = 'Just some text'
@@ -39,7 +39,7 @@ def test_article_is_valid():
 
 def test_article_title():
 
-    article = Article(test_website)
+    article = Item(test_website)
 
     # Title should be 'Untitled' if article contains no html
     article.html_full = None
@@ -60,7 +60,7 @@ def test_article_title():
 
 def test_article_basic():
 
-    article = Article(test_website)
+    article = Item(test_website)
     article.from_md_filename('001-basic-article.md')
 
     # filename should be without number and .html instead of .md
@@ -105,7 +105,7 @@ def test_article_with_h1_and_break_and_date_and_cc():
 #   Don't show this bit on the index page
 #   <!-- 1/8/1998 -->
 
-    article = Article(test_website)
+    article = Item(test_website)
     article.from_md_filename('002-article-with-h1-break-and-date.md')
 
     # The title should be the <h1> contents
@@ -150,7 +150,7 @@ def test_article_with_h1_and_break_and_date_and_cc():
 
 def test_special_article():
 
-    article = Article(test_website)
+    article = Item(test_website)
     article.from_md_filename('dont-show-on-list-page.md')
 
     # Special article should not have a date
@@ -165,8 +165,8 @@ def test_special_article():
 
 def test_noindex_article():
 
-    article_index = Article(test_website)
-    article_dont_index = Article(test_website)
+    article_index = Item(test_website)
+    article_dont_index = Item(test_website)
 
     article_index.from_md_filename('001-basic-article.md')
     article_dont_index.from_md_filename('009-unindexed-article.md')
@@ -177,27 +177,27 @@ def test_noindex_article():
 
 def test_article_cc():
 
-    article = Article(test_website)
-    article.filename = 'test_filename.html'
+    item = Item(test_website)
+    item.filename = 'test_filename.html'
 
     cc_license = '<p class="magntetizer-license">'
     cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">'
     cc_license += '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
     cc_license += '</a><br />This work by <a xmlns:cc="http://creativecommons.org/ns#" href="'
-    cc_license += 'https://example.com/' + article.filename
+    cc_license += 'https://example.com/' + item.filename
     cc_license += '" property="cc:attributionName" rel="cc:attributionURL">'
     cc_license += 'Test Author</a> is licensed under a '
     cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.'
     cc_license += '</p>'
 
-    assert article.cc_license() == cc_license
+    assert item.cc_license() == cc_license
 
 
 def test_html_contents_from_multiple_md_files():
 
     filenames = ['005-simple-article-1.md', '006-simple-article-2.md', '007-simple-article-3.md',]
 
-    html = Article.html_contents_from_multiple_md_files(test_website, filenames)
+    html = Item.html_contents_from_multiple_md_files(test_website, filenames)
 
     assert html.count('<article>') == 3
     assert 'Article 5' in html

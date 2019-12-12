@@ -1,5 +1,5 @@
 import pytest
-from article import *
+from item import *
 from website import *
 from atom import *
 
@@ -68,10 +68,10 @@ def test_feed():
 
 def test_feed_entry():
 
-    article = Article(test_website)
-    article.from_md_filename('002-article-with-h1-break-and-date.md')
+    item = Item(test_website)
+    item.from_md_filename('002-article-with-h1-break-and-date.md')
 
-    entry = article.feed_entry()
+    entry = item.feed_entry()
 
     # Entry should be nested in <entry></entry>
     assert entry.startswith('<entry>')

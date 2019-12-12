@@ -1,5 +1,5 @@
 import pytest
-from article import *
+from item import *
 from website import *
 
 test_website = Website('../tests/config/test_magnetizer.cfg')
@@ -7,13 +7,13 @@ test_website.refresh()
 
 def test_twitter_card_meta_data():
 
-    test_article = Article(test_website)
+    test_item = Item(test_website)
 
-    test_article.md = '<!-- comment -->\n# Heading\n\nSome text\n\n![alt text](http://example.com/first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
-    test_article.html_full = '<h1>Heading</h1><p>Some text ...</p>'
-    test_article.url = 'https://example.com/test.html'
+    test_item.md = '<!-- comment -->\n# Heading\n\nSome text\n\n![alt text](http://example.com/first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
+    test_item.html_full = '<h1>Heading</h1><p>Some text ...</p>'
+    test_item.url = 'https://example.com/test.html'
 
-    card = test_article.twitter_card()
+    card = test_item.twitter_card()
 
     # Twitter card should be of type "summary_large_image"
     assert '<meta name="twitter:card" content="summary_large_image" />' in card
@@ -35,12 +35,12 @@ def test_twitter_card_meta_data():
 
 def test_twitter_card_relative_image_url():
 
-    test_article = Article(test_website)
+    test_item = Item(test_website)
 
-    test_article.md = '# Heading\n\nSome text\n\n![alt text](first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
-    test_article.url = 'https://example.com/test.html'
+    test_item.md = '# Heading\n\nSome text\n\n![alt text](first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
+    test_item.url = 'https://example.com/test.html'
 
-    card = test_article.twitter_card()
+    card = test_item.twitter_card()
 
     # Relative URL should be converted to absolute URL
     assert '<meta name="twitter:image" content="https://example.com/first_image.jpg" />' in card
@@ -48,12 +48,12 @@ def test_twitter_card_relative_image_url():
 
 def test_twitter_card_no_image_url():
 
-    test_article = Article(test_website)
+    test_item = Item(test_website)
 
-    test_article.md = '# Heading\n\nSome text\n\nSome more text'
-    test_article.url = 'https://example.com/test.html'
+    test_item.md = '# Heading\n\nSome text\n\nSome more text'
+    test_item.url = 'https://example.com/test.html'
 
-    card = test_article.twitter_card()
+    card = test_item.twitter_card()
 
     # twitter:image should not be present if no image in post
     assert '<meta name="twitter:image"' not in card
@@ -61,10 +61,10 @@ def test_twitter_card_no_image_url():
 
 def test_twitter_card_from_article_from_file():
 
-    test_article = Article(test_website)
-    test_article.from_md_filename('002-article-with-h1-break-and-date.md')
+    test_item = Item(test_website)
+    test_item.from_md_filename('002-article-with-h1-break-and-date.md')
 
-    card = test_article.twitter_card()
+    card = test_item.twitter_card()
 
     # h1 tag should be stripped out
     assert '<meta name="twitter:description" content="This text should always be here' in card

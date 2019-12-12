@@ -7,7 +7,7 @@ from re import search
 from mutil import *
 
 
-class Article:
+class Item:
 
     def __init__(self, website):
         
@@ -221,13 +221,13 @@ class Article:
     @staticmethod
     def html_contents_from_multiple_md_files(website, filenames):
 
-        article = Article(website)
+        item = Item(website)
         html = ''
 
         for filename in filenames:
 
             if filename.split('-', 1)[0].isdigit():
-                if article.from_md_filename(filename):
-                    html += article.html
+                if item.from_md_filename(filename):
+                    html += item.html
 
         return html

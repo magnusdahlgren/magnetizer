@@ -11,7 +11,7 @@ test_website.refresh()
 def test_webpage_from_single_article():
 
     webpage = Webpage(test_website)
-    webpage.article_from_md_filename('001-basic-article.md')
+    webpage.item_from_md_filename('001-basic-article.md')
 
     # Page title should be "Article title - Website name"
     title = 'This is the heading - Test website name'
@@ -31,7 +31,7 @@ def test_webpage_from_single_article():
     assert webpage.html.count('<footer>footer</footer>') == 1
 
     # Filename for webpage should be based on the article
-    article = Article(test_website)
+    article = Item(test_website)
     article.from_md_filename('001-basic-article.md')
     assert webpage.filename == article.filename
 
@@ -63,7 +63,7 @@ def test_webpage_from_single_article():
 def test_special_page():
 
     webpage = Webpage(test_website)
-    webpage.article_from_md_filename('dont-show-on-list-page.md')
+    webpage.item_from_md_filename('dont-show-on-list-page.md')
 
     # Page title should be "Article title - Website name"
     title = 'This post should not be in the index - Test website name'
@@ -83,7 +83,7 @@ def test_special_page():
     assert webpage.html.count('<footer>footer</footer>') == 0
 
     # Filename for webpage should be based on the article
-    article = Article(test_website)
+    article = Item(test_website)
     article.from_md_filename('dont-show-on-list-page.md')
     assert webpage.filename == article.filename
 
@@ -148,10 +148,10 @@ def test_home_page():
 def test_page_indexability():
 
     webpage_index = Webpage(test_website)
-    webpage_index.article_from_md_filename('001-basic-article.md')
+    webpage_index.item_from_md_filename('001-basic-article.md')
 
     webpage_dont_index = Webpage(test_website)
-    webpage_dont_index.article_from_md_filename('009-unindexed-article.md')
+    webpage_dont_index.item_from_md_filename('009-unindexed-article.md')
 
     # Don't include noindex tag for article page that SHOULD be indexed
     assert '<meta name="robots" content="noindex">' not in webpage_index.html
@@ -199,7 +199,7 @@ def test_webpage_write_multiple_from_filenames():
     test_website.wipe()
 
     filenames = ['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-show-on-list-page.md']
-    Webpage.write_article_pages_from_md_filenames(test_website, filenames)
+    Webpage.write_item_pages_from_md_filenames(test_website, filenames)
 
     written_filenames = listdir(test_website.config.value('output_path'))
 

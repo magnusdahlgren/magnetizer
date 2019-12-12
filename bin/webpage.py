@@ -1,6 +1,6 @@
 from website import *
 from template import *
-from article import *
+from item import *
 from markdown import markdown
 from os import listdir
 from math import ceil
@@ -22,18 +22,18 @@ class Webpage:
         self.indexable    = True
 
     
-    def article_from_md_filename(self, filename):
+    def item_from_md_filename(self, filename):
 
-        article = Article(self.website)
+        item = Item(self.website)
         
-        if article.from_md_filename(filename):
+        if item.from_md_filename(filename):
 
-            self.filename = article.filename
-            self.title = article.title()
-            self.indexable = article.indexable
-            self.meta_description = article.meta_description()
-            self.twitter_card = article.twitter_card()
-            self.populate_html(article.html_full, article.type)
+            self.filename = item.filename
+            self.title = item.title()
+            self.indexable = item.indexable
+            self.meta_description = item.meta_description()
+            self.twitter_card = item.twitter_card()
+            self.populate_html(item.html_full, item.type)
             return True
 
         else:
@@ -43,7 +43,7 @@ class Webpage:
     def homepage_from_md_filenames(self, filenames):
 
         filenames = MUtil.filter_out_non_article_filenames(filenames)[0:3]
-        html = Article.html_contents_from_multiple_md_files(self.website, filenames)
+        html = Item.html_contents_from_multiple_md_files(self.website, filenames)
 
         self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
         self.meta_description = self.website.config.value('homepage_meta_description')
@@ -62,7 +62,7 @@ class Webpage:
         if page_no > 1:
             self.url_previous = 'blog-%s.html' % str(page_no - 1)
 
-        html = Article.html_contents_from_multiple_md_files(self.website, filenames)
+        html = Item.html_contents_from_multiple_md_files(self.website, filenames)
         self.populate_html(html, 'magnetizer-list')
 
 
@@ -153,29 +153,29 @@ class Webpage:
 
 
     @staticmethod
-    def write_article_pages_from_md_filenames(website, filenames):
+    def write_item_pages_from_md_filenames(website, filenames):
 
-        print('Generating article pages --> %s' % website.config.value('output_path'))
+        print('Generating item pages --> %s' % website.config.value('output_path'))
         generated = 0
         ignored = 0
 
         for filename in filenames: 
 
             webpage = Webpage(website)
-            if webpage.article_from_md_filename(filename):
+            if webpage.item_from_md_filename(filename):
                 webpage.write()
                 generated += 1
             else:
                 ignored +=1
 
-        print (colours.OK + ' --> ' + colours.END + 'Generated %s articles, ignored %s files' % (generated, ignored))
+        print (colours.OK + ' --> ' + colours.END + 'Generated %s item pages, ignored %s files' % (generated, ignored))
 
 
     @staticmethod
-    def write_article_pages_from_directory(website, directory):
+    def write_item_pages_from_directory(website, directory):
 
         filenames = Webpage.filenames_from_directory(directory)        
-        Webpage.write_article_pages_from_md_filenames(website, filenames)
+        Webpage.write_item_pages_from_md_filenames(website, filenames)
 
 
     @staticmethod

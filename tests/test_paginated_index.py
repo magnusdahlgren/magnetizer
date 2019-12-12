@@ -13,9 +13,9 @@ test_website.config.set('source_path', '../tests/temp/')
 def test_single_list_page():
 
     test_website.wipe()
-    clean_up_test_articles_md()
-    generate_test_articles_md(4)
-    generate_non_indexable_test_articles_md()
+    clean_up_test_items_md()
+    generate_test_items_md(4)
+    generate_non_indexable_test_items_md()
 
     Webpage.write_list_pages_from_directory(test_website, test_website.config.value('source_path'))
 
@@ -65,8 +65,8 @@ def test_single_list_page():
 def test_three_paginated_list_pages():
 
     test_website.wipe()
-    clean_up_test_articles_md()
-    generate_test_articles_md(10)
+    clean_up_test_items_md()
+    generate_test_items_md(10)
 
     Webpage.write_list_pages_from_directory(test_website, test_website.config.value('source_path'))
 
@@ -78,6 +78,8 @@ def test_three_paginated_list_pages():
 
     with open(test_website.config.value('output_path') + 'blog-1.html', 'r') as myfile:
         blog_1_content = myfile.read()
+
+    print (blog_1_content)
 
     with open(test_website.config.value('output_path') + 'blog-2.html', 'r') as myfile:
         blog_2_content = myfile.read()
@@ -169,37 +171,37 @@ def test_pagination_previous_and_next():
     assert webpage.pagination_html() == result
 
 
-def generate_non_indexable_test_articles_md():
+def generate_non_indexable_test_items_md():
 
     for n in range(1, 6):
 
         md = '# Ignore me %s.\n<!-- %s/1/1998 -->' % (n, n)
-        filename = 'ignore-test-article-%s.md' % n
+        filename = 'ignore-test-item-%s.md' % n
 
         with open(test_website.config.value('source_path') + filename, 'w') as myfile:
             myfile.write(md)
 
 
-def generate_test_articles_md(number_of_posts):
+def generate_test_items_md(number_of_posts):
 
     # delete old posts
 
     for n in range(1, number_of_posts + 1):
 
         md = '# Article %s.\n<!-- %s/1/1998 -->' % (n, n)
-        filename = str(n).zfill(3) + '-test-article-%s.md' % n
+        filename = str(n).zfill(3) + '-test-item-%s.md' % n
 
         with open(test_website.config.value('source_path') + filename, 'w') as myfile:
             myfile.write(md)
 
 
-def clean_up_test_articles_md():
+def clean_up_test_items_md():
 
     # Todo: Make this more generic but without risking to deleting unintended files
 
     for n in range(1, 50):
 
-        filename = str(n).zfill(3) + '-test-article-%s.md' % n
+        filename = str(n).zfill(3) + '-test-item-%s.md' % n
 
         if path.isfile(test_website.config.value('source_path') + filename):
             remove(test_website.config.value('source_path') + filename)
