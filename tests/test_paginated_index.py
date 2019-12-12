@@ -44,8 +44,8 @@ def test_single_list_page():
     # Don't show article footers on list page 
     assert '<footer>footer</footer>' not in blog_1_content
 
-    # Body should have class='magnetizer-list'
-    assert "<body class='magnetizer-list'>" in blog_1_content
+    # Body should have class='magnetizer-listing'
+    assert "<body class='magnetizer-listing'>" in blog_1_content
 
     # Twitter card should *not* be present (todo: yet!)
     assert '<meta name="twitter:card" content="summary" />' not in blog_1_content

@@ -63,7 +63,7 @@ class Webpage:
             self.url_previous = 'blog-%s.html' % str(page_no - 1)
 
         html = Item.html_contents_from_multiple_md_files(self.website, filenames)
-        self.populate_html(html, 'magnetizer-list')
+        self.populate_html(html, 'magnetizer-listing')
 
 
     def populate_html(self, html, page_class):
@@ -82,7 +82,7 @@ class Webpage:
             self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
             self.html = self.html.replace(self.website.tag['index_footer'], self.website.index_footer_html)
 
-        if page_class == 'magnetizer-list' or page_class == 'magnetizer-article-item':
+        if page_class == 'magnetizer-listing' or page_class == 'magnetizer-article-item':
             self.html = self.html.replace(self.website.tag['list_page_header'], self.website.list_page_header_html)
 
         if self.pagination_html() is not None:
