@@ -1,4 +1,0 @@
-https://example.com/
-https://example.com/blog-1.html
-https://example.com/the-simple-website-generator.html
-https://example.com/for-magnus-by-magnus.html
