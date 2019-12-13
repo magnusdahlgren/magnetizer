@@ -43,7 +43,6 @@ class Website:
     def refresh(self):
         self.article_footer_html = Website.read_file(self.config.value('template_path'), self.config.value('article_footer_template_filename'))
         self.index_header_html = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
-        self.index_footer_html = Website.read_file(self.config.value('template_path'), self.config.value('index_footer_template_filename'))
         self.list_page_header_html = Website.read_file(self.config.value('template_path'), self.config.value('list_page_header_template_filename'))
 
         css_contents = Website.read_file(self.config.value('resources_path'), self.config.value('website_css_filename'))
