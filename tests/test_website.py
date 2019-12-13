@@ -13,3 +13,10 @@ def test_website_css_filename():
 def test_website_partial_html():
 
     assert test_website.partial_html('_include_1.html') == "<div class='include'>Include 1</div>"
+
+
+def test_website_template():
+
+    # Website should be using _website_template.html
+    assert '<!-- MAGNETIZER_PAGE_CONTENT -->' in test_website.template.template
+

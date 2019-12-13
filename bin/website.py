@@ -4,17 +4,22 @@ import shutil
 import hashlib
 from mutil import *
 from sitemap import *
+from template import *
 
 class Website:
+
+    WEBSITE_TEMPLATE = '_website_template.html'
 
     def __init__(self, config_file_name):
 
         self.config = Config(config_file_name)
         self.sitemap = Sitemap(self.config.value('website_base_url'))
+        self.template = Template(self.tag['content'], self.config.value('template_path') + Website.WEBSITE_TEMPLATE)
         self.refresh()
                 
     tag = {
         'content'           : '<!-- MAGNETIZER_CONTENT -->',
+        'page_content'      : '<!-- MAGNETIZER_PAGE_CONTENT -->',
         'meta'              : '<!-- MAGNETIZER_META -->',
         'index_header'      : '<!-- MAGNETIZER_INDEX_HEADER -->',
         'index_footer'      : '<!-- MAGNETIZER_INDEX_FOOTER -->',

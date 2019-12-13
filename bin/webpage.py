@@ -66,6 +66,21 @@ class Webpage:
         self.populate_html(html, 'magnetizer-listing')
 
 
+    def populate_html_new(self, html, page_class):
+
+        if self.twitter_card is not None:
+            meta = self.meta() + self.twitter_card
+        else:
+            meta = self.meta()
+
+        self.html = self.website.template # MAIN TEMPLATE
+        # To do: pick the correct page_template based on page type
+        self.html = self.html.replace(self.website.tag['page_content'], self.template.template)
+        self.html = self.html.replace(self.website.tag['content'], html, 1)
+        self.html = self.html.replace(self.website.tag['page_class'], page_class, 1)
+        self.html = self.html.replace(self.website.tag['meta'], meta, 1)
+
+
     def populate_html(self, html, page_class):
 
         if self.twitter_card is not None:
@@ -73,7 +88,9 @@ class Webpage:
         else:
             meta = self.meta()
 
-        self.html = self.template.template
+        self.html = self.website.template.template # MAIN TEMPLATE
+        # To do: pick the correct page_template based on page type
+        self.html = self.html.replace(self.website.tag['page_content'], self.template.template)
         self.html = self.html.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['page_class'], page_class, 1)
         self.html = self.html.replace(self.website.tag['meta'], meta, 1)
