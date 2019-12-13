@@ -22,7 +22,7 @@ class Item:
         self.md = None
         self.filename = None
         self.footer_html = website.article_footer_html
-        self.html = None
+        self.html_summary = None
         self.html_full = None
         self.date_html = None
         self.date = None
@@ -83,19 +83,19 @@ class Item:
                 else:
                     readmore = ""
 
-                self.html = markdown(s) + readmore
-                self.html = MUtil.link_h1(self.html, self.filename)
-                self.html = MUtil.downgrade_headings(self.html)
-                self.html = self.template.render(self.website, self.html)
-                self.html = self.html.replace(self.website.tag['article_footer'], '', 1)
-                self.html = sub(r'<!-- MAGNETIZER_INCLUDE (.*?)-->', '', self.html)
+                self.html_summary = markdown(s) + readmore
+                self.html_summary = MUtil.link_h1(self.html_summary, self.filename)
+                self.html_summary = MUtil.downgrade_headings(self.html_summary)
+                self.html_summary = self.template.render(self.website, self.html_summary)
+                self.html_summary = self.html_summary.replace(self.website.tag['article_footer'], '', 1)
+                self.html_summary = sub(r'<!-- MAGNETIZER_INCLUDE (.*?)-->', '', self.html_summary)
 
                 if self.date_html is not None:
 
                     self.html_full = self.html_full.replace(self.website.tag['date'], self.date_html, 1)
 
                     # date in short html should be a link
-                    self.html = self.html.replace(self.website.tag['date'], MUtil.wrap_it_in_a_link(self.date_html, self.filename), 1)
+                    self.html_summary = self.html_summary.replace(self.website.tag['date'], MUtil.wrap_it_in_a_link(self.date_html, self.filename), 1)
 
                 return True
 
@@ -245,6 +245,6 @@ class Item:
 
             if filename.split('-', 1)[0].isdigit():
                 if item.from_md_filename(filename):
-                    html += item.html
+                    html += item.html_summary
 
         return html

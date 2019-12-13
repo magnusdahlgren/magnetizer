@@ -94,7 +94,7 @@ def test_article_basic():
     assert article.meta_description() == 'Meta description from article'
 
     # short html (for index) should NOT include a footer
-    assert '<footer>footer</footer>' not in article.html
+    assert '<footer>footer</footer>' not in article.html_summary
 
     # full html (for article page) should have a footer
     assert '<footer>footer</footer>' in article.html_full
@@ -104,15 +104,15 @@ def test_article_basic():
 
     # article should NOT have a CC license
     cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />'
-    assert article.html.count(cc_license) == 0
+    assert article.html_summary.count(cc_license) == 0
     assert article.html_full.count(cc_license) == 0
 
     # includes should be stripped, from the short html only
     assert '<!-- MAGNETIZER_INCLUDE' in article.html_full
-    assert '<!-- MAGNETIZER_INCLUDE' not in article.html
+    assert '<!-- MAGNETIZER_INCLUDE' not in article.html_summary
 
     # comments should be left in the article html
-    assert '<!-- Comment -->' in article.html
+    assert '<!-- Comment -->' in article.html_summary
     assert '<!-- Comment -->' in article.html_full
 
 
@@ -137,17 +137,17 @@ def test_article_with_h1_and_break_and_date_and_cc():
 
     # The bit after the break tag should only show in the full html
     dont_show = "Don't show this bit on the index page"
-    assert article.html.count(dont_show) == 0
+    assert article.html_summary.count(dont_show) == 0
     assert article.html_full.count(dont_show) == 1
 
     # The short html should have a 'read more' link, but not the full html
     read_more = "<a href='article-with-h1-break-and-date.html' class='magnetizer-more'>Read more</a>"
-    assert article.html.count(read_more) == 1
+    assert article.html_summary.count(read_more) == 1
     assert article.html_full.count(read_more) == 0
 
     # The short html should contain a link around the heading, but not the full html
     heading_link = "<h2><a href='article-with-h1-break-and-date.html'>This should be the title</a></h2>"
-    assert article.html.count(heading_link) == 1
+    assert article.html_summary.count(heading_link) == 1
     assert article.html_full.count("<a href='article-with-h1-break-and-date.html'>") == 0
 
     # The article should have the correct date
@@ -155,17 +155,17 @@ def test_article_with_h1_and_break_and_date_and_cc():
 
     # The article should have a date in the html
     date = "<time datetime='1998-08-01'>1 August 1998</time>"
-    assert article.html.count(date) == 1
+    assert article.html_summary.count(date) == 1
     assert article.html_full.count(date) == 1
 
     # Only the short html should show the date with a link
     date_with_link = "<a href='article-with-h1-break-and-date.html'><time datetime='1998-08-01'>1 August 1998</time></a>"
-    assert article.html.count(date_with_link) == 1
+    assert article.html_summary.count(date_with_link) == 1
     assert article.html_full.count(date_with_link) == 0
 
     # Only the full html should have a CC license
     cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
-    assert article.html.count(cc_license) == 0
+    assert article.html_summary.count(cc_license) == 0
     assert article.html_full.count(cc_license) == 1
 
 
