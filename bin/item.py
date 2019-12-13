@@ -48,13 +48,13 @@ class Item:
                 else:
                     self.type = Item.STATIC_ITEM
 
-                self.template = Template(self.website, self.website.config.value('template_path') + self.template_filename())
+                self.template = Template(self.website.tag['content'], self.website.config.value('template_path') + self.template_filename())
                 self.filename  = filename
 
                 if self.website.tag['noindex'] in self.md:
                     self.indexable = False
 
-                self.html_full = self.template.render(self.website, markdown(self.md))
+                self.html_full = self.template.render(markdown(self.md))
 
                 if self.type == Item.STATIC_ITEM:
                     back_link = '<a href="/" class="magnetizer-nav-back">Back to homepage</a>'
@@ -86,7 +86,7 @@ class Item:
                 self.html_summary = markdown(s) + readmore
                 self.html_summary = MUtil.link_h1(self.html_summary, self.filename)
                 self.html_summary = MUtil.downgrade_headings(self.html_summary)
-                self.html_summary = self.template.render(self.website, self.html_summary)
+                self.html_summary = self.template.render(self.html_summary)
                 self.html_summary = self.html_summary.replace(self.website.tag['article_footer'], '', 1)
                 self.html_summary = sub(r'<!-- MAGNETIZER_INCLUDE (.*?)-->', '', self.html_summary)
 
