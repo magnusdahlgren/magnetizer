@@ -18,6 +18,9 @@ def test_webpage_from_single_article():
     assert webpage.title == title
     assert webpage.html.count('<title>' + title + '</title>') == 1
 
+    # Page should use static page template
+    assert '<p>Article page template</p>' in webpage.html
+
     # Homepage header should not be present
     assert webpage.html.count('<div>header</div>') == 0
 
@@ -35,8 +38,8 @@ def test_webpage_from_single_article():
     article.from_md_filename('001-basic-article.md')
     assert webpage.filename == article.filename
 
-    # Body should have class='magnetizer-article-item'
-    assert webpage.html.count("<body class='magnetizer-article-item'>") == 1
+    # Body should have class='magnetizer-article-page'
+    assert webpage.html.count("<body class='magnetizer-article-page'>") == 1
 
     # Twitter card should be present
     assert '<meta name="twitter:card" content="summary_large_image" />' in webpage.html
@@ -70,6 +73,9 @@ def test_static_item_page():
     assert webpage.title == title
     assert webpage.html.count('<title>' + title + '</title>') == 1
 
+    # Page should use static page template
+    assert '<p>Static page template</p>' in webpage.html
+
     # Homepage header should NOT be present
     assert webpage.html.count('<div>header</div>') == 0
 
@@ -87,8 +93,8 @@ def test_static_item_page():
     article.from_md_filename('dont-show-on-list-page.md')
     assert webpage.filename == article.filename
 
-    # Body should have class='magnetizer-static-item'
-    assert webpage.html.count("<body class='magnetizer-static-item'>") == 1
+    # Body should have class='magnetizer-static-page'
+    assert webpage.html.count("<body class='magnetizer-static-page'>") == 1
 
     # Twitter card should be present
     assert '<meta name="twitter:card" content="summary_large_image" />' in webpage.html
@@ -108,14 +114,8 @@ def test_home_page():
     webpage = Webpage(test_website)
     webpage.homepage_from_md_filenames(['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt', '005-simple-article-1.md', '006-simple-article-2.md'] )
 
-    # Homepage header should be present
-    assert webpage.html.count('<div>header</div>') == 1
-
-    # Include (from homepage header) should be present
-    assert "<div class='include'>Include 1</div>" in webpage.html
-
-    # Homepage footer should be present
-    assert webpage.html.count('<div>homepage footer</div>') == 1
+    # Page should use homepage page template
+    assert '<p>Homepage page template</p>' in webpage.html
 
     # 3 articles should be present
     assert webpage.html.count('<article>') == 3
@@ -126,8 +126,8 @@ def test_home_page():
     # Don't show article footers on index 
     assert webpage.html.count('<footer>footer</footer>') == 0
 
-    # Body should have class='magnetizer-homepage'
-    assert webpage.html.count("<body class='magnetizer-homepage'>") == 1
+    # Body should have class='magnetizer-homepage-page'
+    assert webpage.html.count("<body class='magnetizer-homepage-page'>") == 1
 
     # Twitter card should *not* be present (todo: yet!)
     assert '<meta name="twitter:card" content="summary" />' not in webpage.html
