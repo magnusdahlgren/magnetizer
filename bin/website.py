@@ -26,7 +26,6 @@ class Website:
         'content'           : '<!-- MAGNETIZER_CONTENT -->',
         'page_content'      : '<!-- MAGNETIZER_PAGE_CONTENT -->',
         'meta'              : '<!-- MAGNETIZER_META -->',
-        'index_header'      : '<!-- MAGNETIZER_INDEX_HEADER -->',
         'index_footer'      : '<!-- MAGNETIZER_INDEX_FOOTER -->',
         'list_page_header'  : '<!-- MAGNETIZER_LIST_PAGE_HEADER -->',
         'article_footer'    : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
@@ -42,7 +41,6 @@ class Website:
 
     def refresh(self):
         self.article_footer_html = Website.read_file(self.config.value('template_path'), self.config.value('article_footer_template_filename'))
-        self.index_header_html = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
         self.list_page_header_html = Website.read_file(self.config.value('template_path'), self.config.value('list_page_header_template_filename'))
 
         css_contents = Website.read_file(self.config.value('resources_path'), self.config.value('website_css_filename'))
