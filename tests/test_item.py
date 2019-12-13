@@ -12,7 +12,6 @@ test_website.refresh()
 def test_article_is_valid():
 
     article = Item(test_website)
-    article.template = Template(article.website, article.website.config.value('template_path') + article.website.config.value('article_template_filename'))
 
     article.md = 'Just some text'
     assert not article.is_valid()
@@ -58,15 +57,37 @@ def test_article_title():
     assert article.title() == "Article title emphasis - Test website name"
 
 
+def test_item_template_filename():
+
+    # Article with no type should not have a template filename
+    item = Item(test_website)
+    item.type = None
+    assert item.template_filename() is None
+
+    # Article item should use article item template
+    item = Item(test_website)
+    item.type = Item.ARTICLE_ITEM
+    assert item.template_filename() == Item.ARTICLE_ITEM_TEMPLATE_FILENAME
+
+    # Static item should use static item template
+    item = Item(test_website)
+    item.type = Item.STATIC_ITEM
+    assert item.template_filename() == Item.STATIC_ITEM_TEMPLATE_FILENAME
+
+
+
 def test_article_basic():
 
     article = Item(test_website)
     article.from_md_filename('001-basic-article.md')
 
+    # Article item should use article item template
+    assert '<article>' in article.html_full
+
     # filename should be without number and .html instead of .md
     assert article.filename == 'basic-article.html'
 
-    # title should be the contents from <h1M
+    # title should be the contents from <h1>
     assert article.title() == 'This is the heading - Test website name'
 
     # meta description should be pulled in from article
@@ -150,17 +171,20 @@ def test_article_with_h1_and_break_and_date_and_cc():
 
 def test_static_item():
 
-    article = Item(test_website)
-    article.from_md_filename('dont-show-on-list-page.md')
+    item = Item(test_website)
+    item.from_md_filename('dont-show-on-list-page.md')
+
+    # Static item should use static item template
+    assert '<main>' in item.html_full
 
     # Special article should not have a date
-    assert '<time datetime' not in article.html_full
+    assert '<time datetime' not in item.html_full
 
     # Special article should not have a footer
-    assert '<footer>footer</footer>' not in article.html_full
+    assert '<footer>footer</footer>' not in item.html_full
 
     # Special article should still have a link back to the homepage
-    assert '<a href="/" class="magnetizer-nav-back">Back to homepage</a>' in article.html_full
+    assert '<a href="/" class="magnetizer-nav-back">Back to homepage</a>' in item.html_full
 
 
 def test_noindex_article():

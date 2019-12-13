@@ -12,11 +12,13 @@ class Item:
     ARTICLE_ITEM = "magnetizer-article-item"
     STATIC_ITEM = "magnetizer-static-item"
 
+    ARTICLE_ITEM_TEMPLATE_FILENAME = "_article_item_template.html"
+    STATIC_ITEM_TEMPLATE_FILENAME = "_static_item_template.html"
 
     def __init__(self, website):
         
         self.website = website
-        self.template = Template(website, website.config.value('template_path') + website.config.value('article_template_filename'))
+        self.template = None
         self.md = None
         self.filename = None
         self.footer_html = website.article_footer_html
@@ -43,11 +45,10 @@ class Item:
                 if filename.split('-', 1)[0].isdigit():
                     filename  = filename.split('-', 1)[1]
                     self.type = Item.ARTICLE_ITEM
-                    # is_special_article = False
                 else:
-                    # is_special_article = True
                     self.type = Item.STATIC_ITEM
 
+                self.template = Template(self.website, self.website.config.value('template_path') + self.template_filename())
                 self.filename  = filename
 
                 if self.website.tag['noindex'] in self.md:
@@ -222,6 +223,16 @@ class Item:
             return True
         else:
             return False
+
+
+    def template_filename(self):
+
+        if self.type == Item.ARTICLE_ITEM:
+            return Item.ARTICLE_ITEM_TEMPLATE_FILENAME
+        elif self.type == Item.STATIC_ITEM:
+            return Item.STATIC_ITEM_TEMPLATE_FILENAME
+        else:
+            return None
 
 
     @staticmethod
