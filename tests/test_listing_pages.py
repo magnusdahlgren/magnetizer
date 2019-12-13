@@ -32,11 +32,8 @@ def test_single_list_page():
     assert 'Article 2.' in blog_1_content
     assert 'Article 1.' in blog_1_content
 
-    # Homepage header should not be present
-    assert '<div>header</div>' not in blog_1_content
-
-    # List page header should be present
-    assert '<div>list page header</div>' in blog_1_content
+    # Page should use listing page template
+    assert '<p>Listing page template</p>' in blog_1_content
 
     # Index title = "Website Name - Page 1"
     assert '<title>Test website name - Page 1</title>' in blog_1_content
@@ -44,8 +41,8 @@ def test_single_list_page():
     # Don't show article footers on list page 
     assert '<footer>footer</footer>' not in blog_1_content
 
-    # Body should have class='magnetizer-listing'
-    assert "<body class='magnetizer-listing'>" in blog_1_content
+    # Body should have class='magnetizer-listing-page'
+    assert "<body class='magnetizer-listing-page'>" in blog_1_content
 
     # Twitter card should *not* be present (todo: yet!)
     assert '<meta name="twitter:card" content="summary" />' not in blog_1_content
@@ -92,7 +89,7 @@ def test_three_paginated_list_pages():
     assert 'Article 9.' in blog_1_content 
     assert 'Article 8.' in blog_1_content
     assert 'Article 7.' in blog_1_content
-    assert '<div>list page header</div>' in blog_1_content
+    assert '<p>Listing page template</p>' in blog_1_content
 
 
     assert blog_2_content.count('<article>') == 4
@@ -100,12 +97,12 @@ def test_three_paginated_list_pages():
     assert 'Article 5.' in blog_2_content 
     assert 'Article 4.' in blog_2_content
     assert 'Article 3.' in blog_2_content
-    assert '<div>list page header</div>' in blog_2_content
+    assert '<p>Listing page template</p>' in blog_2_content
 
     assert blog_3_content.count('<article>') == 2
     assert 'Article 2.' in blog_3_content 
     assert 'Article 1.' in blog_3_content 
-    assert '<div>list page header</div>' in blog_3_content
+    assert '<p>Listing page template</p>' in blog_3_content
 
 
     # Page title = "Website Name - Page n"

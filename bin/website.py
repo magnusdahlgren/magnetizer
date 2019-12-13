@@ -10,6 +10,11 @@ class Website:
 
     WEBSITE_TEMPLATE = '_website_template.html'
 
+    HOMEPAGE_PAGE_TEMPLATE_FILENAME = '_homepage_page_template.html'
+    LISTING_PAGE_TEMPLATE_FILENAME = '_listing_page_template.html'
+    ARTICLE_PAGE_TEMPLATE_FILENAME = '_article_page_template.html'
+    STATIC_PAGE_TEMPLATE_FILENAME = '_static_page_template.html'
+
     def __init__(self, config_file_name):
 
         self.config = Config(config_file_name)
@@ -38,7 +43,6 @@ class Website:
     def refresh(self):
         self.article_footer_html = Website.read_file(self.config.value('template_path'), self.config.value('article_footer_template_filename'))
         self.index_header_html = Website.read_file(self.config.value('template_path'), self.config.value('index_header_template_filename'))
-        self.index_footer_html = Website.read_file(self.config.value('template_path'), self.config.value('index_footer_template_filename'))
         self.list_page_header_html = Website.read_file(self.config.value('template_path'), self.config.value('list_page_header_template_filename'))
 
         css_contents = Website.read_file(self.config.value('resources_path'), self.config.value('website_css_filename'))
