@@ -17,7 +17,6 @@ class Webpage:
     def __init__(self, website):
         
         self.website      = website
-        self.template     = Template(website, website.config.value('template_path') + website.config.value('webpage_template_filename'))
         self.filename     = None
         self.html         = None
         self.title        = None
@@ -87,33 +86,25 @@ class Webpage:
         else:
             meta = self.meta()
 
-        self.html = self.website.template.template # MAIN TEMPLATE
+        self.html = self.website.template.template
 
         if page_class == Webpage.HOMEPAGE_PAGE_TYPE:
-            template_filename = Website.HOMEPAGE_PAGE_TEMPLATE_FILENAME
+            page_template_filename = Website.HOMEPAGE_PAGE_TEMPLATE_FILENAME
         elif page_class == Webpage.LISTING_PAGE_TYPE:
-            template_filename = Website.LISTING_PAGE_TEMPLATE_FILENAME            
+            page_template_filename = Website.LISTING_PAGE_TEMPLATE_FILENAME            
         elif page_class == Webpage.STATIC_PAGE_TYPE:
-            template_filename = Website.STATIC_PAGE_TEMPLATE_FILENAME
+            page_template_filename = Website.STATIC_PAGE_TEMPLATE_FILENAME
         elif page_class == Webpage.ARTICLE_PAGE_TYPE:
-            template_filename = Website.ARTICLE_PAGE_TEMPLATE_FILENAME
+            page_template_filename = Website.ARTICLE_PAGE_TEMPLATE_FILENAME
         else:
-            template_filename = self.website.config.value('webpage_template_filename')
+            page_template_filename = None
 
-        template = Template(self.website, self.website.config.value('template_path') + template_filename)          
+        template = Template(self.website, self.website.config.value('template_path') + page_template_filename)          
 
-        # To do: pick the correct page_template based on page type
         self.html = self.html.replace(self.website.tag['page_content'], template.template)
         self.html = self.html.replace(self.website.tag['content'], html, 1)
         self.html = self.html.replace(self.website.tag['page_class'], page_class, 1)
         self.html = self.html.replace(self.website.tag['meta'], meta, 1)
-
-        if page_class == 'magnetizer-homepage':
-            self.html = self.html.replace(self.website.tag['index_header'], self.website.index_header_html)
-            self.html = self.html.replace(self.website.tag['index_footer'], self.website.index_footer_html)
-
-        if page_class == 'magnetizer-listing' or page_class == 'magnetizer-article-item':
-            self.html = self.html.replace(self.website.tag['list_page_header'], self.website.list_page_header_html)
 
         if self.pagination_html() is not None:
             self.html = self.html.replace(self.website.tag['pagination'], self.pagination_html(), 1)
