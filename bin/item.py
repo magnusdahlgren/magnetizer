@@ -56,18 +56,14 @@ class Item:
                 self.html_full = self.template.render(markdown(self.md))
 
                 if self.type == Item.STATIC_ITEM:
-                    back_link = '<a href="/" class="magnetizer-nav-back">Back to homepage</a>'
                     self.date = None
                     self.date_html = None
                     self.html_full = self.html_full.replace(self.website.tag['item_footer'], self.website.static_item_footer_html, 1)
                 else:
-                    back_link = '<a href="blog-1.html" class="magnetizer-nav-back">Back to blog</a>'
                     self.date      = self.date_from_markdown_source()
                     self.date_html = self.date_html_from_date()
                     self.html_full = self.html_full.replace(self.website.tag['item_footer'], self.website.article_item_footer_html, 1)
 
-                # todo: move back link to template
-                self.html_full = self.html_full.replace(self.website.tag['article_back_link'], back_link)
                 self.html_full = self.html_full.replace(self.website.tag['break'], '')
 
                 if self.html_full.count(self.website.tag['creative_commons']) > 0:

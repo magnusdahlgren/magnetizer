@@ -94,10 +94,10 @@ def test_article_basic():
     assert article.meta_description() == 'Meta description from article'
 
     # full html should have ARTICLE item footer
-    assert '<footer>article footer</footer>' in article.html_full
-    assert '<footer>' not in article.html_summary
+    assert '<footer class="article-footer">' in article.html_full
+    assert '<footer' not in article.html_summary
 
-    # full html should have a link back to the blog
+    # full html should have a link back to the blog (from article item footer)
     assert '<a href="blog-1.html" class="magnetizer-nav-back">Back to blog</a>' in article.html_full
 
     # article should NOT have a CC license
@@ -175,14 +175,14 @@ def test_static_item():
     # Static item should use static item template
     assert '<main>' in item.html_full
 
-    # Special article should not have a date
+    # Static item should not have a date
     assert '<time datetime' not in item.html_full
 
     # full html should have STATIC item footer
-    assert '<footer>static footer</footer>' in item.html_full
-    assert '<footer>' not in item.html_summary
+    assert '<footer class="static-footer">' in item.html_full
+    assert '<footer' not in item.html_summary
 
-    # Special article should still have a link back to the homepage
+    # Static item should have a link back to the homepage (from static item footer)
     assert '<a href="/" class="magnetizer-nav-back">Back to homepage</a>' in item.html_full
 
 
