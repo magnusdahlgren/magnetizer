@@ -30,7 +30,6 @@ class Website:
         'content'           : '<!-- MAGNETIZER_CONTENT -->',
         'page_content'      : '<!-- MAGNETIZER_PAGE_CONTENT -->',
         'meta'              : '<!-- MAGNETIZER_META -->',
-        'index_footer'      : '<!-- MAGNETIZER_INDEX_FOOTER -->',
         'item_footer'       : '<!-- MAGNETIZER_ITEM_FOOTER -->',
         'date'              : '<!-- MAGNETIZER_DATE -->',
         'page_class'        : '<!-- MAGNETIZER_PAGE_CLASS -->',
@@ -51,7 +50,7 @@ class Website:
         self.css_filename = self.config.value('website_css_filename') + '?' + css_hash
 
 
-    def partial_html(self, filename):
+    def include(self, filename):
 
         if path.isfile(path.join(self.config.value('template_path'), filename)):
             return Website.read_file(self.config.value('template_path'), filename)

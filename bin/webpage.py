@@ -112,7 +112,7 @@ class Webpage:
         includes = self.includes()
 
         for include in includes:
-            self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE %s -->' % include, self.website.partial_html(include))
+            self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE %s -->' % include, self.website.include(include))
 
         # Remove all remaining comment tags
         self.html = sub(r'<!--(.*?)-->', '', self.html)
