@@ -63,7 +63,7 @@ class Webpage:
         self.populate_html(html, Webpage.HOMEPAGE_PAGE_TYPE)
 
 
-    def list_page_from_md_filenames(self, filenames, page_no, total_no_of_pages):
+    def listing_page_from_md_filenames(self, filenames, page_no, total_no_of_pages):
 
         self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
 
@@ -227,7 +227,7 @@ class Webpage:
         for n in range (1, 1 + total_no_of_pages):
             webpage = Webpage(website)
             page_filenames = filenames[articles_per_page * (n - 1 ) : articles_per_page * n]
-            webpage.list_page_from_md_filenames(page_filenames, n, total_no_of_pages)
+            webpage.listing_page_from_md_filenames(page_filenames, n, total_no_of_pages)
             webpage.filename = 'blog-%s.html' % str(n)
             webpage.write()
 
