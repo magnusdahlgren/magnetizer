@@ -159,7 +159,7 @@ Magnetizer templates use html comment tags to indicate where dynamic content wil
 | `<!-- MAGNETIZER_META -->`   | The page meta data, e.g. title, will show here. This tag must be included somewhere between `<head>` and `</head>`. |
 | `<!-- MAGNETIZER_PAGE_CLASS -->` | Will be `magnetizer-index` on listing page and `magnetizer-article` on article page. Example use: `<body class='<!-- MAGNETIZER_PAGE_CLASS -->'>` |
 | `<!-- MAGNETIZER_INDEX_HEADER -->` | On the index page, this is where `_index_header.html` will show |
-| `<!-- MAGNETIZER_ARTICLE_FOOTER -->` | On article pages, this is where `_article_footer.html` will show  |
+| `<!-- MAGNETIZER_ITEM_FOOTER -->` | On article pages, this is where `_article_footer.html` will show  |
 | `<!-- MAGNETIZER_DATE -->`    | The date an article was published. See [Article dates](#article-dates) |
 | `<!-- MAGNETIZER_CC -->` | Where to show the Creative Commons license, if there is one | 
 
