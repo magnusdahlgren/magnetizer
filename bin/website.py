@@ -15,6 +15,10 @@ class Website:
     ARTICLE_PAGE_TEMPLATE_FILENAME = '_article_page_template.html'
     STATIC_PAGE_TEMPLATE_FILENAME = '_static_page_template.html'
 
+    ARTICLE_ITEM_FOOTER_TEMPLATE_FILENAME = "_article_item_footer_template.html"
+    STATIC_ITEM_FOOTER_TEMPLATE_FILENAME = "_static_item_footer_template.html"
+
+
     def __init__(self, config_file_name):
 
         self.config = Config(config_file_name)
@@ -27,7 +31,7 @@ class Website:
         'page_content'      : '<!-- MAGNETIZER_PAGE_CONTENT -->',
         'meta'              : '<!-- MAGNETIZER_META -->',
         'index_footer'      : '<!-- MAGNETIZER_INDEX_FOOTER -->',
-        'article_footer'    : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
+        'item_footer'       : '<!-- MAGNETIZER_ARTICLE_FOOTER -->',
         'article_back_link' : '<!-- MAGNETIZER_ARTICLE_BACK_LINK -->',
         'date'              : '<!-- MAGNETIZER_DATE -->',
         'page_class'        : '<!-- MAGNETIZER_PAGE_CLASS -->',
@@ -39,7 +43,9 @@ class Website:
     }
 
     def refresh(self):
-        self.article_footer_html = Website.read_file(self.config.value('template_path'), self.config.value('article_footer_template_filename'))
+
+        self.article_item_footer_html = Website.read_file(self.config.value('template_path'), self.ARTICLE_ITEM_FOOTER_TEMPLATE_FILENAME)
+        self.static_item_footer_html = Website.read_file(self.config.value('template_path'), self.STATIC_ITEM_FOOTER_TEMPLATE_FILENAME)
 
         css_contents = Website.read_file(self.config.value('resources_path'), self.config.value('website_css_filename'))
         css_hash = hashlib.md5(bytes(css_contents, encoding='utf-8')).hexdigest()

@@ -21,7 +21,6 @@ class Item:
         self.template = None
         self.md = None
         self.filename = None
-        self.footer_html = website.article_footer_html
         self.html_summary = None
         self.html_full = None
         self.date_html = None
@@ -58,16 +57,16 @@ class Item:
 
                 if self.type == Item.STATIC_ITEM:
                     back_link = '<a href="/" class="magnetizer-nav-back">Back to homepage</a>'
-                    # self.type = 'magnetizer-special'
                     self.date = None
                     self.date_html = None
-                    self.html_full = self.html_full.replace(self.website.tag['article_footer'], '', 1)
+                    self.html_full = self.html_full.replace(self.website.tag['item_footer'], self.website.static_item_footer_html, 1)
                 else:
                     back_link = '<a href="blog-1.html" class="magnetizer-nav-back">Back to blog</a>'
                     self.date      = self.date_from_markdown_source()
                     self.date_html = self.date_html_from_date()
-                    self.html_full = self.html_full.replace(self.website.tag['article_footer'], self.footer_html, 1)
+                    self.html_full = self.html_full.replace(self.website.tag['item_footer'], self.website.article_item_footer_html, 1)
 
+                # todo: move back link to template
                 self.html_full = self.html_full.replace(self.website.tag['article_back_link'], back_link)
                 self.html_full = self.html_full.replace(self.website.tag['break'], '')
 
@@ -87,7 +86,7 @@ class Item:
                 self.html_summary = MUtil.link_h1(self.html_summary, self.filename)
                 self.html_summary = MUtil.downgrade_headings(self.html_summary)
                 self.html_summary = self.template.render(self.html_summary)
-                self.html_summary = self.html_summary.replace(self.website.tag['article_footer'], '', 1)
+                self.html_summary = self.html_summary.replace(self.website.tag['item_footer'], '', 1)
                 self.html_summary = sub(r'<!-- MAGNETIZER_INCLUDE (.*?)-->', '', self.html_summary)
 
                 if self.date_html is not None:

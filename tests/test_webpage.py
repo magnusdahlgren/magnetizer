@@ -30,8 +30,8 @@ def test_webpage_from_single_article():
     # Webpage should contain the text from the article
     assert webpage.html.count('<p>And here is some text...</p>') == 1
 
-    # Article footer should be present
-    assert webpage.html.count('<footer>footer</footer>') == 1
+    # Article item footer should be present
+    assert webpage.html.count('<footer>article footer</footer>') == 1
 
     # Filename for webpage should be based on the article
     article = Item(test_website)

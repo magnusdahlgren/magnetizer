@@ -93,11 +93,9 @@ def test_article_basic():
     # meta description should be pulled in from article
     assert article.meta_description() == 'Meta description from article'
 
-    # short html (for index) should NOT include a footer
-    assert '<footer>footer</footer>' not in article.html_summary
-
-    # full html (for article page) should have a footer
-    assert '<footer>footer</footer>' in article.html_full
+    # full html should have ARTICLE item footer
+    assert '<footer>article footer</footer>' in article.html_full
+    assert '<footer>' not in article.html_summary
 
     # full html should have a link back to the blog
     assert '<a href="blog-1.html" class="magnetizer-nav-back">Back to blog</a>' in article.html_full
@@ -180,8 +178,9 @@ def test_static_item():
     # Special article should not have a date
     assert '<time datetime' not in item.html_full
 
-    # Special article should not have a footer
-    assert '<footer>footer</footer>' not in item.html_full
+    # full html should have STATIC item footer
+    assert '<footer>static footer</footer>' in item.html_full
+    assert '<footer>' not in item.html_summary
 
     # Special article should still have a link back to the homepage
     assert '<a href="/" class="magnetizer-nav-back">Back to homepage</a>' in item.html_full
