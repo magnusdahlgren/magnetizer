@@ -22,11 +22,11 @@ def test_article_is_valid():
     article.md = 'Date but not starting with h1\n# Heading\n<!-- 1/1/1980 -->'
     assert article.is_valid()
 
-    article.md = '# Both h1 and date\n<!-- 1/1/1980 -->\n# But more than one h1'
-    print (article.html_full)
-    assert not article.is_valid()
-
     article.md = '# Both h1 and date\n<!-- 1/1/1980 -->'
+    assert article.is_valid()
+
+    article.md = '# Both h1 and date\n<!-- 1/1/1980 -->\n# and more than one h1'
+    print (article.html_full)
     assert article.is_valid()
 
     article.md = '<!-- Some random comment -->\n\n# Both heading and date\n<!-- 1/1/1980 -->'

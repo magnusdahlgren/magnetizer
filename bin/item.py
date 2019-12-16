@@ -214,7 +214,7 @@ class Item:
 
     def is_valid(self):
 
-        if markdown(self.md).count("<h1>") == 1 and search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.md):
+        if "<h1>" in markdown(self.md) and search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.md):
             return True
         else:
             return False
