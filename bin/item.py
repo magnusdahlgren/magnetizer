@@ -1,3 +1,8 @@
+"""A module to provides the class Item.
+
+TODO: Better documentation
+"""
+
 import html
 from re import sub
 from re import search
@@ -8,6 +13,18 @@ from mutil import *
 
 
 class Item:
+    """A class to represent content items.
+
+    Typical use is:
+    item = Item(website)
+    item.from_md_filename()
+
+    An item can be either an ARTICLE_ITEM ("blog post") or a STATIC_ITEM ("static page").
+    Which one it is is determined by the filename. If the filename starts with a number and
+    a dash (e.g. '001-'), it is an ARTICLE_ITEM, otherwise it's STATIC.
+
+    TODO: Document available attributes and methods
+    """
 
     ARTICLE_ITEM = "magnetizer-article-item"
     STATIC_ITEM = "magnetizer-static-item"
@@ -44,13 +61,11 @@ class Item:
             if self.is_valid():
 
                 filename = filename.split('.', 1)[0] + '.html'
+                self.type = Item.item_type(filename)
 
                 # Remove first part of filename if it is a number
                 if filename.split('-', 1)[0].isdigit():
                     filename = filename.split('-', 1)[1]
-                    self.type = Item.ARTICLE_ITEM
-                else:
-                    self.type = Item.STATIC_ITEM
 
                 self.template = Template(self.website.tag['content'],
                                          self.website.config.value('template_path') +
@@ -146,7 +161,8 @@ class Item:
 
     def meta_description(self):
         """Identify the meta_description for the Item, i.e. the contents of the
-        <!-- META_DESCRIPTION --> tag."""
+        <!-- META_DESCRIPTION --> tag.
+        """
 
         match = re.search(r"<!-- *META_DESCRIPTION *= *(.*?) *-->", self.markdown_source)
 
@@ -174,7 +190,8 @@ class Item:
 
     def date_html_from_date(self):
         """Renders a html <time> element based on the item's date.
-        e.g. "<time datetime='2019-08-03'>3 August 2019</time>"""
+        e.g. "<time datetime='2019-08-03'>3 August 2019</time>
+        """
 
         if self.date is not None:
             result = "<time datetime='%s'>" % self.date.isoformat()
@@ -187,7 +204,8 @@ class Item:
 
     def date_from_markdown_source(self):
         """Identify the date for the Item from a comment in the markdown source,
-        e.g. <!-- 24/12/2019 -->"""
+        e.g. <!-- 24/12/2019 -->
+        """
 
 
         match = search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.markdown_source)
@@ -275,11 +293,27 @@ class Item:
 
 
     @staticmethod
+    def item_type(filename):
+        """Determine the item type for this file, based on its filename.
+
+        Result:
+        Item.ARTICLE_ITEM - if filename starts with a number and a dash, e.g. '001-'
+        Item.STATIC_ITEM - otherwise
+        """
+
+        if filename.split('-', 1)[0].isdigit():
+            return Item.ARTICLE_ITEM
+
+        return Item.STATIC_ITEM
+
+
+    @staticmethod
     def html_contents_from_multiple_md_files(website, filenames):
         """Splice the html contents of the files specified into one blob of html
 
         Keyword Arguments:
-        filenames - a list of filenames"""
+        filenames - a list of filenames
+        """
 
         item = Item(website)
         html_content = ''
