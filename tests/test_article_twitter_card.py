@@ -9,7 +9,7 @@ def test_twitter_card_meta_data():
 
     test_item = Item(test_website)
 
-    test_item.md = '<!-- comment -->\n# Heading\n\nSome text\n\n![alt text](http://example.com/first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
+    test_item.markdown_source = '<!-- comment -->\n# Heading\n\nSome text\n\n![alt text](http://example.com/first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
     test_item.html_full = '<h1>Heading</h1><p>Some text ...</p>'
     test_item.url = 'https://example.com/test.html'
 
@@ -37,7 +37,7 @@ def test_twitter_card_relative_image_url():
 
     test_item = Item(test_website)
 
-    test_item.md = '# Heading\n\nSome text\n\n![alt text](first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
+    test_item.markdown_source = '# Heading\n\nSome text\n\n![alt text](first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
     test_item.url = 'https://example.com/test.html'
 
     card = test_item.twitter_card()
@@ -50,7 +50,7 @@ def test_twitter_card_no_image_url():
 
     test_item = Item(test_website)
 
-    test_item.md = '# Heading\n\nSome text\n\nSome more text'
+    test_item.markdown_source = '# Heading\n\nSome text\n\nSome more text'
     test_item.url = 'https://example.com/test.html'
 
     card = test_item.twitter_card()

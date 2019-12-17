@@ -13,23 +13,23 @@ def test_article_is_valid():
 
     article = Item(test_website)
 
-    article.md = 'Just some text'
+    article.markdown_source = 'Just some text'
     assert not article.is_valid()
 
-    article.md = '# Starting with h1\nBut no date'
+    article.markdown_source = '# Starting with h1\nBut no date'
     assert not article.is_valid()
 
-    article.md = 'Date but not starting with h1\n# Heading\n<!-- 1/1/1980 -->'
+    article.markdown_source = 'Date but not starting with h1\n# Heading\n<!-- 1/1/1980 -->'
     assert article.is_valid()
 
-    article.md = '# Both h1 and date\n<!-- 1/1/1980 -->'
+    article.markdown_source = '# Both h1 and date\n<!-- 1/1/1980 -->'
     assert article.is_valid()
 
-    article.md = '# Both h1 and date\n<!-- 1/1/1980 -->\n# and more than one h1'
+    article.markdown_source = '# Both h1 and date\n<!-- 1/1/1980 -->\n# and more than one h1'
     print (article.html_full)
     assert article.is_valid()
 
-    article.md = '<!-- Some random comment -->\n\n# Both heading and date\n<!-- 1/1/1980 -->'
+    article.markdown_source = '<!-- Some random comment -->\n\n# Both heading and date\n<!-- 1/1/1980 -->'
     assert article.is_valid()
 
     # Article without heading or date should be rejected
