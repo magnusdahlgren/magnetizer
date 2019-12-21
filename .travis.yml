@@ -3,5 +3,4 @@ python:
   - "3.7"
 cache: pip
 script:
-  - cd bin
-  - python -m pytest -vv ../tests/
+  - python -m pytest -vv
