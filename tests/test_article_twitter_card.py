@@ -1,6 +1,6 @@
 import pytest
 from item import *
-from website import *
+from magnetizer import *
 
 test_website = Website('../tests/config/test_magnetizer.cfg')
 test_website.refresh()

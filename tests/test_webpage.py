@@ -1,9 +1,7 @@
 import pytest
-from webpage import *
-from website import *
-from random import *
 from os import listdir, path, remove
 import shutil
+from magnetizer import *
 
 test_website = Website('../tests/config/test_magnetizer.cfg')
 test_website.refresh()

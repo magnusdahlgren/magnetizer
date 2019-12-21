@@ -1,7 +1,5 @@
 import pytest
-from item import *
-from website import *
-from atom import *
+from magnetizer import *
 
 """
 <?xml version="1.0" encoding="utf-8"?>
