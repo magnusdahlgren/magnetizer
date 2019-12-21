@@ -8,7 +8,7 @@ from webpage import Webpage
 class Atom:
     """The Atom class represents the atom feed.
     """
-
+    
     def __init__(self, website):
 
         self.website = website
