@@ -1,6 +1,6 @@
 import pytest
 from random import *
-from os import listdir, path, remove
+from os import listdir, path, remove, makedirs
 import shutil
 from magnetizer import *
 
@@ -180,7 +180,10 @@ def generate_non_indexable_test_items_md():
 
 def generate_test_items_md(number_of_posts):
 
-    # delete old posts
+    if not path.exists(test_website.config.value('source_path')):
+        makedirs(test_website.config.value('source_path'))
+
+    # todo: delete old posts
 
     for n in range(1, number_of_posts + 1):
 
