@@ -213,11 +213,6 @@ def test_webpage_write_multiple_from_filenames():
     assert 'ignore-this.html' not in written_filenames
     assert '100-ignore-this.txt' not in written_filenames
 
-    # ... so in total, 4 files should have been written
-    assert len([name for name in written_filenames if path.isfile(path.join(test_website.config.value('output_path'), name))]) == 4
-
-    print(test_website.sitemap.pages)
-
     # The written files should be included in the sitemap
     assert 'https://example.com/basic-article.html' in test_website.sitemap.pages
     assert 'https://example.com/article-with-h1-break-and-date.html' in test_website.sitemap.pages
