@@ -4,10 +4,10 @@ from os import listdir, path, remove
 import shutil
 from magnetizer import *
 
-test_website = Website('../tests/config/test_magnetizer.cfg')
+test_website = Website('tests/config/test_magnetizer.cfg')
 test_website.refresh()
 
-test_website.config.set('source_path', '../tests/temp/')
+test_website.config.set('source_path', 'tests/temp/')
 
 def test_single_list_page():
 

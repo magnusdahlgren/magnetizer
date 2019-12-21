@@ -3,7 +3,7 @@ from os import listdir, path, remove
 import shutil
 from magnetizer import *
 
-test_website = Website('../tests/config/test_magnetizer.cfg')
+test_website = Website('tests/config/test_magnetizer.cfg')
 test_website.refresh()
 
 def test_webpage_from_single_article():

@@ -27,7 +27,7 @@ from magnetizer import *
 </feed>
 """
 
-test_website = Website('../tests/config/test_magnetizer.cfg')
+test_website = Website('tests/config/test_magnetizer.cfg')
 test_website.refresh()
 
 atom = Atom(test_website)

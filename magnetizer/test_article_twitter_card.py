@@ -2,7 +2,7 @@ import pytest
 from item import *
 from magnetizer import *
 
-test_website = Website('../tests/config/test_magnetizer.cfg')
+test_website = Website('tests/config/test_magnetizer.cfg')
 test_website.refresh()
 
 def test_twitter_card_meta_data():
