@@ -1,15 +1,29 @@
-import pytest
-from item import *
-from magnetizer import *
+""" Tests for Item Twitter cards
+"""
 
-test_website = Website('tests/config/test_magnetizer.cfg')
-test_website.refresh()
+from item import Item
+from website import Website
+
+TEST_WEBSITE = Website('tests/config/test_magnetizer.cfg')
+TEST_WEBSITE.refresh()
 
 def test_twitter_card_meta_data():
+    """ Test to ensure Twitter card meta data is correctly generated
+    """
 
-    test_item = Item(test_website)
+    test_item = Item(TEST_WEBSITE)
 
-    test_item.markdown_source = '<!-- comment -->\n# Heading\n\nSome text\n\n![alt text](http://example.com/first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
+    test_item.markdown_source = ('<!-- comment -->\n'
+                                 '# Heading\n'
+                                 '\n'
+                                 'Some text\n'
+                                 '![alt text](http://example.com/first_image.jpg)\n'
+                                 '![alt text](http://example.com/second_image.jpg)\n'
+                                 '\n'
+                                 'Some text\n'
+                                 '\n'
+                                 'Some more text')
+
     test_item.html_full = '<h1>Heading</h1><p>Some text ...</p>'
     test_item.url = 'https://example.com/test.html'
 
@@ -30,14 +44,27 @@ def test_twitter_card_meta_data():
 
     # Leading h1 should be stripped out from description
     # Include abstract in description
-    assert '<meta name="twitter:description" content="Some text Some text Some more text" />' in card
+    assert ('<meta name="twitter:description" ' +
+            'content="Some text Some text Some more text" />') in card
 
 
 def test_twitter_card_relative_image_url():
+    """ Test to ensure relative image URL becomes absolute in Twitter card
+    """
 
-    test_item = Item(test_website)
+    test_item = Item(TEST_WEBSITE)
 
-    test_item.markdown_source = '# Heading\n\nSome text\n\n![alt text](first_image.jpg) ![alt text](http://example.com/second_image.jpg)\n\nSome text\n\nSome more text'
+    test_item.markdown_source = ('# Heading\n'
+                                 '\n'
+                                 'Some text\n'
+                                 '\n'
+                                 '![alt text](first_image.jpg)\n'
+                                 '![alt text](http://example.com/second_image.jpg)\n'
+                                 '\n'
+                                 'Some text\n'
+                                 '\n'
+                                 'Some more text')
+
     test_item.url = 'https://example.com/test.html'
 
     card = test_item.twitter_card()
@@ -47,8 +74,10 @@ def test_twitter_card_relative_image_url():
 
 
 def test_twitter_card_no_image_url():
+    """ Test to ensure Twitter card is still valid when item contains no image
+    """
 
-    test_item = Item(test_website)
+    test_item = Item(TEST_WEBSITE)
 
     test_item.markdown_source = '# Heading\n\nSome text\n\nSome more text'
     test_item.url = 'https://example.com/test.html'
@@ -60,8 +89,10 @@ def test_twitter_card_no_image_url():
 
 
 def test_twitter_card_from_article_from_file():
+    """ Test to ensure Twitter card is possible to generate when reading item from file
+    """
 
-    test_item = Item(test_website)
+    test_item = Item(TEST_WEBSITE)
     test_item.from_md_filename('002-article-with-h1-break-and-date.md')
 
     card = test_item.twitter_card()
