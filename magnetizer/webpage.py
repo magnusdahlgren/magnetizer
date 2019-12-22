@@ -40,6 +40,8 @@ class Webpage:
             False - otherwise
         """
 
+        success = False
+
         self.item = Item(self.website)
 
         if self.item.from_md_filename(filename):
@@ -55,10 +57,9 @@ class Webpage:
                 page_type = None
 
             self.populate_html(self.item.html_full, page_type)
-            return True
+            success = True
 
-        else:
-            return False
+        return success
 
 
     def homepage_from_md_filenames(self, filenames):
