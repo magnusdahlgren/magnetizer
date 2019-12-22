@@ -1,8 +1,7 @@
-import pytest
-from magnetizer import *
-from item import Item
+""" Test atom.py
 
-"""
+ Example feed:
+
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
@@ -28,46 +27,56 @@ from item import Item
 </feed>
 """
 
-test_website = Website('tests/config/test_magnetizer.cfg')
-test_website.refresh()
+from item import Item
+from website import Website
+from atom import Atom
 
-atom = Atom(test_website)
-feed = atom.feed(['004-invalid-article.md', '003-another-article.md', '002-article-with-h1-break-and-date.md', '001-basic-article.md', 'dont-index-this-article.md', '100-ignore-this.txt'])
+TEST_WEBSITE = Website('tests/config/test_magnetizer.cfg')
+TEST_WEBSITE.refresh()
+
+ATOM = Atom(TEST_WEBSITE)
+FEED = ATOM.feed(['004-invalid-article.md', '003-another-article.md',
+                  '002-article-with-h1-break-and-date.md', '001-basic-article.md',
+                  'dont-index-this-article.md', '100-ignore-this.txt'])
 
 def test_feed():
+    """ Test to ensure Atom feed is correct
+    """
 
     # Should start with xml version
-    assert feed.startswith('<?xml version="1.0" encoding="utf-8"?>')
-    
+    assert FEED.startswith('<?xml version="1.0" encoding="utf-8"?>')
+
     # XML namespace should be Atom
-    assert '<feed xmlns="http://www.w3.org/2005/Atom">' in feed
+    assert '<feed xmlns="http://www.w3.org/2005/Atom">' in FEED
 
     # Title should be website name - tagline (amps must be escaped)
-    assert '<title>Test website name - test tag &amp; line</title>' in feed
-    
+    assert '<title>Test website name - test tag &amp; line</title>' in FEED
+
     # Author should be site author
-    assert '<author><name>Test Author</name></author>' in feed
+    assert '<author><name>Test Author</name></author>' in FEED
 
     # Generator should be Magnetizer
-    assert '<generator uri="https://github.com/magnusdahlgren/magnetizer">Magnetizer</generator>' in feed
+    assert ('<generator uri="https://github.com/magnusdahlgren/magnetizer">' +
+            'Magnetizer</generator>') in FEED
 
     # Id should be site URL
-    assert '<id>https://example.com/</id>' in feed
+    assert '<id>https://example.com/</id>' in FEED
 
     # Updated should be when the latest post was updated
-    assert '<updated>1998-08-02T00:00:02Z</updated>' in feed
-    # todo
+    assert '<updated>1998-08-02T00:00:02Z</updated>' in FEED
 
     # Feed should have 3 entries
-    assert feed.count('<entry>') == 3
+    assert FEED.count('<entry>') == 3
 
     # Feed tag should be closed
-    assert feed.endswith('</feed>')
+    assert FEED.endswith('</feed>')
 
 
 def test_feed_entry():
+    """ Test to ensure Atom entry is correct
+    """
 
-    item = Item(test_website)
+    item = Item(TEST_WEBSITE)
     item.from_md_filename('002-article-with-h1-break-and-date.md')
 
     entry = item.feed_entry()
@@ -87,18 +96,21 @@ def test_feed_entry():
     assert '<updated>1998-08-01T00:00:01Z</updated>' in entry
 
     # Summary should be article abstract (amps must be escaped)
-    # todo
-    assert "<summary>This text should always be here Don't show this bit on the index page</summary>" in entry
+    assert ("<summary>This text should always be here Don't show this bit on " +
+            "the index page</summary>") in entry
 
 
 def test_write_feed_from_directory():
+    """ Test to ensure Atom feed is correct when generated from files in a directory
+    """
 
-    test_website.wipe()
 
-    atom = Atom(test_website)
+    TEST_WEBSITE.wipe()
+
+    atom = Atom(TEST_WEBSITE)
     atom.write()
 
-    with open(test_website.config.value('output_path') + 'atom.xml', 'r') as myfile:
+    with open(TEST_WEBSITE.config.value('output_path') + 'atom.xml', 'r') as myfile:
         feed = myfile.read()
 
     # Feed should be atom feed
@@ -107,6 +119,4 @@ def test_write_feed_from_directory():
     # Feed should contain a number of articles
     assert feed.count('<entry>') >= 3
 
-    test_website.wipe()
-
-
+    TEST_WEBSITE.wipe()
