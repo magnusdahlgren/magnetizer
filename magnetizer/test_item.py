@@ -1,17 +1,18 @@
-import pytest
-from random import *
-from os import listdir, path, remove
-import shutil
-from magnetizer import *
-from item import Item
+""" Tests for item.py
+"""
 
-test_website = Website('tests/config/test_magnetizer.cfg')
-test_website.refresh()
+from item import Item
+from website import Website
+
+TEST_WEBSITE = Website('tests/config/test_magnetizer.cfg')
+TEST_WEBSITE.refresh()
 
 
 def test_article_is_valid():
+    """ Verify the Item.is_valid() function
+    """
 
-    article = Item(test_website)
+    article = Item(TEST_WEBSITE)
 
     article.markdown_source = 'Just some text'
     assert not article.is_valid()
@@ -25,11 +26,12 @@ def test_article_is_valid():
     article.markdown_source = '# Both h1 and date\n<!-- 1/1/1980 -->'
     assert article.is_valid()
 
-    article.markdown_source = '# Both h1 and date\n<!-- 1/1/1980 -->\n# and more than one h1'
-    print (article.html_full)
+    article.markdown_source = ('# Both h1 and date\n<!-- 1/1/1980 -->\n' +
+                               '# and more than one h1')
     assert article.is_valid()
 
-    article.markdown_source = '<!-- Some random comment -->\n\n# Both heading and date\n<!-- 1/1/1980 -->'
+    article.markdown_source = ('<!-- Some random comment -->\n\n' +
+                               '# Both heading and date\n<!-- 1/1/1980 -->')
     assert article.is_valid()
 
     # Article without heading or date should be rejected
@@ -37,13 +39,15 @@ def test_article_is_valid():
 
 
 def test_article_title():
+    """ Verify the item's title
+    """
 
-    article = Item(test_website)
+    article = Item(TEST_WEBSITE)
 
     # Title should be 'Untitled' if article contains no html
     article.html_full = None
     assert article.title() == "Untitled - Test website name"
-    
+
     # Title should be 'Untitled' if article contains no <h1>
     article.html_full = "Blah <h2>Blah</h2> Blah"
     assert article.title() == "Untitled - Test website name"
@@ -58,27 +62,31 @@ def test_article_title():
 
 
 def test_item_template_filename():
+    """ Verify the Item gets the appropriate template based on whether it is a static
+    item or an article item.
+    """
 
     # Article with no type should not have a template filename
-    item = Item(test_website)
+    item = Item(TEST_WEBSITE)
     item.type = None
     assert item.template_filename() is None
 
     # Article item should use article item template
-    item = Item(test_website)
+    item = Item(TEST_WEBSITE)
     item.type = Item.ARTICLE_ITEM
     assert item.template_filename() == Item.ARTICLE_ITEM_TEMPLATE_FILENAME
 
     # Static item should use static item template
-    item = Item(test_website)
+    item = Item(TEST_WEBSITE)
     item.type = Item.STATIC_ITEM
     assert item.template_filename() == Item.STATIC_ITEM_TEMPLATE_FILENAME
 
 
-
 def test_article_basic():
+    """ Verify article item is generated correctly from file
+    """
 
-    article = Item(test_website)
+    article = Item(TEST_WEBSITE)
     article.from_md_filename('001-basic-article.md')
 
     # Article item should use article item template
@@ -101,7 +109,7 @@ def test_article_basic():
     assert '<a href="blog-1.html" class="magnetizer-nav-back">Back to blog</a>' in article.html_full
 
     # article should NOT have a CC license
-    cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />'
+    cc_license = 'src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png"'
     assert article.html_summary.count(cc_license) == 0
     assert article.html_full.count(cc_license) == 0
 
@@ -115,6 +123,8 @@ def test_article_basic():
 
 
 def test_article_with_h1_and_break_and_date_and_cc():
+    """ Derify logic for title, break, date and creatice commons
+    """
 
 #   # This should be the title
 #   ![alt text](resources/image.png)
@@ -124,7 +134,7 @@ def test_article_with_h1_and_break_and_date_and_cc():
 #   Don't show this bit on the index page
 #   <!-- 1/8/1998 -->
 
-    article = Item(test_website)
+    article = Item(TEST_WEBSITE)
     article.from_md_filename('002-article-with-h1-break-and-date.md')
 
     # The title should be the <h1> contents
@@ -139,12 +149,14 @@ def test_article_with_h1_and_break_and_date_and_cc():
     assert article.html_full.count(dont_show) == 1
 
     # The short html should have a 'read more' link, but not the full html
-    read_more = "<a href='article-with-h1-break-and-date.html' class='magnetizer-more'>Read more</a>"
+    read_more = ("<a href='article-with-h1-break-and-date.html' " +
+                 "class='magnetizer-more'>Read more</a>")
     assert article.html_summary.count(read_more) == 1
     assert article.html_full.count(read_more) == 0
 
     # The short html should contain a link around the heading, but not the full html
-    heading_link = "<h2><a href='article-with-h1-break-and-date.html'>This should be the title</a></h2>"
+    heading_link = ("<h2><a href='article-with-h1-break-and-date.html'>" +
+                    "This should be the title</a></h2>")
     assert article.html_summary.count(heading_link) == 1
     assert article.html_full.count("<a href='article-with-h1-break-and-date.html'>") == 0
 
@@ -157,19 +169,23 @@ def test_article_with_h1_and_break_and_date_and_cc():
     assert article.html_full.count(date) == 1
 
     # Only the short html should show the date with a link
-    date_with_link = "<a href='article-with-h1-break-and-date.html'><time datetime='1998-08-01'>1 August 1998</time></a>"
+    date_with_link = ("<a href='article-with-h1-break-and-date.html'>" +
+                      "<time datetime='1998-08-01'>1 August 1998</time></a>")
     assert article.html_summary.count(date_with_link) == 1
     assert article.html_full.count(date_with_link) == 0
 
     # Only the full html should have a CC license
-    cc_license = '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
+    cc_license = ('<img alt="Creative Commons Licence" style="border-width:0" ' +
+                  'src="https://i.creativecommons.org/l/by/4.0/88x31.png" />')
     assert article.html_summary.count(cc_license) == 0
     assert article.html_full.count(cc_license) == 1
 
 
 def test_static_item():
+    """ Verify that static item is correctly generated from file
+    """
 
-    item = Item(test_website)
+    item = Item(TEST_WEBSITE)
     item.from_md_filename('dont-show-on-list-page.md')
 
     # Static item should use static item template
@@ -187,40 +203,49 @@ def test_static_item():
 
 
 def test_noindex_article():
+    """ Verify logic for item.is_indexable()
+    """
 
-    article_index = Item(test_website)
-    article_dont_index = Item(test_website)
+    article_index = Item(TEST_WEBSITE)
+    article_dont_index = Item(TEST_WEBSITE)
 
     article_index.from_md_filename('001-basic-article.md')
     article_dont_index.from_md_filename('009-unindexed-article.md')
 
-    assert article_index.is_indexable() == True
-    assert article_dont_index.is_indexable() == False
+    assert article_index.is_indexable()
+    assert not article_dont_index.is_indexable()
 
 
 def test_article_cc():
+    """ Verify logic for Creative Commons
+    """
 
-    item = Item(test_website)
+    item = Item(TEST_WEBSITE)
     item.filename = 'test_filename.html'
 
     cc_license = '<p class="magntetizer-license">'
     cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">'
-    cc_license += '<img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
+    cc_license += '<img alt="Creative Commons Licence" style="border-width:0" '
+    cc_license += 'src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
     cc_license += '</a><br />This work by <a xmlns:cc="http://creativecommons.org/ns#" href="'
     cc_license += 'https://example.com/' + item.filename
     cc_license += '" property="cc:attributionName" rel="cc:attributionURL">'
     cc_license += 'Test Author</a> is licensed under a '
-    cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.'
+    cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">'
+    cc_license += 'Creative Commons Attribution 4.0 International License</a>.'
     cc_license += '</p>'
 
     assert item.cc_license() == cc_license
 
 
 def test_html_contents_from_multiple_md_files():
+    """ Verify Item.html_contents_from_multiple_md_files()
+    """
 
-    filenames = ['005-simple-article-1.md', '006-simple-article-2.md', '007-simple-article-3.md',]
+    filenames = ['005-simple-article-1.md', '006-simple-article-2.md',
+                 '007-simple-article-3.md']
 
-    html = Item.html_contents_from_multiple_md_files(test_website, filenames)
+    html = Item.html_contents_from_multiple_md_files(TEST_WEBSITE, filenames)
 
     assert html.count('<article>') == 3
     assert 'Article 5' in html
