@@ -1,8 +1,19 @@
-from webpage import *
-from atom import *
+""" Main module for Magnetizer to trigger generation of all pages.
+
+Usage:
+
+$ python magnetizer.py -config magnetizer.cfg
+
+"""
+
 from sys import argv
+from webpage import Webpage
+from website import Website
+from atom import Atom
 
 def main():
+    """ Main method to trigger generation of all pages
+    """
 
     if len(argv) == 3 and argv[1] == '-config':
         config_filename = argv[2]

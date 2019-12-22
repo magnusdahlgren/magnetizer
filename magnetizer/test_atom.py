@@ -1,5 +1,6 @@
 import pytest
 from magnetizer import *
+from item import Item
 
 """
 <?xml version="1.0" encoding="utf-8"?>
