@@ -4,7 +4,6 @@
 import html
 from item import Item
 from webpage import Webpage
-from website import Website
 from mutil import COLOUR_OK, COLOUR_END
 
 class Atom:
