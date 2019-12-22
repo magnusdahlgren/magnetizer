@@ -9,7 +9,8 @@ from re import search
 from datetime import datetime
 from markdown import markdown
 from template import Template
-from mutil import link_h1, downgrade_headings, wrap_it_in_a_link, strip_tags_from_html, first_image_url_from_html, abstract_from_html, COLOUR_ERROR, COLOUR_END
+from mutil import link_h1, downgrade_headings, wrap_it_in_a_link, strip_tags_from_html, \
+    first_image_url_from_html, abstract_from_html, COLOUR_ERROR, COLOUR_END
 
 
 class Item:
