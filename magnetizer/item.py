@@ -82,14 +82,14 @@ class Item:
 
                 self.html_full = self.html_full.replace(
                     self.website.tag['item_footer'],
-                    self.website.static_item_footer_html, 1)
+                    self.website.static_footer_html, 1)
 
             else:
                 self.date = self.date_from_markdown_source()
 
                 self.html_full = self.html_full.replace(
                     self.website.tag['item_footer'],
-                    self.website.article_item_footer_html, 1)
+                    self.website.article_footer_html, 1)
 
             self.html_full = self.html_full.replace(self.website.tag['break'], '')
 
