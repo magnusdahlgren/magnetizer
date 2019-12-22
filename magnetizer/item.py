@@ -132,8 +132,6 @@ class Item:
                 print(colours.ERROR + ' (!) ' + colours.END +
                       "'%s' must include exactly one h1 and a date)" % filename)
 
-                return False
-
         return False
 
 
