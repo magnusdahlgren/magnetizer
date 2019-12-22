@@ -78,7 +78,7 @@ class MUtil:
 
 
     @staticmethod
-    def filter_out_non_article_filenames(filenames):
+    def purge_non_article_filenames(filenames):
 
         result = []
 

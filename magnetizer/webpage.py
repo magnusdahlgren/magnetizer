@@ -1,12 +1,19 @@
-from website import *
-from template import *
-from item import *
-from markdown import markdown
-from os import listdir
+""" A module to generate .html files for the homepage, listings pages and item pages.
+"""
+
+from os import path, listdir
 from math import ceil
+from re import findall, sub
+
+from mutil import MUtil, colours
+from website import Website
+from template import Template
+from item import Item
 
 
 class Webpage:
+    """ A class representing a webpage
+    """
 
     HOMEPAGE_PAGE_TYPE = "magnetizer-homepage-page"
     LISTING_PAGE_TYPE = "magnetizer-listing-page"
@@ -15,38 +22,39 @@ class Webpage:
 
 
     def __init__(self, website):
-        
-        self.website      = website
-        self.filename     = None
-        self.html         = None
-        self.title        = None
-        self.twitter_card = None
+
+        self.website = website
+        self.filename = None
+        self.item = None
+        self.html = None
+        self.title = None
         self.url_previous = None
-        self.url_next     = None
-        self.meta_description = None
-        self.indexable    = True
+        self.url_next = None
 
-    
+
     def item_from_md_filename(self, filename):
+        """ Creates an Item by reading a .md file
 
-        item = Item(self.website)
-        
-        if item.from_md_filename(filename):
+            Returns:
+            True - if the file was successfully imported to an Item
+            False - otherwise
+        """
 
-            self.filename = item.filename
-            self.title = item.title()
-            self.indexable = item.is_indexable()
-            self.meta_description = item.meta_description()
-            self.twitter_card = item.twitter_card()
+        self.item = Item(self.website)
 
-            if item.type == Item.ARTICLE_ITEM:
+        if self.item.from_md_filename(filename):
+
+            self.filename = self.item.filename
+            self.title = self.item.title()
+
+            if self.item.type == Item.ARTICLE_ITEM:
                 page_type = Webpage.ARTICLE_PAGE_TYPE
-            elif item.type == Item.STATIC_ITEM:
+            elif self.item.type == Item.STATIC_ITEM:
                 page_type = Webpage.STATIC_PAGE_TYPE
             else:
                 page_type = None
 
-            self.populate_html(item.html_full, page_type)
+            self.populate_html(self.item.html_full, page_type)
             return True
 
         else:
@@ -54,16 +62,30 @@ class Webpage:
 
 
     def homepage_from_md_filenames(self, filenames):
+        """ Populates the Webpage with homepage contents
 
-        filenames = MUtil.filter_out_non_article_filenames(filenames)[0:3]
+        Parameters:
+        filenames - a list of the latest articles to include on the homepage
+        """
+
+        filenames = MUtil.purge_non_article_filenames(filenames)[0:3]
         html = Item.html_contents_from_multiple_md_files(self.website, filenames)
 
-        self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
-        self.meta_description = self.website.config.value('homepage_meta_description')
+        website_name = self.website.config.value('website_name')
+        website_tagline = self.website.config.value('website_tagline')
+
+        self.title = "%s - %s" % (website_name, website_tagline)
         self.populate_html(html, Webpage.HOMEPAGE_PAGE_TYPE)
 
 
     def listing_page_from_md_filenames(self, filenames, page_no, total_no_of_pages):
+        """ Populates the Webpage with listing page contents
+
+        Parameters:
+        filenames - a list of the articles to include on the page
+        page_no - which page in the pagination this is
+        total_no_of_pages - how many listing pages in total there are
+        """
 
         self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
 
@@ -79,31 +101,39 @@ class Webpage:
         self.populate_html(html, Webpage.LISTING_PAGE_TYPE)
 
 
-    def populate_html(self, html, page_class):
+    def populate_html(self, html, page_type):
+        """ Inserting the page content into the appropriate template, based on what type
+        of page it is.
 
-        if self.twitter_card is not None:
-            meta = self.meta() + self.twitter_card
+        Parameters:
+        html - the html content of the page
+        page_type - the type of page
+        """
+
+        if self.item is not None:
+            meta = self.meta(page_type) + self.item.twitter_card()
         else:
-            meta = self.meta()
+            meta = self.meta(page_type)
 
         self.html = self.website.template.template
 
-        if page_class == Webpage.HOMEPAGE_PAGE_TYPE:
+        if page_type == Webpage.HOMEPAGE_PAGE_TYPE:
             page_template_filename = Website.HOMEPAGE_PAGE_TEMPLATE_FILENAME
-        elif page_class == Webpage.LISTING_PAGE_TYPE:
-            page_template_filename = Website.LISTING_PAGE_TEMPLATE_FILENAME            
-        elif page_class == Webpage.STATIC_PAGE_TYPE:
+        elif page_type == Webpage.LISTING_PAGE_TYPE:
+            page_template_filename = Website.LISTING_PAGE_TEMPLATE_FILENAME
+        elif page_type == Webpage.STATIC_PAGE_TYPE:
             page_template_filename = Website.STATIC_PAGE_TEMPLATE_FILENAME
-        elif page_class == Webpage.ARTICLE_PAGE_TYPE:
+        elif page_type == Webpage.ARTICLE_PAGE_TYPE:
             page_template_filename = Website.ARTICLE_PAGE_TEMPLATE_FILENAME
         else:
             page_template_filename = None
 
-        template = Template(self.website, self.website.config.value('template_path') + page_template_filename)          
+        template = Template(self.website,
+                            self.website.config.value('template_path') + page_template_filename)
 
         self.html = self.html.replace(self.website.tag['page_content'], template.template)
         self.html = self.html.replace(self.website.tag['content'], html, 1)
-        self.html = self.html.replace(self.website.tag['page_class'], page_class, 1)
+        self.html = self.html.replace(self.website.tag['page_class'], page_type, 1)
         self.html = self.html.replace(self.website.tag['meta'], meta, 1)
 
         if self.pagination_html() is not None:
@@ -112,33 +142,73 @@ class Webpage:
         includes = self.includes()
 
         for include in includes:
-            self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE %s -->' % include, self.website.include(include))
+            self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE %s -->' % \
+                include, self.website.include(include))
 
         # Remove all remaining comment tags
         self.html = sub(r'<!--(.*?)-->', '', self.html)
 
 
-    def meta(self):
+    def meta(self, page_type):
+        """ Returns a html block of appropriate meta data for the webpage
+        """
 
-        m = '<title>%s</title>\n' % self.title
+        meta_alternate = '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />\n'
+        meta_stylesheet = '<link rel="stylesheet" type="text/css" href="%s">\n'
+        meta_description = '<meta name="description" content="%s">\n'
 
-        if self.meta_description is not None:
-            m += '<meta name="description" content="%s">\n' % self.meta_description.replace('"','\\"')
+        meta_html = '<title>%s</title>\n' % self.title
 
-        if not self.indexable:
-            m += '<meta name="robots" content="noindex">'
+        if self.meta_description(page_type) is not None:
+            meta_html += meta_description % self.meta_description(page_type).replace('"', '\\"')
 
-        m += '<link rel="alternate" type="application/rss+xml" href="%s/atom.xml" />\n' % self.website.config.value('website_base_url')
-        m += '<link rel="stylesheet" type="text/css" href="%s">\n' % self.website.css_filename
-        return m
+        if not self.is_indexable():
+            meta_html += '<meta name="robots" content="noindex">'
+
+        meta_html += meta_alternate % self.website.config.value('website_base_url')
+        meta_html += meta_stylesheet % self.website.css_filename
+        return meta_html
+
+    def is_indexable(self):
+        """ Determines if the page should be indexable by search engines. Only item pages
+        with a noindex tag are not indexable.
+        """
+
+        if self.item is not None:
+            return self.item.is_indexable()
+
+        return True
+
+
+    def meta_description(self, page_type):
+        """ Determine the meta description for the web page:
+
+        Returns:
+        Item page - meta desctiption from the Item
+        Homepage - homepage meta descripti0n from config
+        Listing page - None
+        """
+
+        description = None
+
+        if page_type in [Webpage.STATIC_PAGE_TYPE, Webpage.ARTICLE_PAGE_TYPE]:
+            description = self.item.meta_description()
+        elif page_type == Webpage.HOMEPAGE_PAGE_TYPE:
+            description = self.website.config.value('homepage_meta_description')
+
+        return description
 
 
     def includes(self):
+        """ Replaces include tags in the webpage html with the appropriate includes
+        """
 
         return set(findall(r"<!-- *MAGNETIZER_INCLUDE *(.*?) *-->", self.html))
 
 
     def pagination_html(self):
+        """ Returns html for links to the next and previous page, if they exist
+        """
 
         start = '<nav class="magnetizer-pagination"><ul>'
         items = ''
@@ -156,16 +226,20 @@ class Webpage:
 
         if self.url_previous is not None or self.url_next is not None:
             return start + items + end
-        else:
-            return None
+
+        return None
 
 
     def write(self):
+        """ Writes the webpage to file
+        """
 
         if self.filename is not None:
 
+            error = colours.ERROR + ' (!) ' + colours.END + "Overwriting existing '%s'"
+
             if path.isfile(path.join(self.website.config.value('output_path'), self.filename)):
-                print (colours.ERROR + ' (!) ' + colours.END + "'%s' already exists and will be overwritten" % self.filename)
+                print(error % self.filename)
 
             with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
                 myfile.write(self.html)
@@ -175,32 +249,49 @@ class Webpage:
 
     @staticmethod
     def write_item_pages_from_md_filenames(website, filenames):
+        """ Writes multiple item pages to file
+
+        Parameters:
+        filenames - the list of .md filenames to generate .html files from
+        """
 
         print('Generating item pages --> %s' % website.config.value('output_path'))
         generated = 0
         ignored = 0
 
-        for filename in filenames: 
+        for filename in filenames:
 
             webpage = Webpage(website)
             if webpage.item_from_md_filename(filename):
                 webpage.write()
                 generated += 1
             else:
-                ignored +=1
+                ignored += 1
 
-        print (colours.OK + ' --> ' + colours.END + 'Generated %s item pages, ignored %s files' % (generated, ignored))
+        success = colours.OK + ' --> ' + colours.END + 'Generated %s item pages, ignored %s files'
+        print(success % (generated, ignored))
 
 
     @staticmethod
     def write_item_pages_from_directory(website, directory):
+        """ Writes multiple item pages to file
 
-        filenames = Webpage.filenames_from_directory(directory)        
+        Parameters:
+        directory - the directory containing the .md filenames to generate .html files from
+        """
+
+        filenames = Webpage.filenames_from_directory(directory)
         Webpage.write_item_pages_from_md_filenames(website, filenames)
 
 
     @staticmethod
     def write_homepage_from_directory(website, directory):
+        """ Writes the homepage to file
+
+        Parameters:
+        directory - the directory containing the .md filenames for the article listing
+        on the homepage
+        """
 
         filenames = Webpage.filenames_from_directory(directory)
 
@@ -215,20 +306,26 @@ class Webpage:
 
     @staticmethod
     def write_list_pages_from_directory(website, directory):
+        """ Writes list pages to file
 
-        articles_per_page = int(website.config.value('articles_per_page'))
+        Parameters:
+        directory - the directory containing the .md filenames for the article listing
+        """
 
-        filenames = MUtil.filter_out_non_article_filenames(Webpage.filenames_from_directory(directory))       
+        per_page = int(website.config.value('articles_per_page'))
 
-        total_no_of_pages = ceil (len(filenames) / articles_per_page)
+        filenames = MUtil.purge_non_article_filenames(Webpage.filenames_from_directory(directory))
 
-        print('Generating %s list pages --> %s' % (str(total_no_of_pages), website.config.value('output_path')))
+        total_no_of_pages = ceil(len(filenames) / per_page)
 
-        for n in range (1, 1 + total_no_of_pages):
+        output_path = website.config.value('output_path')
+        print('Generating %s list pages --> %s' % (str(total_no_of_pages), output_path))
+
+        for counter in range(1, 1 + total_no_of_pages):
             webpage = Webpage(website)
-            page_filenames = filenames[articles_per_page * (n - 1 ) : articles_per_page * n]
-            webpage.listing_page_from_md_filenames(page_filenames, n, total_no_of_pages)
-            webpage.filename = 'blog-%s.html' % str(n)
+            page_filenames = filenames[per_page * (counter - 1) : per_page * counter]
+            webpage.listing_page_from_md_filenames(page_filenames, counter, total_no_of_pages)
+            webpage.filename = 'blog-%s.html' % str(counter)
             webpage.write()
 
         print(colours.OK + ' --> ' + colours.END + '%s etc' % webpage.filename)
@@ -236,7 +333,10 @@ class Webpage:
 
     @staticmethod
     def filenames_from_directory(directory):
+        """ Returns a alphabetically sorted list of filenames from a directory
+
+        Parameters:
+        directory - The directory to list the files from
+        """
 
         return sorted(listdir(directory), reverse=True)
-
-

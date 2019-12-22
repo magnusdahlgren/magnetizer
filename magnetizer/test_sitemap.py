@@ -3,6 +3,7 @@ from os import listdir, path, remove
 from random import *
 import shutil
 from magnetizer import *
+from sitemap import Sitemap
 
 test_website = Website('tests/config/test_magnetizer.cfg')
 test_website.refresh()

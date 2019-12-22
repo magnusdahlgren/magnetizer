@@ -1,5 +1,6 @@
 import pytest
 from magnetizer import *
+from config import Config
 
 config = Config('tests/config/test.cfg')
 

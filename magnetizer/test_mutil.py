@@ -109,7 +109,7 @@ def test_filter_out_non_article_filenames():
 
     filenames = ['001-article-1.md', '002-article-2.md', 'non-article.md', '003-image.gif', '123-article-3.md']
 
-    filtered_filenames = MUtil.filter_out_non_article_filenames(filenames)
+    filtered_filenames = MUtil.purge_non_article_filenames(filenames)
 
     assert len(filtered_filenames) == 3
     assert '001-article-1.md' in filtered_filenames
