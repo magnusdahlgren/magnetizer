@@ -35,7 +35,7 @@ class Webpage:
 
             self.filename = item.filename
             self.title = item.title()
-            self.indexable = item.indexable
+            self.indexable = item.is_indexable()
             self.meta_description = item.meta_description()
             self.twitter_card = item.twitter_card()
 
@@ -135,7 +135,7 @@ class Webpage:
 
     def includes(self):
 
-        return set(re.findall(r"<!-- *MAGNETIZER_INCLUDE *(.*?) *-->", self.html))
+        return set(findall(r"<!-- *MAGNETIZER_INCLUDE *(.*?) *-->", self.html))
 
 
     def pagination_html(self):

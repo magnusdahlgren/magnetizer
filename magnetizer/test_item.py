@@ -148,7 +148,7 @@ def test_article_with_h1_and_break_and_date_and_cc():
     assert article.html_full.count("<a href='article-with-h1-break-and-date.html'>") == 0
 
     # The article should have the correct date
-    assert article.date_html == "<time datetime='1998-08-01'>1 August 1998</time>"
+    assert article.date_html_from_date() == "<time datetime='1998-08-01'>1 August 1998</time>"
 
     # The article should have a date in the html
     date = "<time datetime='1998-08-01'>1 August 1998</time>"
@@ -193,8 +193,8 @@ def test_noindex_article():
     article_index.from_md_filename('001-basic-article.md')
     article_dont_index.from_md_filename('009-unindexed-article.md')
 
-    assert article_index.indexable == True
-    assert article_dont_index.indexable == False
+    assert article_index.is_indexable() == True
+    assert article_dont_index.is_indexable() == False
 
 
 def test_article_cc():

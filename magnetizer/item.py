@@ -8,8 +8,8 @@ from re import sub
 from re import search
 from datetime import datetime
 from markdown import markdown
-from template import *
-from mutil import *
+from template import Template
+from mutil import MUtil, colours
 
 
 class Item:
@@ -35,15 +35,12 @@ class Item:
     def __init__(self, website):
 
         self.website = website
-        self.template = None
         self.markdown_source = None
         self.filename = None
         self.html_summary = None
         self.html_full = None
-        self.date_html = None
         self.date = None
         self.type = None
-        self.indexable = True
 
 
     def from_md_filename(self, filename):
@@ -67,20 +64,16 @@ class Item:
                 if filename.split('-', 1)[0].isdigit():
                     filename = filename.split('-', 1)[1]
 
-                self.template = Template(self.website.tag['content'],
-                                         self.website.config.value('template_path') +
-                                         self.template_filename())
+                template = Template(self.website.tag['content'],
+                                    self.website.config.value('template_path') +
+                                    self.template_filename())
 
                 self.filename = filename
 
-                if self.website.tag['noindex'] in self.markdown_source:
-                    self.indexable = False
-
-                self.html_full = self.template.render(markdown(self.markdown_source))
+                self.html_full = template.render(markdown(self.markdown_source))
 
                 if self.type == Item.STATIC_ITEM:
                     self.date = None
-                    self.date_html = None
 
                     self.html_full = self.html_full.replace(
                         self.website.tag['item_footer'],
@@ -88,7 +81,6 @@ class Item:
 
                 else:
                     self.date = self.date_from_markdown_source()
-                    self.date_html = self.date_html_from_date()
 
                     self.html_full = self.html_full.replace(
                         self.website.tag['item_footer'],
@@ -104,32 +96,34 @@ class Item:
                     self.html_full = self.html_full.replace(
                         self.website.tag['creative_commons'], '')
 
-                s = self.markdown_source.split(self.website.tag['break'], maxsplit=1)[0]
+                summary = self.markdown_source.split(self.website.tag['break'], maxsplit=1)[0]
 
                 # Show 'read more' if post has been abbreviated
-                if s != self.markdown_source:
+                if summary != self.markdown_source:
                     readmore = "<a href='%s' class='magnetizer-more'>Read more</a>" % \
                         self.filename
                 else:
                     readmore = ""
 
-                self.html_summary = markdown(s) + readmore
+                self.html_summary = markdown(summary) + readmore
                 self.html_summary = MUtil.link_h1(self.html_summary, self.filename)
                 self.html_summary = MUtil.downgrade_headings(self.html_summary)
-                self.html_summary = self.template.render(self.html_summary)
+                self.html_summary = template.render(self.html_summary)
                 self.html_summary = self.html_summary.replace(
                     self.website.tag['item_footer'], '', 1)
                 self.html_summary = sub(r'<!-- MAGNETIZER_INCLUDE (.*?)-->', '', self.html_summary)
 
-                if self.date_html is not None:
+                date_html = self.date_html_from_date()
+
+                if date_html is not None:
 
                     self.html_full = self.html_full.replace(
-                        self.website.tag['date'], self.date_html, 1)
+                        self.website.tag['date'], date_html, 1)
 
                     # date in short html should be a link
                     self.html_summary = self.html_summary.replace(
                         self.website.tag['date'],
-                        MUtil.wrap_it_in_a_link(self.date_html, self.filename), 1)
+                        MUtil.wrap_it_in_a_link(date_html, self.filename), 1)
 
                 return True
 
@@ -151,7 +145,7 @@ class Item:
 
         if self.html_full is not None:
 
-            match = re.search(r"<h1>(.*?)<\/h1>", self.html_full)
+            match = search(r"<h1>(.*?)<\/h1>", self.html_full)
 
             if match:
                 title = MUtil.strip_tags_from_html(match.group(1))
@@ -164,7 +158,7 @@ class Item:
         <!-- META_DESCRIPTION --> tag.
         """
 
-        match = re.search(r"<!-- *META_DESCRIPTION *= *(.*?) *-->", self.markdown_source)
+        match = search(r"<!-- *META_DESCRIPTION *= *(.*?) *-->", self.markdown_source)
 
         if match:
             return match.group(1)
@@ -238,32 +232,24 @@ class Item:
     def twitter_card(self):
         """Generates meta data for a Twitter card for the item"""
 
-        try:
-            twitter_handle = self.website.config.value('website_twitter')
+        twitter_handle = self.website.config.value('website_twitter')
 
-            card = '<meta name="twitter:card" content="summary_large_image" />'
-            card += '<meta name="twitter:site" content="%s" />' % twitter_handle
-            card += '<meta name="twitter:title" content="%s" />' % self.title()
+        card = '<meta name="twitter:card" content="summary_large_image" />'
+        card += '<meta name="twitter:site" content="%s" />' % twitter_handle
+        card += '<meta name="twitter:title" content="%s" />' % self.title()
 
-            img_url = MUtil.first_image_url_from_html(markdown(self.markdown_source))
+        img_url = MUtil.first_image_url_from_html(markdown(self.markdown_source))
 
-            card += '<meta name="twitter:description" content="%s" />' % self.abstract()
+        card += '<meta name="twitter:description" content="%s" />' % self.abstract()
 
-            if img_url:
+        if img_url:
 
-                if not img_url.startswith('http'):
-                    img_url = self.website.config.value('website_base_url') + '/' + img_url
+            if not img_url.startswith('http'):
+                img_url = self.website.config.value('website_base_url') + '/' + img_url
 
-                card += '<meta name="twitter:image" content="%s" />' % img_url
+            card += '<meta name="twitter:image" content="%s" />' % img_url
 
-            return card
-
-        except:
-
-            print(colours.ERROR + ' (!) ' + colours.END +
-                  "'website_twitter' not defined in config. Twitter cards will be disabled.")
-
-            return ''
+        return card
 
 
     def abstract(self):
@@ -277,6 +263,14 @@ class Item:
 
         return "<h1>" in markdown(self.markdown_source) and \
             search(r'.*<!-- (\d\d?/\d\d?/\d\d\d\d?) -->.*', self.markdown_source)
+
+
+    def is_indexable(self):
+        """Determine whether the item should be indexable by search engines by looking
+        for noindex tag in the markdown source
+        """
+
+        return not self.website.tag['noindex'] in self.markdown_source
 
 
     def template_filename(self):

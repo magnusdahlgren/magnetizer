@@ -1,5 +1,3 @@
-from config import *
-
 class Template:
 
     def __init__(self, content_tag, filename):

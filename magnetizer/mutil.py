@@ -1,11 +1,11 @@
-import re
+from re import sub, search, compile, findall
 
 class MUtil:
 
     @staticmethod
     def link_h1(html, url):
 
-        match = re.search(r"<h1>(.*?)<\/h1>", html)
+        match = search(r"<h1>(.*?)<\/h1>", html)
             
         if match:
             h1 = match.group()
@@ -13,23 +13,6 @@ class MUtil:
             return html.replace(h1, "<h1>" + MUtil.wrap_it_in_a_link(h1_content, url) + "</h1>", 1)
         else:
             return html
-
-
-    @staticmethod
-    def link_first_tag_no_more(html, url):
-
-        html_rows = html.split('\n',1)
-        first_row = html_rows[0]
-
-        if first_row.startswith('<img '):
-            result = MUtil.wrap_it_in_a_link(first_row, url)
-            return '\n'.join([result, html_rows[1] ])
-
-        if first_row.startswith('<h1>') and first_row.endswith('</h1>'):
-            result = '<h1>' + MUtil.wrap_it_in_a_link(first_row[4:-5], url) + '</h1>'
-            return '\n'.join([result, html_rows[1] ])
-
-        return html
 
 
     @staticmethod
@@ -57,8 +40,8 @@ class MUtil:
     def abstract_from_html(html):
 
         s = MUtil.strip_tags_from_html(MUtil.strip_anything_before_h1_from_html(html)).strip()
-        s = re.sub(r'\n', ' ', s)
-        s = re.sub(r'\s\s+',' ', s)
+        s = sub(r'\n', ' ', s)
+        s = sub(r'\s\s+',' ', s)
 
         if len(s) > 300:
             s = s[0:300] + '…'
@@ -69,7 +52,7 @@ class MUtil:
     def first_image_url_from_html(html):
 
         pattern = "<img .*?src=['\"](.*?)['\"].*?>"
-        match = re.search(pattern, html)
+        match = search(pattern, html)
         
         if match:
             return match.group(1)
@@ -80,7 +63,7 @@ class MUtil:
     @staticmethod
     def strip_tags_from_html(html):
 
-        tag_re = re.compile(r'(<!--.*?-->|<[^>]*>)')
+        tag_re = compile(r'(<!--.*?-->|<[^>]*>)')
         return tag_re.sub('', html)
 
 
@@ -100,7 +83,7 @@ class MUtil:
         result = []
 
         for filename in filenames:
-            if re.search(r'^\d+-\S+\.md$', filename):
+            if search(r'^\d+-\S+\.md$', filename):
                 result.append(filename)
 
         return result
