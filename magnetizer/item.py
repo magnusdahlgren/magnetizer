@@ -55,82 +55,82 @@ class Item:
             with open(self.website.config.value('source_path') + filename, 'r') as myfile:
                 self.markdown_source = myfile.read()
 
-            if self.is_valid():
-
-                filename = filename.split('.', 1)[0] + '.html'
-                self.type = Item.item_type(filename)
-
-                # Remove first part of filename if it is a number
-                if filename.split('-', 1)[0].isdigit():
-                    filename = filename.split('-', 1)[1]
-
-                template = Template(self.website.tag['content'],
-                                    self.website.config.value('template_path') +
-                                    self.template_filename())
-
-                self.filename = filename
-
-                self.html_full = template.render(markdown(self.markdown_source))
-
-                if self.type == Item.STATIC_ITEM:
-                    self.date = None
-
-                    self.html_full = self.html_full.replace(
-                        self.website.tag['item_footer'],
-                        self.website.static_item_footer_html, 1)
-
-                else:
-                    self.date = self.date_from_markdown_source()
-
-                    self.html_full = self.html_full.replace(
-                        self.website.tag['item_footer'],
-                        self.website.article_item_footer_html, 1)
-
-                self.html_full = self.html_full.replace(self.website.tag['break'], '')
-
-                if self.html_full.count(self.website.tag['creative_commons']) > 0:
-
-                    self.html_full = self.html_full.replace(
-                        self.website.tag['cc_here'], self.cc_license(), 1)
-
-                    self.html_full = self.html_full.replace(
-                        self.website.tag['creative_commons'], '')
-
-                summary = self.markdown_source.split(self.website.tag['break'], maxsplit=1)[0]
-
-                # Show 'read more' if post has been abbreviated
-                if summary != self.markdown_source:
-                    readmore = "<a href='%s' class='magnetizer-more'>Read more</a>" % \
-                        self.filename
-                else:
-                    readmore = ""
-
-                self.html_summary = markdown(summary) + readmore
-                self.html_summary = MUtil.link_h1(self.html_summary, self.filename)
-                self.html_summary = MUtil.downgrade_headings(self.html_summary)
-                self.html_summary = template.render(self.html_summary)
-                self.html_summary = self.html_summary.replace(
-                    self.website.tag['item_footer'], '', 1)
-                self.html_summary = sub(r'<!-- MAGNETIZER_INCLUDE (.*?)-->', '', self.html_summary)
-
-                date_html = self.date_html_from_date()
-
-                if date_html is not None:
-
-                    self.html_full = self.html_full.replace(
-                        self.website.tag['date'], date_html, 1)
-
-                    # date in short html should be a link
-                    self.html_summary = self.html_summary.replace(
-                        self.website.tag['date'],
-                        MUtil.wrap_it_in_a_link(date_html, self.filename), 1)
-
-                return True
-
-            else:
+            if not self.is_valid():
 
                 print(colours.ERROR + ' (!) ' + colours.END +
                       "'%s' must include exactly one h1 and a date)" % filename)
+
+                return False
+
+            filename = filename.split('.', 1)[0] + '.html'
+            self.type = Item.item_type(filename)
+
+            # Remove first part of filename if it is a number
+            if filename.split('-', 1)[0].isdigit():
+                filename = filename.split('-', 1)[1]
+
+            template = Template(self.website.tag['content'],
+                                self.website.config.value('template_path') +
+                                self.template_filename())
+
+            self.filename = filename
+
+            self.html_full = template.render(markdown(self.markdown_source))
+
+            if self.type == Item.STATIC_ITEM:
+                self.date = None
+
+                self.html_full = self.html_full.replace(
+                    self.website.tag['item_footer'],
+                    self.website.static_item_footer_html, 1)
+
+            else:
+                self.date = self.date_from_markdown_source()
+
+                self.html_full = self.html_full.replace(
+                    self.website.tag['item_footer'],
+                    self.website.article_item_footer_html, 1)
+
+            self.html_full = self.html_full.replace(self.website.tag['break'], '')
+
+            if self.html_full.count(self.website.tag['creative_commons']) > 0:
+
+                self.html_full = self.html_full.replace(
+                    self.website.tag['cc_here'], self.cc_license(), 1)
+
+                self.html_full = self.html_full.replace(
+                    self.website.tag['creative_commons'], '')
+
+            summary = self.markdown_source.split(self.website.tag['break'], maxsplit=1)[0]
+
+            # Show 'read more' if post has been abbreviated
+            if summary != self.markdown_source:
+                readmore = "<a href='%s' class='magnetizer-more'>Read more</a>" % \
+                    self.filename
+            else:
+                readmore = ""
+
+            self.html_summary = markdown(summary) + readmore
+            self.html_summary = MUtil.link_h1(self.html_summary, self.filename)
+            self.html_summary = MUtil.downgrade_headings(self.html_summary)
+            self.html_summary = template.render(self.html_summary)
+            self.html_summary = self.html_summary.replace(
+                self.website.tag['item_footer'], '', 1)
+            self.html_summary = sub(r'<!-- MAGNETIZER_INCLUDE (.*?)-->', '', self.html_summary)
+
+            date_html = self.date_html_from_date()
+
+            if date_html is not None:
+
+                self.html_full = self.html_full.replace(
+                    self.website.tag['date'], date_html, 1)
+
+                # date in short html should be a link
+                self.html_summary = self.html_summary.replace(
+                    self.website.tag['date'],
+                    MUtil.wrap_it_in_a_link(date_html, self.filename), 1)
+
+            return True
 
         return False
 
