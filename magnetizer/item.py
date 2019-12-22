@@ -134,8 +134,7 @@ class Item:
 
                 return False
 
-        else:
-            return False
+        return False
 
 
     def title(self):
