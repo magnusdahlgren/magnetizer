@@ -1,11 +1,25 @@
+""" Magnetizer Config
+
+Reads a config file with key-value pairs (two strings separated by a dash) and
+lets user use the key to retrieve the value.
+"""
+
 class Config:
+    """
+    Parameters:
+    filename - filname of the config file to read
+
+    Example file format:
+    output_path     = tests/public/
+    website_name    = Test website name
+    """
 
     def __init__(self, filename):
-        
+
         self.config = {}
 
-        with open(filename, 'r') as f:
-            raw_config = f.readlines()
+        with open(filename, 'r') as file_contents:
+            raw_config = file_contents.readlines()
 
         for line in raw_config:
 
@@ -19,13 +33,28 @@ class Config:
                 if value.startswith('[') and value.endswith(']'):
                     value = value[1:-1].split(',')
                     value = [element.strip() for element in value]
- 
+
                 self.config[key] = value
 
 
     def value(self, key):
+        """ Look up key
+
+        Parameters:
+        key
+
+        Returns:
+        value of key
+        """
         return self.config[key]
-        
+
 
     def set(self, key, value):
+        """ Sets value of key (used for tests only)
+
+        Parameters:
+        key
+        value
+        """
+
         self.config[key] = value
