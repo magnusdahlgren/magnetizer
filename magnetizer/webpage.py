@@ -5,7 +5,7 @@ from os import path, listdir
 from math import ceil
 from re import findall, sub
 
-from mutil import MUtil, colours
+from mutil import purge_non_article_filenames, COLOUR_OK, COLOUR_ERROR, COLOUR_END
 from website import Website
 from template import Template
 from item import Item
@@ -69,7 +69,7 @@ class Webpage:
         filenames - a list of the latest articles to include on the homepage
         """
 
-        filenames = MUtil.purge_non_article_filenames(filenames)[0:3]
+        filenames = purge_non_article_filenames(filenames)[0:3]
         html = Item.html_contents_from_multiple_md_files(self.website, filenames)
 
         website_name = self.website.config.value('website_name')
@@ -237,7 +237,7 @@ class Webpage:
 
         if self.filename is not None:
 
-            error = colours.ERROR + ' (!) ' + colours.END + "Overwriting existing '%s'"
+            error = COLOUR_ERROR + ' (!) ' + COLOUR_END + "Overwriting existing '%s'"
 
             if path.isfile(path.join(self.website.config.value('output_path'), self.filename)):
                 print(error % self.filename)
@@ -269,7 +269,7 @@ class Webpage:
             else:
                 ignored += 1
 
-        success = colours.OK + ' --> ' + colours.END + 'Generated %s item pages, ignored %s files'
+        success = COLOUR_OK + ' --> ' + COLOUR_END + 'Generated %s item pages, ignored %s files'
         print(success % (generated, ignored))
 
 
@@ -302,7 +302,7 @@ class Webpage:
         webpage.write()
 
         print('Generating homepage --> %s' % website.config.value('output_path'))
-        print(colours.OK + ' --> ' + colours.END + '%s' % webpage.filename)
+        print(COLOUR_OK + ' --> ' + COLOUR_END + '%s' % webpage.filename)
 
 
     @staticmethod
@@ -315,7 +315,7 @@ class Webpage:
 
         per_page = int(website.config.value('articles_per_page'))
 
-        filenames = MUtil.purge_non_article_filenames(Webpage.filenames_from_directory(directory))
+        filenames = purge_non_article_filenames(Webpage.filenames_from_directory(directory))
 
         total_no_of_pages = ceil(len(filenames) / per_page)
 
@@ -329,7 +329,7 @@ class Webpage:
             webpage.filename = 'blog-%s.html' % str(counter)
             webpage.write()
 
-        print(colours.OK + ' --> ' + colours.END + '%s etc' % webpage.filename)
+        print(COLOUR_OK + ' --> ' + COLOUR_END + '%s etc' % webpage.filename)
 
 
     @staticmethod

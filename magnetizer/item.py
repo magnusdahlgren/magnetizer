@@ -9,7 +9,7 @@ from re import search
 from datetime import datetime
 from markdown import markdown
 from template import Template
-from mutil import MUtil, colours
+from mutil import link_h1, downgrade_headings, wrap_it_in_a_link, strip_tags_from_html, first_image_url_from_html, abstract_from_html, COLOUR_ERROR, COLOUR_END
 
 
 class Item:
@@ -57,7 +57,7 @@ class Item:
 
             if not self.is_valid():
 
-                print(colours.ERROR + ' (!) ' + colours.END +
+                print(COLOUR_ERROR + ' (!) ' + COLOUR_END +
                       "'%s' must include exactly one h1 and a date)" % filename)
 
                 return False
@@ -111,8 +111,8 @@ class Item:
                 readmore = ""
 
             self.html_summary = markdown(summary) + readmore
-            self.html_summary = MUtil.link_h1(self.html_summary, self.filename)
-            self.html_summary = MUtil.downgrade_headings(self.html_summary)
+            self.html_summary = link_h1(self.html_summary, self.filename)
+            self.html_summary = downgrade_headings(self.html_summary)
             self.html_summary = template.render(self.html_summary)
             self.html_summary = self.html_summary.replace(
                 self.website.tag['item_footer'], '', 1)
@@ -128,7 +128,7 @@ class Item:
                 # date in short html should be a link
                 self.html_summary = self.html_summary.replace(
                     self.website.tag['date'],
-                    MUtil.wrap_it_in_a_link(date_html, self.filename), 1)
+                    wrap_it_in_a_link(date_html, self.filename), 1)
 
             return True
 
@@ -145,7 +145,7 @@ class Item:
             match = search(r"<h1>(.*?)<\/h1>", self.html_full)
 
             if match:
-                title = MUtil.strip_tags_from_html(match.group(1))
+                title = strip_tags_from_html(match.group(1))
 
         return '%s - %s' % (title, self.website.config.value('website_name'))
 
@@ -235,7 +235,7 @@ class Item:
         card += '<meta name="twitter:site" content="%s" />' % twitter_handle
         card += '<meta name="twitter:title" content="%s" />' % self.title()
 
-        img_url = MUtil.first_image_url_from_html(markdown(self.markdown_source))
+        img_url = first_image_url_from_html(markdown(self.markdown_source))
 
         card += '<meta name="twitter:description" content="%s" />' % self.abstract()
 
@@ -252,7 +252,7 @@ class Item:
     def abstract(self):
         """Generate a short abstract for the item"""
 
-        return MUtil.abstract_from_html(markdown(self.markdown_source))
+        return abstract_from_html(markdown(self.markdown_source))
 
 
     def is_valid(self):

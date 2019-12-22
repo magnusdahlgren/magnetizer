@@ -2,7 +2,7 @@
 to index.
 """
 
-from mutil import colours
+from mutil import COLOUR_OK, COLOUR_END
 
 class Sitemap:
     """ A class to populate a sitemap and then write it to file
@@ -33,7 +33,8 @@ class Sitemap:
             for page in self.pages:
                 myfile.write(page + '\n')
                 counter += 1
-        print(colours.OK + ' --> ' + colours.END + 'Generated sitemap with %s items' % counter)
+
+        print(COLOUR_OK + ' --> ' + COLOUR_END + 'Generated sitemap with %s items' % counter)
 
 
     def clear(self):

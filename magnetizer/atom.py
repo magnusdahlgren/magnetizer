@@ -2,8 +2,10 @@
 """
 
 import html
-from item import Item, colours
+from item import Item
 from webpage import Webpage
+from website import Website
+from mutil import COLOUR_OK, COLOUR_END
 
 class Atom:
     """The Atom class represents the atom feed.
@@ -63,4 +65,4 @@ class Atom:
 
         with open(self.website.config.value('output_path') + 'atom.xml', 'w') as myfile:
             myfile.write(self.feed_data)
-            print(colours.OK + ' --> ' + colours.END + 'atom.xml')
+            print(COLOUR_OK + ' --> ' + COLOUR_END + 'atom.xml')

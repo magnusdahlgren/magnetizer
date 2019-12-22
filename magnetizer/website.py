@@ -11,9 +11,9 @@ from os import listdir, path, remove
 import shutil
 import hashlib
 from config import Config
-from mutil import colours
 from sitemap import Sitemap
 from template import Template
+from mutil import COLOUR_OK, COLOUR_ERROR, COLOUR_END
 
 class Website:
     """ Class representing a website
@@ -83,7 +83,7 @@ class Website:
         if path.isfile(path.join(self.config.value('template_path'), filename)):
             return Website.read_file(self.config.value('template_path'), filename)
 
-        print(colours.ERROR + ' (!) ' + colours.END + "Include '%s' does not exist!" % filename)
+        print(COLOUR_ERROR + ' (!) ' + COLOUR_END + "Include '%s' does not exist!" % filename)
         return "[ ERROR: Include '%s' does not exist! ]" % filename
 
 
@@ -110,7 +110,7 @@ class Website:
                 else:
                     ignored += 1
 
-        message = colours.OK + ' --> ' + colours.END + 'Copied %s files, ignored %s'
+        message = COLOUR_OK + ' --> ' + COLOUR_END + 'Copied %s files, ignored %s'
         print(message % (copied, ignored))
 
 
@@ -136,7 +136,7 @@ class Website:
 
         self.sitemap.clear()
 
-        message = colours.OK + ' --> ' + colours.END + 'Deleted %s files, ignored %s'
+        message = COLOUR_OK + ' --> ' + COLOUR_END + 'Deleted %s files, ignored %s'
         print(message % (deleted, ignored))
 
 
