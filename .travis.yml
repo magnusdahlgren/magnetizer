@@ -6,4 +6,4 @@ install:
 cache: pip
 script:
   - python -m pytest -vv
-  - pylint magnetizer/atom.py magnetizer/config.py magnetizer/sitemap.py magnetizer/item.py magnetizer/webpage.py magnetizer/template.py magnetizer/magnetizer.py magnetizer/test_article_twitter_card.py magnetizer/test_atom.py magnetizer/test_config.py magnetizer_test_item.py
+  - pylint magnetizer/atom.py magnetizer/config.py magnetizer/sitemap.py magnetizer/item.py magnetizer/webpage.py magnetizer/template.py magnetizer/magnetizer.py magnetizer/test_article_twitter_card.py magnetizer/test_atom.py magnetizer/test_config.py magnetizer/test_item.py
