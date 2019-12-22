@@ -1,12 +1,23 @@
-from os import listdir, path, remove, mkdir, rename
-from config import *
+""" Module representing a website.
+
+A website consists of:
+- configuartion
+- a sitemap
+- a website template
+"""
+
+
+from os import listdir, path, remove
 import shutil
 import hashlib
-from mutil import *
-from sitemap import *
-from template import *
+from config import Config
+from mutil import colours
+from sitemap import Sitemap
+from template import Template
 
 class Website:
+    """ Class representing a website
+    """
 
     WEBSITE_TEMPLATE = '_website_template.html'
 
@@ -23,9 +34,10 @@ class Website:
 
         self.config = Config(config_file_name)
         self.sitemap = Sitemap(self.config.value('website_base_url'))
-        self.template = Template(self.tag['content'], self.config.value('template_path') + Website.WEBSITE_TEMPLATE)
+        self.template = Template(self.tag['content'],
+                                 self.config.value('template_path') + Website.WEBSITE_TEMPLATE)
         self.refresh()
-                
+
     tag = {
         'content'           : '<!-- MAGNETIZER_CONTENT -->',
         'page_content'      : '<!-- MAGNETIZER_PAGE_CONTENT -->',
@@ -41,26 +53,45 @@ class Website:
     }
 
     def refresh(self):
+        """ Run as part of init to populate the Website elements
 
-        self.article_item_footer_html = Website.read_file(self.config.value('template_path'), self.ARTICLE_ITEM_FOOTER_TEMPLATE_FILENAME)
-        self.static_item_footer_html = Website.read_file(self.config.value('template_path'), self.STATIC_ITEM_FOOTER_TEMPLATE_FILENAME)
+        - reads item footer templates
+        - calculates cache bursting checksum for css filename
+        """
 
-        css_contents = Website.read_file(self.config.value('resources_path'), self.config.value('website_css_filename'))
+        self.article_footer_html = Website.read_file(self.config.value('template_path'),
+                                                     self.ARTICLE_ITEM_FOOTER_TEMPLATE_FILENAME)
+        self.static_footer_html = Website.read_file(self.config.value('template_path'),
+                                                    self.STATIC_ITEM_FOOTER_TEMPLATE_FILENAME)
+
+        css_contents = Website.read_file(self.config.value('resources_path'),
+                                         self.config.value('website_css_filename'))
         css_hash = hashlib.md5(bytes(css_contents, encoding='utf-8')).hexdigest()
         self.css_filename = self.config.value('website_css_filename') + '?' + css_hash
 
 
     def include(self, filename):
+        """ Reads the contents of an include file
+
+        Parameters:
+        - filename
+
+        Returns:
+        - the contents of the include file or an error message
+        """
 
         if path.isfile(path.join(self.config.value('template_path'), filename)):
             return Website.read_file(self.config.value('template_path'), filename)
 
-        else:
-            print (colours.ERROR + ' (!) ' + colours.END + "Include '%s' does not exist!" % filename)
-            return "[ ERROR: Include '%s' does not exist! ]" % filename
+        print(colours.ERROR + ' (!) ' + colours.END + "Include '%s' does not exist!" % filename)
+        return "[ ERROR: Include '%s' does not exist! ]" % filename
 
 
     def copy_resources(self):
+        """ Copies resource files from the resources directory to the output directory,
+        e.g. css, images etc. Files not included in approved_filetypes will be ignored.
+
+        """
 
         print("Copying resources --> %s " % self.config.value('output_path'))
         copied = 0
@@ -73,22 +104,27 @@ class Website:
                 extension = filename.split('.')[-1]
 
                 if '.' + extension in self.config.value('approved_filetypes'):
-                    shutil.copyfile(self.config.value('resources_path') + filename , self.config.value('output_path') + filename)
+                    shutil.copyfile(self.config.value('resources_path') + filename,
+                                    self.config.value('output_path') + filename)
                     copied += 1
                 else:
                     ignored += 1
 
-        print (colours.OK + ' --> ' + colours.END + 'Copied %s files, ignored %s' % (copied, ignored) )
+        message = colours.OK + ' --> ' + colours.END + 'Copied %s files, ignored %s'
+        print(message % (copied, ignored))
 
 
     def wipe(self):
+        """ Delete the files from the output directory, typically when regenerating the site.
+        Ignores files not ending with .html or not in approved_filetypes.
+        """
 
         print('Deleting previous files from %s ' % self.config.value('output_path'))
         deleted = 0
         ignored = 0
 
         for filename in listdir(self.config.value('output_path')):
-            
+
             if path.isfile(self.config.value('output_path') + filename):
                 extension = '.' + filename.split('.')[-1]
 
@@ -100,11 +136,14 @@ class Website:
 
         self.sitemap.clear()
 
-        print (colours.OK + ' --> ' + colours.END + 'Deleted %s files, ignored %s' % (deleted, ignored) )
+        message = colours.OK + ' --> ' + colours.END + 'Deleted %s files, ignored %s'
+        print(message % (deleted, ignored))
 
 
     @staticmethod
     def read_file(directory, filename):
+        """ Helper method for reading files.
+        """
 
         with open(directory + filename, 'r') as myfile:
             return myfile.read()
