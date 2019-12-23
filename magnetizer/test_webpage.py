@@ -1,15 +1,19 @@
-import pytest
-from os import listdir, path, remove
-import shutil
-from magnetizer import *
-from item import Item
+""" Tests for webpage.py
+"""
 
-test_website = Website('tests/config/test_magnetizer.cfg')
-test_website.refresh()
+from os import listdir, path, remove
+from website import Website
+from item import Item
+from webpage import Webpage
+
+TEST_WEBSITE = Website('tests/config/test_magnetizer.cfg')
+TEST_WEBSITE.refresh()
 
 def test_webpage_from_single_article():
+    """ Test creating an article item page using item_from_md_filename()
+    """
 
-    webpage = Webpage(test_website)
+    webpage = Webpage(TEST_WEBSITE)
     webpage.item_from_md_filename('001-basic-article.md')
 
     # Page title should be "Article title - Website name"
@@ -33,7 +37,7 @@ def test_webpage_from_single_article():
     assert webpage.html.count('<footer class="article-footer">') == 1
 
     # Filename for webpage should be based on the article
-    article = Item(test_website)
+    article = Item(TEST_WEBSITE)
     article.from_md_filename('001-basic-article.md')
     assert webpage.filename == article.filename
 
@@ -44,7 +48,8 @@ def test_webpage_from_single_article():
     assert '<meta name="twitter:card" content="summary_large_image" />' in webpage.html
 
     # Link to Atom feed should be present
-    assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
+    assert ('<link rel="alternate" type="application/rss+xml" ' +
+            'href="https://example.com/atom.xml" />') in webpage.html
 
     # Link to CSS should be present
     assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in webpage.html
@@ -59,12 +64,14 @@ def test_webpage_from_single_article():
     assert '<!--' not in webpage.html
 
     # Meta description should be pulled in from article
-    assert '<meta name="description" content="Meta description from article">' in webpage.html 
+    assert '<meta name="description" content="Meta description from article">' in webpage.html
 
 
 def test_static_item_page():
+    """ Test creating a static item page using item_from_md_filename()
+    """
 
-    webpage = Webpage(test_website)
+    webpage = Webpage(TEST_WEBSITE)
     webpage.item_from_md_filename('dont-show-on-list-page.md')
 
     # Page title should be "Article title - Website name"
@@ -88,7 +95,7 @@ def test_static_item_page():
     assert webpage.html.count('<footer>footer</footer>') == 0
 
     # Filename for webpage should be based on the article
-    article = Item(test_website)
+    article = Item(TEST_WEBSITE)
     article.from_md_filename('dont-show-on-list-page.md')
     assert webpage.filename == article.filename
 
@@ -99,7 +106,8 @@ def test_static_item_page():
     assert '<meta name="twitter:card" content="summary_large_image" />' in webpage.html
 
     # Link to Atom feed should be present
-    assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
+    assert ('<link rel="alternate" type="application/rss+xml" ' +
+            'href="https://example.com/atom.xml" />') in webpage.html
 
     # Link to CSS should be present
     assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in webpage.html
@@ -109,9 +117,17 @@ def test_static_item_page():
 
 
 def test_home_page():
+    """ Test creating a homepage using homepage_from_md_filenames()
+    """
 
-    webpage = Webpage(test_website)
-    webpage.homepage_from_md_filenames(['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', 'dont-index-this-article.md', '100-ignore-this.txt', '005-simple-article-1.md', '006-simple-article-2.md'] )
+    webpage = Webpage(TEST_WEBSITE)
+    webpage.homepage_from_md_filenames(['001-basic-article.md',
+                                        '002-article-with-h1-break-and-date.md',
+                                        '003-another-article.md',
+                                        'dont-index-this-article.md',
+                                        '100-ignore-this.txt',
+                                        '005-simple-article-1.md',
+                                        '006-simple-article-2.md'])
 
     # Page should use homepage page template
     assert '<p>Homepage page template</p>' in webpage.html
@@ -122,7 +138,7 @@ def test_home_page():
     # Index title = "Website Name - Tag Line"
     assert webpage.title == "Test website name - test tag & line"
 
-    # Don't show article footers on index 
+    # Don't show article footers on index
     assert webpage.html.count('<footer>footer</footer>') == 0
 
     # Body should have class='magnetizer-homepage-page'
@@ -135,7 +151,8 @@ def test_home_page():
     assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in webpage.html
 
     # Link to Atom feed should be present
-    assert '<link rel="alternate" type="application/rss+xml" href="https://example.com/atom.xml" />' in webpage.html
+    assert ('<link rel="alternate" type="application/rss+xml" ' +
+            'href="https://example.com/atom.xml" />') in webpage.html
 
     # Meta description from config file should be present
     assert '<meta name="description" content="Meta \\"description\\" from config">' in webpage.html
@@ -145,11 +162,13 @@ def test_home_page():
 
 
 def test_page_indexability():
+    """ Test to make sure indexability carries through from item to webpage
+    """
 
-    webpage_index = Webpage(test_website)
+    webpage_index = Webpage(TEST_WEBSITE)
     webpage_index.item_from_md_filename('001-basic-article.md')
 
-    webpage_dont_index = Webpage(test_website)
+    webpage_dont_index = Webpage(TEST_WEBSITE)
     webpage_dont_index.item_from_md_filename('009-unindexed-article.md')
 
     # Don't include noindex tag for article page that SHOULD be indexed
@@ -160,47 +179,54 @@ def test_page_indexability():
 
 
 def test_write_homepage():
+    """ Test of write_homepage_from_directory()
+    """
 
-    Webpage.write_homepage_from_directory(test_website, test_website.config.value('source_path'))
+    Webpage.write_homepage_from_directory(TEST_WEBSITE, TEST_WEBSITE.config.value('source_path'))
 
     # Homepage should contain some html content
-    with open(test_website.config.value('output_path') + 'index.html', 'r') as myfile:
+    with open(TEST_WEBSITE.config.value('output_path') + 'index.html', 'r') as myfile:
         assert myfile.read().count('<html>') == 1
 
     # Homepage should be included in sitemap
-    assert 'https://example.com/' in test_website.sitemap.pages
+    assert 'https://example.com/' in TEST_WEBSITE.sitemap.pages
 
-    test_website.wipe()
+    TEST_WEBSITE.wipe()
 
 
 def test_webpage_write():
+    """ Test of webpage.write()
+    """
 
-    RESULT = "This is a test!"
+    result = "This is a test!"
 
-    webpage = Webpage(test_website)
-    webpage.html = RESULT
+    webpage = Webpage(TEST_WEBSITE)
+    webpage.html = result
     webpage.filename = 'my-post.html'
     webpage.write()
 
     # File should have the correct contents
-    with open(test_website.config.value('output_path') + webpage.filename, 'r') as myfile:
-        assert myfile.read() == RESULT
+    with open(TEST_WEBSITE.config.value('output_path') + webpage.filename, 'r') as myfile:
+        assert myfile.read() == result
 
     # Page should be included in sitemap
-    assert 'https://example.com/my-post.html' in test_website.sitemap.pages
+    assert 'https://example.com/my-post.html' in TEST_WEBSITE.sitemap.pages
 
 
-    test_website.wipe()
+    TEST_WEBSITE.wipe()
 
 
 def test_webpage_write_multiple_from_filenames():
+    """ Test of write_item_pages_from_md_filenames()
+    """
 
-    test_website.wipe()
+    TEST_WEBSITE.wipe()
 
-    filenames = ['001-basic-article.md', '002-article-with-h1-break-and-date.md', '003-another-article.md', '100-ignore-this.txt', 'dont-show-on-list-page.md']
-    Webpage.write_item_pages_from_md_filenames(test_website, filenames)
+    filenames = ['001-basic-article.md', '002-article-with-h1-break-and-date.md',
+                 '003-another-article.md', '100-ignore-this.txt', 'dont-show-on-list-page.md']
+    Webpage.write_item_pages_from_md_filenames(TEST_WEBSITE, filenames)
 
-    written_filenames = listdir(test_website.config.value('output_path'))
+    written_filenames = listdir(TEST_WEBSITE.config.value('output_path'))
 
     # All the normal articles should have been written
     assert 'basic-article.html' in written_filenames
@@ -215,60 +241,65 @@ def test_webpage_write_multiple_from_filenames():
     assert '100-ignore-this.txt' not in written_filenames
 
     # The written files should be included in the sitemap
-    assert 'https://example.com/basic-article.html' in test_website.sitemap.pages
-    assert 'https://example.com/article-with-h1-break-and-date.html' in test_website.sitemap.pages
-    assert 'https://example.com/another-article.html' in test_website.sitemap.pages
-    assert 'https://example.com/dont-show-on-list-page.html' in test_website.sitemap.pages
+    assert 'https://example.com/basic-article.html' in TEST_WEBSITE.sitemap.pages
+    assert 'https://example.com/article-with-h1-break-and-date.html' in TEST_WEBSITE.sitemap.pages
+    assert 'https://example.com/another-article.html' in TEST_WEBSITE.sitemap.pages
+    assert 'https://example.com/dont-show-on-list-page.html' in TEST_WEBSITE.sitemap.pages
 
     # Ignored files should not be included in the sitemap
-    assert 'https://example.com/ignore-this.html' not in test_website.sitemap.pages
+    assert 'https://example.com/ignore-this.html' not in TEST_WEBSITE.sitemap.pages
 
-    test_website.wipe()
+    TEST_WEBSITE.wipe()
 
 
 def test_resources_copy_to_output():
+    """ Test of Website.copy_resources
+    """
 
-    test_website.wipe()
-
-    test_website.copy_resources()
+    TEST_WEBSITE.wipe()
+    TEST_WEBSITE.copy_resources()
 
     # supported files should have been copied
-    assert path.isfile(test_website.config.value('output_path') + 'resource.txt')
-    assert path.isfile(test_website.config.value('output_path') + 'resource.jpg')
+    assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'resource.txt')
+    assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'resource.jpg')
 
     # unsupported files should not have been copied
-    assert not path.isfile(test_website.config.value('output_path') + 'resource.xxx')
+    assert not path.isfile(TEST_WEBSITE.config.value('output_path') + 'resource.xxx')
 
-    test_website.wipe()
+    TEST_WEBSITE.wipe()
 
 
 def test_wipe_output_directory():
+    """ Test of Website.wipe()
+    """
 
     files_to_delete = ['wipe_me.html', 'wipe_me_2.html', 'wipe_me.jpg', 'wipe_me.pdf']
     files_to_leave_in_place = ['leave_me.xxx']
 
     # create some test files
     for filename in files_to_delete + files_to_leave_in_place:
-        with open(test_website.config.value('output_path') + filename, 'w') as myfile:
-                myfile.write('test file content')
+        with open(TEST_WEBSITE.config.value('output_path') + filename, 'w') as myfile:
+            myfile.write('test file content')
 
-    test_website.wipe()
+    TEST_WEBSITE.wipe()
 
     for filename in files_to_delete:
-        assert not path.isfile(test_website.config.value('output_path') + filename)
+        assert not path.isfile(TEST_WEBSITE.config.value('output_path') + filename)
 
     for filename in files_to_leave_in_place:
-        assert path.isfile(test_website.config.value('output_path') + filename)
+        assert path.isfile(TEST_WEBSITE.config.value('output_path') + filename)
 
         # Remove the test file
-        remove(test_website.config.value('output_path') + filename)
+        remove(TEST_WEBSITE.config.value('output_path') + filename)
 
-    assert test_website.sitemap.pages == []
+    assert TEST_WEBSITE.sitemap.pages == []
 
 
 def test_includes():
+    """ Test of webpage.includes()
+    """
 
-    webpage = Webpage(test_website)
+    webpage = Webpage(TEST_WEBSITE)
     webpage.html = '<h1>Some html</h1>'
     webpage.html += "<!-- MAGNETIZER_INCLUDE _include1.html -->"
     webpage.html += "<!-- MAGNETIZER_INCLUDE _include2.html -->"
@@ -279,7 +310,7 @@ def test_includes():
     correct_includes = ['_include1.html', '_include2.html', '_include3.html']
     includes = webpage.includes()
 
-    # Set should contain each include from the html 
+    # Set should contain each include from the html
     for correct_include in correct_includes:
         assert correct_include in includes
 
