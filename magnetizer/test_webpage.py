@@ -1,7 +1,7 @@
 """ Tests for webpage.py
 """
 
-from os import listdir, path, remove
+from os import listdir
 from website import Website
 from item import Item
 from webpage import Webpage
@@ -250,49 +250,6 @@ def test_webpage_write_multiple_from_filenames():
     assert 'https://example.com/ignore-this.html' not in TEST_WEBSITE.sitemap.pages
 
     TEST_WEBSITE.wipe()
-
-
-def test_resources_copy_to_output():
-    """ Test of Website.copy_resources
-    """
-
-    TEST_WEBSITE.wipe()
-    TEST_WEBSITE.copy_resources()
-
-    # supported files should have been copied
-    assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'resource.txt')
-    assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'resource.jpg')
-
-    # unsupported files should not have been copied
-    assert not path.isfile(TEST_WEBSITE.config.value('output_path') + 'resource.xxx')
-
-    TEST_WEBSITE.wipe()
-
-
-def test_wipe_output_directory():
-    """ Test of Website.wipe()
-    """
-
-    files_to_delete = ['wipe_me.html', 'wipe_me_2.html', 'wipe_me.jpg', 'wipe_me.pdf']
-    files_to_leave_in_place = ['leave_me.xxx']
-
-    # create some test files
-    for filename in files_to_delete + files_to_leave_in_place:
-        with open(TEST_WEBSITE.config.value('output_path') + filename, 'w') as myfile:
-            myfile.write('test file content')
-
-    TEST_WEBSITE.wipe()
-
-    for filename in files_to_delete:
-        assert not path.isfile(TEST_WEBSITE.config.value('output_path') + filename)
-
-    for filename in files_to_leave_in_place:
-        assert path.isfile(TEST_WEBSITE.config.value('output_path') + filename)
-
-        # Remove the test file
-        remove(TEST_WEBSITE.config.value('output_path') + filename)
-
-    assert TEST_WEBSITE.sitemap.pages == []
 
 
 def test_includes():
