@@ -1,14 +1,16 @@
-import pytest
-from os import listdir, path, remove
-from random import *
-import shutil
-from magnetizer import *
-from sitemap import Sitemap
+""" Tests for sitemap.py
+"""
 
-test_website = Website('tests/config/test_magnetizer.cfg')
-test_website.refresh()
+from random import randint
+from sitemap import Sitemap
+from website import Website
+
+TEST_WEBSITE = Website('tests/config/test_magnetizer.cfg')
+TEST_WEBSITE.refresh()
 
 def test_sitemap():
+    """ Test of test_sitemap()
+    """
 
     base_url = 'https://example.com'
 
@@ -19,7 +21,7 @@ def test_sitemap():
     sitemap = Sitemap(base_url)
 
     # New sitemap should include no pages
-    assert len(sitemap.pages) == 0
+    assert not sitemap.pages
 
     sitemap.append(page1)
 
@@ -42,10 +44,10 @@ def test_sitemap():
     assert len(sitemap.pages) == 4
     assert sitemap.pages[3] == "%s/" % base_url
 
-    sitemap.write(test_website.config.value('output_path'))
+    sitemap.write(TEST_WEBSITE.config.value('output_path'))
 
-    with open(test_website.config.value('output_path') + 'sitemap.txt', 'r') as f:
-        sitemap_from_file = f.read().splitlines()
+    with open(TEST_WEBSITE.config.value('output_path') + 'sitemap.txt', 'r') as my_file:
+        sitemap_from_file = my_file.read().splitlines()
 
     # sitemap written to file should contain our 3 pages
     assert len(sitemap.pages) == 4
