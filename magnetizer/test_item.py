@@ -223,19 +223,10 @@ def test_article_cc():
     item = Item(TEST_WEBSITE)
     item.filename = 'test_filename.html'
 
-    cc_license = '<p class="magntetizer-license">'
-    cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">'
-    cc_license += '<img alt="Creative Commons Licence" style="border-width:0" '
-    cc_license += 'src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
-    cc_license += '</a><br />This work by <a xmlns:cc="http://creativecommons.org/ns#" href="'
-    cc_license += 'https://example.com/' + item.filename
-    cc_license += '" property="cc:attributionName" rel="cc:attributionURL">'
-    cc_license += 'Test Author</a> is licensed under a '
-    cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">'
-    cc_license += 'Creative Commons Attribution 4.0 International License</a>.'
-    cc_license += '</p>'
-
-    assert item.cc_license() == cc_license
+    assert ('This work by <a xmlns:cc="http://creativecommons.org/ns#" href="' +
+            'https://example.com/' + item.filename +
+            '" property="cc:attributionName" rel="cc:attributionURL">' +
+            'Test Author</a>') in item.cc_license()
 
 
 def test_html_contents_from_multiple_md_files():
