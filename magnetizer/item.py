@@ -211,20 +211,18 @@ class Item:
     def cc_license(self):
         """Renders html to show Creative Commons license information for the item"""
 
-        cc_license = '<p class="magntetizer-license">'
-        cc_license += '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">'
-        cc_license += '<img alt="Creative Commons Licence" style="border-width:0" '
-        cc_license += 'src="https://i.creativecommons.org/l/by/4.0/88x31.png" />'
-        cc_license += '</a><br />This work by <a xmlns:cc="http://creativecommons.org/ns#" href="'
-        cc_license += self.website.config.value('website_base_url') + '/' + self.filename
-        cc_license += '" property="cc:attributionName" rel="cc:attributionURL">'
-        cc_license += self.website.config.value('website_author')
-        cc_license += '</a> is licensed under a <a rel="license" '
-        cc_license += 'href="http://creativecommons.org/licenses/by/4.0/">'
-        cc_license += 'Creative Commons Attribution 4.0 International License</a>.'
-        cc_license += '</p>'
-
-        return cc_license
+        return ('<p class="magntetizer-license">' +
+                '<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">' +
+                '<img alt="Creative Commons Licence" style="border-width:0" ' +
+                'src="https://i.creativecommons.org/l/by/4.0/88x31.png" />' +
+                '</a><br />This work by <a xmlns:cc="http://creativecommons.org/ns#" href="' +
+                self.website.config.value('website_base_url') + '/' + self.filename +
+                '" property="cc:attributionName" rel="cc:attributionURL">' +
+                self.website.config.value('website_author') +
+                '</a> is licensed under a <a rel="license" ' +
+                'href="http://creativecommons.org/licenses/by/4.0/">' +
+                'Creative Commons Attribution 4.0 International License</a>.' +
+                '</p>')
 
 
     def twitter_card(self):
