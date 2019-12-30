@@ -245,7 +245,8 @@ class Webpage:
             with open(self.website.config.value('output_path') + self.filename, 'w') as myfile:
                 myfile.write(self.html)
 
-            self.website.sitemap.append(self.filename)
+            if self.is_indexable():
+                self.website.sitemap.append(self.filename)
 
 
     @staticmethod
