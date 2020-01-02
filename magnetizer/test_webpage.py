@@ -224,7 +224,7 @@ def test_webpage_write_multiple_from_filenames():
 
     filenames = ['001-basic-article.md', '002-article-with-h1-break-and-date.md',
                  '003-another-article.md', '100-ignore-this.txt', 'dont-show-on-list-page.md',
-                 '009-unindexed-article.md','unindexed-static-page.md']
+                 '009-unindexed-article.md']
     Webpage.write_item_pages_from_md_filenames(TEST_WEBSITE, filenames)
 
     written_filenames = listdir(TEST_WEBSITE.config.value('output_path'))
@@ -237,7 +237,6 @@ def test_webpage_write_multiple_from_filenames():
 
     # The static pages should have been written too
     assert 'dont-show-on-list-page.html' in written_filenames
-    assert 'unindexed-static-page.html' in written_filenames
 
     # The file not ending in .md should not have been written
     assert 'ignore-this.html' not in written_filenames
@@ -249,13 +248,11 @@ def test_webpage_write_multiple_from_filenames():
     assert 'https://example.com/another-article.html' in TEST_WEBSITE.sitemap.pages
     assert 'https://example.com/dont-show-on-list-page.html' in TEST_WEBSITE.sitemap.pages
 
-    # ... except for the unindexed items
+    # ... except for the unindexed article
     assert 'https://example.com/unindexed-article.html' not in TEST_WEBSITE.sitemap.pages
-    assert 'unindexed-static-page.html' not in TEST_WEBSITE.sitemap.pages
 
     # Ignored files should not be included in the sitemap
     assert 'https://example.com/ignore-this.html' not in TEST_WEBSITE.sitemap.pages
-    assert 'unindexed-static-page.html' not in TEST_WEBSITE.sitemap.pages
 
     TEST_WEBSITE.wipe()
 
