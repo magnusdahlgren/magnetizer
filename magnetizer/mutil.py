@@ -154,3 +154,26 @@ def purge_non_article_filenames(filenames):
             result.append(filename)
 
     return result
+
+
+def md_footnotes(source):
+    """ Adds footnote anchor links to a block of markdown, linking from [^nn] to [^nn]:
+
+    Parameters:
+    source - a block of markdown
+
+    Returns:
+    Markdown with footnote anchor links added
+    """
+
+    result = source
+
+    # replace references [^nn] with "<a href='#nn'>[nn]</a>"
+    reference_re = re_compile(r'\[\^(\d+?)\](?!:)')
+    result = reference_re.sub(r"<a href='#\1'>[\1]</a>", result)
+
+    # replace footnotes [^nn]: with "<a id='nn'>[nn]:"
+    footnote_re = re_compile(r'\[\^(\d+?)\]:')
+    result = footnote_re.sub(r"<a id='\1'>[\1]:", result)
+
+    return result

@@ -3,7 +3,7 @@
 
 from mutil import link_h1, wrap_it_in_a_link, downgrade_headings, first_image_url_from_html,\
     abstract_from_html, strip_tags_from_html, strip_anything_before_h1_from_html,\
-    purge_non_article_filenames
+    purge_non_article_filenames, md_footnotes
 
 
 def test_link_h1():
@@ -144,3 +144,23 @@ def test_purge_non_article_filenames():
     assert '001-article-1.md' in filtered_filenames
     assert '002-article-2.md' in filtered_filenames
     assert '123-article-3.md' in filtered_filenames
+
+def test_footnotes():
+    """ Test of md_footnotes()
+    """
+
+    source = ('# Lorem ipsum\n' +
+              'Dolor sit amet[^1], consectetur[^23] adipiscing elit.\n' +
+              '[^1]: Maecenas porta gravida pretium.\n' +
+              '[^23]: In aliquet hendrerit elit nec tempor.\n' +
+              'Nullam quis ipsum ac quam gravida lacinia.')
+
+    result = md_footnotes(source)
+
+    # References [^nn] should be replaced by anchor links
+    assert "<a href='#1'>[1]</a>" in result
+    assert "<a href='#23'>[23]</a>" in result
+
+    # Footnotes [^nn]: should get IDs added
+    assert "<a id='1'>[1]:" in result
+    assert "<a id='23'>[23]:" in result
