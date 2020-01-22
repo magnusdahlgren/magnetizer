@@ -174,6 +174,6 @@ def md_footnotes(source):
 
     # replace footnotes [^nn]: with "<a id='nn'>[nn]:"
     footnote_re = re_compile(r'\[\^(\d+?)\]:')
-    result = footnote_re.sub(r"<a id='\1'>[\1]:", result)
+    result = footnote_re.sub(r"<a id='\1'></a>[\1]:", result)
 
     return result

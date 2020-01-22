@@ -162,5 +162,5 @@ def test_footnotes():
     assert "<a href='#23'>[23]</a>" in result
 
     # Footnotes [^nn]: should get IDs added
-    assert "<a id='1'>[1]:" in result
-    assert "<a id='23'>[23]:" in result
+    assert "<a id='1'></a>[1]:" in result
+    assert "<a id='23'></a>[23]:" in result

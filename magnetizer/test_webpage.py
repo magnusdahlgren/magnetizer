@@ -66,6 +66,12 @@ def test_webpage_from_single_article():
     # Meta description should be pulled in from article
     assert '<meta name="description" content="Meta description from article">' in webpage.html
 
+    # Footnote link should have been added
+    assert "<a href='#1'>[1]</a>" in webpage.html
+
+    # Footnote anchor should have been added
+    assert "<a id='1'></a>[1]:" in webpage.html
+
 
 def test_static_item_page():
     """ Test creating a static item page using item_from_md_filename()

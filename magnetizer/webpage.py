@@ -5,7 +5,7 @@ from os import path, listdir
 from math import ceil
 from re import findall, sub
 
-from mutil import purge_non_article_filenames, COLOUR_OK, COLOUR_ERROR, COLOUR_END
+from mutil import purge_non_article_filenames, COLOUR_OK, COLOUR_ERROR, COLOUR_END, md_footnotes
 from website import Website
 from template import Template
 from item import Item
@@ -145,6 +145,8 @@ class Webpage:
         for include in includes:
             self.html = self.html.replace('<!-- MAGNETIZER_INCLUDE %s -->' % \
                 include, self.website.include(include))
+
+        self.html = md_footnotes(self.html)
 
         # Remove all remaining comment tags
         self.html = sub(r'<!--(.*?)-->', '', self.html)
