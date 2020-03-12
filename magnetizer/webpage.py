@@ -89,7 +89,7 @@ class Webpage:
         """
 
         if page_no == 1:
-            self.title = "%s - %s" % (self.website.config.value('website_name'), 
+            self.title = "%s - %s" % (self.website.config.value('website_name'),
                                       self.website.config.value('website_tagline'))
         else:
             self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
@@ -335,7 +335,10 @@ class Webpage:
             webpage = Webpage(website)
             page_filenames = filenames[per_page * (counter - 1) : per_page * counter]
             webpage.listing_page_from_md_filenames(page_filenames, counter, total_no_of_pages)
-            webpage.filename = 'blog-%s.html' % str(counter)
+            if counter == 1:
+                webpage.filename = 'index.html'
+            else:
+                webpage.filename = 'blog-%s.html' % str(counter)
             webpage.write()
 
         print(COLOUR_OK + ' --> ' + COLOUR_END + '%s etc' % webpage.filename)

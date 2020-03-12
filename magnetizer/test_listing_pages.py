@@ -21,11 +21,12 @@ def test_single_list_page():
 
     Webpage.write_list_pages_from_directory(TEST_WEBSITE, TEST_WEBSITE.config.value('source_path'))
 
-    # There should be exactly 1 blog-n.html files
-    assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'blog-1.html')
+    # There should be an index.html but no blog-n.html files
+    assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'index.html')
+    assert not path.isfile(TEST_WEBSITE.config.value('output_path') + 'blog-1.html')
     assert not path.isfile(TEST_WEBSITE.config.value('output_path') + 'blog-2.html')
 
-    with open(TEST_WEBSITE.config.value('output_path') + 'blog-1.html', 'r') as myfile:
+    with open(TEST_WEBSITE.config.value('output_path') + 'index.html', 'r') as myfile:
         blog_1_content = myfile.read()
 
     assert blog_1_content.count('<article>') == 4
@@ -58,8 +59,8 @@ def test_single_list_page():
     assert 'class="magnetizer-previous"' not in blog_1_content
     assert 'class="magnetizer-next"' not in blog_1_content
 
-    # The blog-1 page should be present in the sitemap
-    assert 'https://example.com/blog-1.html' in TEST_WEBSITE.sitemap.pages
+    # The index page should be present in the sitemap
+    assert 'https://example.com/' in TEST_WEBSITE.sitemap.pages
 
 
 def test_three_paginated_list_pages():
@@ -72,13 +73,14 @@ def test_three_paginated_list_pages():
 
     Webpage.write_list_pages_from_directory(TEST_WEBSITE, TEST_WEBSITE.config.value('source_path'))
 
-    # There should be exactly 3 blog-n.html files
-    assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'blog-1.html')
+    # There should be an index.html and exactly 2 blog-n.html files
+    assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'index.html')
+    assert not path.isfile(TEST_WEBSITE.config.value('output_path') + 'blog-1.html')
     assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'blog-2.html')
     assert path.isfile(TEST_WEBSITE.config.value('output_path') + 'blog-3.html')
     assert not path.isfile(TEST_WEBSITE.config.value('output_path') + 'blog-4.html')
 
-    with open(TEST_WEBSITE.config.value('output_path') + 'blog-1.html', 'r') as myfile:
+    with open(TEST_WEBSITE.config.value('output_path') + 'index.html', 'r') as myfile:
         blog_1_content = myfile.read()
 
     with open(TEST_WEBSITE.config.value('output_path') + 'blog-2.html', 'r') as myfile:
@@ -125,8 +127,9 @@ def test_three_paginated_list_pages():
     assert 'class="magnetizer-next"' not in blog_3_content
     assert '<a href="blog-2.html" class="magnetizer-previous">Newer posts</a>' in blog_3_content
 
-    # The blog-n pages should be present in the sitemap
-    assert 'https://example.com/blog-1.html' in TEST_WEBSITE.sitemap.pages
+    # index.html and the blog-n pages should be present in the sitemap
+    assert 'https://example.com/' in TEST_WEBSITE.sitemap.pages
+    assert not 'https://example.com/blog-1.html' in TEST_WEBSITE.sitemap.pages
     assert 'https://example.com/blog-2.html' in TEST_WEBSITE.sitemap.pages
     assert 'https://example.com/blog-3.html' in TEST_WEBSITE.sitemap.pages
 
