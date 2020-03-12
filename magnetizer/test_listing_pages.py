@@ -62,6 +62,9 @@ def test_single_list_page():
     # The index page should be present in the sitemap
     assert 'https://example.com/' in TEST_WEBSITE.sitemap.pages
 
+    # Link to CSS should be present
+    assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in blog_1_content
+
 
 def test_three_paginated_list_pages():
     """ Test 3 listing pages, with pagination

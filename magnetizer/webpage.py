@@ -62,23 +62,6 @@ class Webpage:
         return success
 
 
-    def homepage_from_md_filenames(self, filenames):
-        """ Populates the Webpage with homepage contents
-
-        Parameters:
-        filenames - a list of the latest articles to include on the homepage
-        """
-
-        filenames = purge_non_article_filenames(filenames)[0:3]
-        html = Item.html_contents_from_multiple_md_files(self.website, filenames)
-
-        website_name = self.website.config.value('website_name')
-        website_tagline = self.website.config.value('website_tagline')
-
-        self.title = "%s - %s" % (website_name, website_tagline)
-        self.populate_html(html, Webpage.HOMEPAGE_PAGE_TYPE)
-
-
     def listing_page_from_md_filenames(self, filenames, page_no, total_no_of_pages):
         """ Populates the Webpage with listing page contents
 
@@ -292,26 +275,6 @@ class Webpage:
 
         filenames = Webpage.filenames_from_directory(directory)
         Webpage.write_item_pages_from_md_filenames(website, filenames)
-
-
-    @staticmethod
-    def write_homepage_from_directory(website, directory):
-        """ Writes the homepage to file
-
-        Parameters:
-        directory - the directory containing the .md filenames for the article listing
-        on the homepage
-        """
-
-        filenames = Webpage.filenames_from_directory(directory)
-
-        webpage = Webpage(website)
-        webpage.homepage_from_md_filenames(filenames)
-        webpage.filename = 'index.html'
-        webpage.write()
-
-        print('Generating homepage --> %s' % website.config.value('output_path'))
-        print(COLOUR_OK + ' --> ' + COLOUR_END + '%s' % webpage.filename)
 
 
     @staticmethod

@@ -122,51 +122,6 @@ def test_static_item_page():
     assert '<!--' not in webpage.html
 
 
-def test_home_page():
-    """ Test creating a homepage using homepage_from_md_filenames()
-    """
-
-    webpage = Webpage(TEST_WEBSITE)
-    webpage.homepage_from_md_filenames(['001-basic-article.md',
-                                        '002-article-with-h1-break-and-date.md',
-                                        '003-another-article.md',
-                                        'dont-index-this-article.md',
-                                        '100-ignore-this.txt',
-                                        '005-simple-article-1.md',
-                                        '006-simple-article-2.md'])
-
-    # Page should use homepage page template
-    assert '<p>Homepage page template</p>' in webpage.html
-
-    # 3 articles should be present
-    assert webpage.html.count('<article>') == 3
-
-    # Index title = "Website Name - Tag Line"
-    assert webpage.title == "Test website name - test tag & line"
-
-    # Don't show article footers on index
-    assert webpage.html.count('<footer>footer</footer>') == 0
-
-    # Body should have class='magnetizer-homepage-page'
-    assert webpage.html.count("<body class='magnetizer-homepage-page'>") == 1
-
-    # Twitter card should *not* be present (todo: yet!)
-    assert '<meta name="twitter:card" content="summary" />' not in webpage.html
-
-    # Link to CSS should be present
-    assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in webpage.html
-
-    # Link to Atom feed should be present
-    assert ('<link rel="alternate" type="application/rss+xml" ' +
-            'href="https://example.com/atom.xml" />') in webpage.html
-
-    # Meta description from config file should be present
-    assert '<meta name="description" content="Meta \\"description\\" from config">' in webpage.html
-
-    # Noindex tag must not be present
-    assert '<meta name="robots" content="noindex">' not in webpage.html
-
-
 def test_page_indexability():
     """ Test to make sure indexability carries through from item to webpage
     """
@@ -182,22 +137,6 @@ def test_page_indexability():
 
     # Include noindex tag for article page that should NOT be indexed
     assert '<meta name="robots" content="noindex">' in webpage_dont_index.html
-
-
-def test_write_homepage():
-    """ Test of write_homepage_from_directory()
-    """
-
-    Webpage.write_homepage_from_directory(TEST_WEBSITE, TEST_WEBSITE.config.value('source_path'))
-
-    # Homepage should contain some html content
-    with open(TEST_WEBSITE.config.value('output_path') + 'index.html', 'r') as myfile:
-        assert myfile.read().count('<html>') == 1
-
-    # Homepage should be included in sitemap
-    assert 'https://example.com/' in TEST_WEBSITE.sitemap.pages
-
-    TEST_WEBSITE.wipe()
 
 
 def test_webpage_write():
