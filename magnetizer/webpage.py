@@ -98,7 +98,9 @@ class Webpage:
             self.url_next = 'blog-%s.html' % str(page_no + 1)
 
         # Show 'previous' link if there is a previous page
-        if page_no > 1:
+        if page_no == 2:
+            self.url_previous = '/'
+        elif page_no > 2:
             self.url_previous = 'blog-%s.html' % str(page_no - 1)
 
         html = Item.html_contents_from_multiple_md_files(self.website, filenames)

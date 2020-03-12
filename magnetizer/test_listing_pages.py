@@ -117,9 +117,9 @@ def test_three_paginated_list_pages():
     assert '<a href="blog-2.html" class="magnetizer-next">Older posts</a>' in blog_1_content
     assert 'class="magnetizer-previous"' not in blog_1_content
 
-    # Middle page should have link to older posts and newer
+    # Middle page should have link to older posts (i.e. homepage) and newer
     assert '<a href="blog-3.html" class="magnetizer-next">Older posts</a>' in blog_2_content
-    assert '<a href="blog-1.html" class="magnetizer-previous">Newer posts</a>' in blog_2_content
+    assert '<a href="/" class="magnetizer-previous">Newer posts</a>' in blog_2_content
 
     # Last page should have link to newer posts but not older
     assert 'class="magnetizer-next"' not in blog_3_content
