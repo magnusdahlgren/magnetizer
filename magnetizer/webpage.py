@@ -89,7 +89,8 @@ class Webpage:
         """
 
         if page_no == 1:
-            self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
+            self.title = "%s - %s" % (self.website.config.value('website_name'), 
+                                      self.website.config.value('website_tagline'))
         else:
             self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
 
