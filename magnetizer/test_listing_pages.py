@@ -38,7 +38,7 @@ def test_single_list_page():
     assert '<p>Listing page template</p>' in blog_1_content
 
     # Index title = "Website Name - Page 1"
-    assert '<title>Test website name - Page 1</title>' in blog_1_content
+    assert 'Test website name - test tag & line' in blog_1_content
 
     # Don't show article footers on list page
     assert '<footer>footer</footer>' not in blog_1_content
@@ -109,7 +109,7 @@ def test_three_paginated_list_pages():
 
 
     # Page title = "Website Name - Page n"
-    assert '<title>Test website name - Page 1</title>' in blog_1_content
+    assert 'Test website name - test tag & line' in blog_1_content
     assert '<title>Test website name - Page 2</title>' in blog_2_content
     assert '<title>Test website name - Page 3</title>' in blog_3_content
 

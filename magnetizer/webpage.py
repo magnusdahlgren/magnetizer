@@ -88,7 +88,10 @@ class Webpage:
         total_no_of_pages - how many listing pages in total there are
         """
 
-        self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
+        if page_no == 1:
+            self.title = "%s - %s" % (self.website.config.value('website_name'), self.website.config.value('website_tagline'))
+        else:
+            self.title = "%s - Page %s" % (self.website.config.value('website_name'), str(page_no))
 
         # Show 'next' link if there is a next page
         if page_no < total_no_of_pages:
