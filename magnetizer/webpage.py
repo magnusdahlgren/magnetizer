@@ -185,7 +185,7 @@ class Webpage:
 
         if page_type in [Webpage.STATIC_PAGE_TYPE, Webpage.ARTICLE_PAGE_TYPE]:
             description = self.item.meta_description()
-        elif page_type == Webpage.HOMEPAGE_PAGE_TYPE:
+        elif page_type == Webpage.LISTING_PAGE_TYPE:
             description = self.website.config.value('homepage_meta_description')
 
         return description

@@ -65,6 +65,9 @@ def test_single_list_page():
     # Link to CSS should be present
     assert '<link rel="stylesheet" type="text/css" href="test-stylesheet.css' in blog_1_content
 
+    # Meta description from config file should be present
+    assert '<meta name="description" content="Meta \\"description\\" from config">' in blog_1_content
+
 
 def test_three_paginated_list_pages():
     """ Test 3 listing pages, with pagination
@@ -130,6 +133,11 @@ def test_three_paginated_list_pages():
     assert 'class="magnetizer-next"' not in blog_3_content
     assert '<a href="blog-2.html" class="magnetizer-previous">Newer posts</a>' in blog_3_content
 
+    # Pages should have meta description from config
+    assert '<meta name="description" content="Meta \\"description\\" from config">' in blog_1_content
+    assert '<meta name="description" content="Meta \\"description\\" from config">' in blog_2_content
+    assert '<meta name="description" content="Meta \\"description\\" from config">' in blog_3_content
+   
     # index.html and the blog-n pages should be present in the sitemap
     assert 'https://example.com/' in TEST_WEBSITE.sitemap.pages
     assert not 'https://example.com/blog-1.html' in TEST_WEBSITE.sitemap.pages
