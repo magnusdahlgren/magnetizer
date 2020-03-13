@@ -62,7 +62,7 @@ The following configuration parameters are available:
 | Parameter | Description                                                                            |
 | ----------|----------------------------------------------------------------------------------------|
 | `website_name`    | The name of the website. Used for meta titles.                                 |
-| `website_tagline` | A tagline, included in the page title on the homepage                          |
+| `website_tagline` | A tagline, included in the page title on the first listing page                          |
 | `website_base_url` | The address where the site is published, e.g. `https://example.com`. No trailing `/`. |
 | `website_author`  | The name of the author of the website (used in feeds). e.g. `Magnus Dahlgren`  |
 | `website_twitter` | The Twitter handle of the author (used in Twitter cards). e.g. `@magnusdahlgren` |

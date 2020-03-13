@@ -24,9 +24,6 @@ def test_webpage_from_single_article():
     # Page should use static page template
     assert '<p>Article page template</p>' in webpage.html
 
-    # Homepage header should not be present
-    assert webpage.html.count('<div>header</div>') == 0
-
     # List page header should be present
     assert webpage.html.count('<div>list page header</div>') == 1
 
@@ -87,9 +84,6 @@ def test_static_item_page():
 
     # Page should use static page template
     assert '<p>Static page template</p>' in webpage.html
-
-    # Homepage header should NOT be present
-    assert webpage.html.count('<div>header</div>') == 0
 
     # List page header should NOT present
     assert webpage.html.count('<div>list page header</div>') == 0

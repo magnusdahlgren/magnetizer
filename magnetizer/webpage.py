@@ -1,4 +1,4 @@
-""" A module to generate .html files for the homepage, listings pages and item pages.
+""" A module to generate .html files for the listings pages and item pages.
 """
 
 from os import path, listdir
@@ -15,7 +15,6 @@ class Webpage:
     """ A class representing a webpage
     """
 
-    HOMEPAGE_PAGE_TYPE = "magnetizer-homepage-page"
     LISTING_PAGE_TYPE = "magnetizer-listing-page"
     ARTICLE_PAGE_TYPE = "magnetizer-article-page"
     STATIC_PAGE_TYPE = "magnetizer-static-page"
@@ -107,9 +106,7 @@ class Webpage:
 
         self.html = self.website.template.template
 
-        if page_type == Webpage.HOMEPAGE_PAGE_TYPE:
-            page_template_filename = Website.HOMEPAGE_PAGE_TEMPLATE_FILENAME
-        elif page_type == Webpage.LISTING_PAGE_TYPE:
+        if page_type == Webpage.LISTING_PAGE_TYPE:
             page_template_filename = Website.LISTING_PAGE_TEMPLATE_FILENAME
         elif page_type == Webpage.STATIC_PAGE_TYPE:
             page_template_filename = Website.STATIC_PAGE_TEMPLATE_FILENAME
@@ -177,8 +174,7 @@ class Webpage:
 
         Returns:
         Item page - meta desctiption from the Item
-        Homepage - homepage meta descripti0n from config
-        Listing page - None
+        Listing page - meta description from config
         """
 
         description = None

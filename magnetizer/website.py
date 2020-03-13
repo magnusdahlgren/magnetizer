@@ -21,7 +21,6 @@ class Website:
 
     WEBSITE_TEMPLATE = '_website_template.html'
 
-    HOMEPAGE_PAGE_TEMPLATE_FILENAME = '_homepage_page_template.html'
     LISTING_PAGE_TEMPLATE_FILENAME = '_listing_page_template.html'
     ARTICLE_PAGE_TEMPLATE_FILENAME = '_article_page_template.html'
     STATIC_PAGE_TEMPLATE_FILENAME = '_static_page_template.html'
