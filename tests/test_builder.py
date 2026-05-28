@@ -1,0 +1,402 @@
+"""Tests for magnetizer/builder.py — build orchestration"""
+
+import json
+import shutil
+from pathlib import Path
+
+import pytest
+from PIL import Image as PILImage
+
+from magnetizer.builder import build
+
+
+# ---------------------------------------------------------------------------
+# Fixtures
+# ---------------------------------------------------------------------------
+
+TEMPLATE = (
+    "<!DOCTYPE html><html><head><title>MAGNETIZER_TITLE</title></head>"
+    "<body>MAGNETIZER_CONTENT</body></html>"
+)
+CONFIG = "site_title: Test Blog\nposts_per_page: 2\n"
+MINIMAL_MD = "---\ndate: 2026-05-24\n---\n\nHello world\n"
+TITLED_MD = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n# My Post\n\nContent here.\n"
+
+
+def make_jpg(path, width=800, height=600):
+    img = PILImage.new("RGB", (width, height), color=(100, 150, 200))
+    img.save(path, "JPEG")
+
+
+def make_project(tmp_path, posts=None, config=CONFIG):
+    """Build a minimal valid project tree and return the project root."""
+    (tmp_path / "content").mkdir()
+    (tmp_path / "dist").mkdir()
+    (tmp_path / "templates").mkdir()
+    (tmp_path / "resources").mkdir()
+    (tmp_path / "resources" / "style.css").write_text("body {}")
+    (tmp_path / "templates" / "index.html").write_text(TEMPLATE)
+    (tmp_path / "config.yaml").write_text(config)
+
+    if posts:
+        for post_id, md_text in posts.items():
+            (tmp_path / "content" / f"{post_id}.md").write_text(md_text)
+
+    return tmp_path
+
+
+# ---------------------------------------------------------------------------
+# Basic post generation
+# ---------------------------------------------------------------------------
+
+class TestBasicBuild:
+
+    def test_post_html_file_created(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert (p / "dist" / "1.html").exists()
+
+    def test_post_html_contains_post_body(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "Hello world" in (p / "dist" / "1.html").read_text()
+
+    def test_post_html_uses_template(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        html = (p / "dist" / "1.html").read_text()
+        assert "<html>" in html
+        assert "MAGNETIZER_CONTENT" not in html
+        assert "MAGNETIZER_TITLE" not in html
+
+    def test_post_html_title_is_site_title_when_no_post_title(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "Test Blog" in (p / "dist" / "1.html").read_text()
+
+    def test_post_html_title_is_post_title_dash_site_title(self, tmp_path):
+        p = make_project(tmp_path, posts={1: TITLED_MD})
+        build(p)
+        assert "My Post - Test Blog" in (p / "dist" / "1.html").read_text()
+
+    def test_multiple_posts_each_get_html_file(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        assert (p / "dist" / "1.html").exists()
+        assert (p / "dist" / "2.html").exists()
+
+    def test_manifest_written_after_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert (p / "manifest.json").exists()
+
+    def test_manifest_contains_content_files(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        data = json.loads((p / "manifest.json").read_text())
+        assert "1.md" in data
+
+
+# ---------------------------------------------------------------------------
+# Image processing
+# ---------------------------------------------------------------------------
+
+class TestImageProcessing:
+
+    def test_resized_image_created_in_dist(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        make_jpg(p / "content" / "1-image-01.jpg", 2400, 1800)
+        build(p)
+        assert (p / "dist" / "1-image-01-resized.jpg").exists()
+
+    def test_resized_image_long_edge_within_max(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD}, config="image_max_dimension: 1200\nposts_per_page: 12\n")
+        make_jpg(p / "content" / "1-image-01.jpg", 2400, 1800)
+        build(p)
+        img = PILImage.open(p / "dist" / "1-image-01-resized.jpg")
+        assert max(img.size) <= 1200
+
+    def test_multiple_resized_images_all_created(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        make_jpg(p / "content" / "1-image-02.jpg")
+        build(p)
+        assert (p / "dist" / "1-image-01-resized.jpg").exists()
+        assert (p / "dist" / "1-image-02-resized.jpg").exists()
+
+    def test_post_html_references_resized_image(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        build(p)
+        html = (p / "dist" / "1.html").read_text()
+        assert "1-image-01-resized.jpg" in html
+
+
+# ---------------------------------------------------------------------------
+# Index pages
+# ---------------------------------------------------------------------------
+
+class TestIndexPages:
+
+    def test_index_html_created(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert (p / "dist" / "index.html").exists()
+
+    def test_index_html_contains_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "Hello world" in (p / "dist" / "index.html").read_text()
+
+    def test_index_page_title_is_site_title(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        html = (p / "dist" / "index.html").read_text()
+        assert "<title>Test Blog</title>" in html
+
+    def test_multiple_pages_created_when_posts_exceed_per_page(self, tmp_path):
+        # posts_per_page=2 in CONFIG, so 3 posts → 2 index pages
+        posts = {i: MINIMAL_MD for i in range(1, 4)}
+        p = make_project(tmp_path, posts=posts)
+        build(p)
+        assert (p / "dist" / "index.html").exists()
+        assert (p / "dist" / "index-2.html").exists()
+
+    def test_second_index_page_title_includes_page_number(self, tmp_path):
+        posts = {i: MINIMAL_MD for i in range(1, 4)}
+        p = make_project(tmp_path, posts=posts)
+        build(p)
+        html = (p / "dist" / "index-2.html").read_text()
+        assert "Test Blog - Page 2" in html
+
+    def test_posts_in_reverse_chronological_order_on_index(self, tmp_path):
+        # Higher post-id = newer, should appear first
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD, 3: MINIMAL_MD})
+        build(p)
+        html = (p / "dist" / "index.html").read_text()
+        pos3 = html.index('id="post-3"')
+        pos2 = html.index('id="post-2"')
+        assert pos3 < pos2
+
+    def test_post_page_back_link_points_to_correct_index_page(self, tmp_path):
+        # posts_per_page=2: post 1 is on index-2.html, posts 2+3 on index.html
+        posts = {i: MINIMAL_MD for i in range(1, 4)}
+        p = make_project(tmp_path, posts=posts)
+        build(p)
+        html = (p / "dist" / "1.html").read_text()
+        assert 'href="index-2.html#post-1"' in html
+
+    def test_post_on_first_index_page_has_correct_back_link(self, tmp_path):
+        posts = {i: MINIMAL_MD for i in range(1, 4)}
+        p = make_project(tmp_path, posts=posts)
+        build(p)
+        html = (p / "dist" / "3.html").read_text()
+        assert 'href="index.html#post-3"' in html
+
+
+# ---------------------------------------------------------------------------
+# Resources
+# ---------------------------------------------------------------------------
+
+class TestResources:
+
+    def test_resources_copied_on_first_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert (p / "dist" / "resources" / "style.css").exists()
+
+    def test_resources_not_copied_if_already_present(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "dist" / "resources").mkdir()
+        sentinel = p / "dist" / "resources" / "existing.css"
+        sentinel.write_text("existing")
+        build(p)
+        assert sentinel.exists()  # not overwritten
+
+    def test_resources_replaced_with_resources_flag(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "dist" / "resources").mkdir()
+        sentinel = p / "dist" / "resources" / "old.css"
+        sentinel.write_text("old")
+        build(p, resources=True)
+        assert not sentinel.exists()
+        assert (p / "dist" / "resources" / "style.css").exists()
+
+
+# ---------------------------------------------------------------------------
+# --flush
+# ---------------------------------------------------------------------------
+
+class TestFlush:
+
+    def test_flush_clears_dist(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        stale = p / "dist" / "stale.html"
+        stale.write_text("<html>old</html>")
+        build(p, flush=True)
+        assert not stale.exists()
+
+    def test_flush_rebuilds_all_posts(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p, flush=True)
+        assert (p / "dist" / "1.html").exists()
+        assert (p / "dist" / "2.html").exists()
+
+    def test_flush_deletes_manifest_before_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        old_manifest = p / "manifest.json"
+        old_manifest.write_text(json.dumps({"old.md": {"mtime": 0.0}}))
+        build(p, flush=True)
+        data = json.loads(old_manifest.read_text())
+        assert "old.md" not in data
+
+    def test_flush_copies_resources(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p, flush=True)
+        assert (p / "dist" / "resources" / "style.css").exists()
+
+    def test_flush_preserves_git_directory(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        git_dir = p / "dist" / ".git"
+        git_dir.mkdir()
+        (git_dir / "config").write_text("[core]")
+        build(p, flush=True)
+        assert git_dir.exists()
+
+    def test_flush_preserves_cname(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        cname = p / "dist" / "CNAME"
+        cname.write_text("example.com")
+        build(p, flush=True)
+        assert cname.exists()
+
+    def test_flush_preserves_nojekyll(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        nojekyll = p / "dist" / ".nojekyll"
+        nojekyll.write_text("")
+        build(p, flush=True)
+        assert nojekyll.exists()
+
+
+# ---------------------------------------------------------------------------
+# Incremental build
+# ---------------------------------------------------------------------------
+
+class TestIncrementalBuild:
+
+    def test_unchanged_post_html_not_regenerated(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        mtime_before = (p / "dist" / "1.html").stat().st_mtime
+
+        # Touch only post 2
+        import time; time.sleep(0.01)
+        (p / "content" / "2.md").write_text(MINIMAL_MD)
+
+        build(p)
+        assert (p / "dist" / "1.html").stat().st_mtime == mtime_before
+
+    def test_changed_post_html_is_regenerated(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        mtime_before = (p / "dist" / "2.html").stat().st_mtime
+
+        import time; time.sleep(0.01)
+        (p / "content" / "2.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
+
+        build(p)
+        assert (p / "dist" / "2.html").stat().st_mtime > mtime_before
+
+    def test_manifest_updated_after_incremental_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+
+        import time; time.sleep(0.01)
+        (p / "content" / "1.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
+        new_mtime = (p / "content" / "1.md").stat().st_mtime
+
+        build(p)
+        data = json.loads((p / "manifest.json").read_text())
+        assert data["1.md"]["mtime"] == new_mtime
+
+
+# ---------------------------------------------------------------------------
+# Single-file (preview) build
+# ---------------------------------------------------------------------------
+
+class TestSingleFileBuild:
+
+    def test_single_file_produces_its_html(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p, filename="1.md")
+        assert (p / "dist" / "1.html").exists()
+
+    def test_single_file_does_not_build_other_posts(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p, filename="1.md")
+        assert not (p / "dist" / "2.html").exists()
+
+    def test_single_file_does_not_create_index_pages(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p, filename="1.md")
+        assert not (p / "dist" / "index.html").exists()
+
+    def test_single_file_does_not_write_manifest(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p, filename="1.md")
+        assert not (p / "manifest.json").exists()
+
+
+# ---------------------------------------------------------------------------
+# Build outcome
+# ---------------------------------------------------------------------------
+
+class TestBuildOutcome:
+
+    def test_fresh_build_returns_created_count(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        result = build(p)
+        assert result["created"] == 2
+
+    def test_fresh_build_returns_zero_updated(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = build(p)
+        assert result["updated"] == 0
+
+    def test_fresh_build_returns_zero_deleted(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = build(p)
+        assert result["deleted"] == 0
+
+    def test_incremental_build_returns_updated_count(self, tmp_path):
+        import time
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        time.sleep(0.01)
+        (p / "content" / "1.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
+        result = build(p)
+        assert result["updated"] == 1
+
+    def test_incremental_build_returns_zero_created_for_existing(self, tmp_path):
+        import time
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        time.sleep(0.01)
+        (p / "content" / "1.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
+        result = build(p)
+        assert result["created"] == 0
+
+    def test_deleted_post_returns_deleted_count(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        (p / "content" / "1.md").unlink()
+        result = build(p)
+        assert result["deleted"] == 1
+
+    def test_no_changes_returns_zero_for_all(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        result = build(p)
+        assert result["created"] == 0
+        assert result["updated"] == 0
+        assert result["deleted"] == 0
