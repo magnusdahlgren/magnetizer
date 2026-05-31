@@ -7,8 +7,8 @@ import markdown as _markdown
 @dataclass
 class Post:
     id: int | str
-    date: str
-    date_uk: str
+    date: str | None
+    date_uk: str | None
     title: str | None
     url: str
     body_html: str
@@ -37,7 +37,7 @@ def _format_date_uk(date_str):
 def parse_post(md_text, post_id, image_filenames):
     fm, body = _parse_frontmatter(md_text)
 
-    date_str = fm.get('date', '')
+    date_str = fm.get('date') or None
     title = fm.get('title') or None
 
     more_parts = body.split('<!-- more -->', 1)
@@ -52,7 +52,7 @@ def parse_post(md_text, post_id, image_filenames):
     return Post(
         id=post_id,
         date=date_str,
-        date_uk=_format_date_uk(date_str),
+        date_uk=_format_date_uk(date_str) if date_str else None,
         title=title,
         url=f"{post_id}.html",
         body_html=body_html,

@@ -528,6 +528,18 @@ class TestAboutPage:
         build(p, filename="about.md")
         assert (p / "dist" / "about.html").exists()
 
+    def test_about_html_created_without_date(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text("---\ntitle: About\n---\n\nNo date here.\n")
+        build(p)
+        assert (p / "dist" / "about.html").exists()
+
+    def test_about_without_date_has_no_footer(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text("---\ntitle: About\n---\n\nNo date here.\n")
+        build(p)
+        assert "<footer>" not in (p / "dist" / "about.html").read_text()
+
     def test_about_image_resized_and_copied(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "about.md").write_text(ABOUT_MD)

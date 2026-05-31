@@ -69,6 +69,12 @@ class TestRenderArticleStructure:
         html = render_article(make_post(), on_index_page=False)
         assert "<footer>" in html
 
+    def test_footer_omitted_when_no_date(self):
+        post = Post(id=1, date=None, date_uk=None, title="About",
+                    url="about.html", body_html="<p>Hi</p>", images=[])
+        html = render_article(post, on_index_page=False)
+        assert "<footer>" not in html
+
     def test_time_element_with_datetime_attribute(self):
         html = render_article(make_post(date="2026-05-24"), on_index_page=False)
         assert '<time datetime="2026-05-24">' in html

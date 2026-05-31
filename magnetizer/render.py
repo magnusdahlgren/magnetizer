@@ -32,14 +32,14 @@ def render_article(post, on_index_page):
     else:
         parts.append(f'<div class="post-body">{post.body_html}</div>')
 
-    if on_index_page:
-        date_content = f'<a href="{post.url}">{post.date_uk}</a>'
-    else:
-        date_content = post.date_uk
-
-    parts.append(
-        f'<footer><time datetime="{post.date}">{date_content}</time></footer>'
-    )
+    if post.date:
+        if on_index_page:
+            date_content = f'<a href="{post.url}">{post.date_uk}</a>'
+        else:
+            date_content = post.date_uk
+        parts.append(
+            f'<footer><time datetime="{post.date}">{date_content}</time></footer>'
+        )
 
     parts.append('</article>')
     return '\n'.join(parts)
