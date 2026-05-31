@@ -12,6 +12,11 @@ def _error(msg):
     sys.exit(1)
 
 
+def validate_config(config):
+    if not config.get("site_url"):
+        _error("'site_url' is required in config.yaml — set it to the absolute base URL of your site, e.g. https://example.github.io")
+
+
 def validate_project(cwd):
     cwd = Path(cwd)
     for name in ("content", "dist", "templates", "resources"):

@@ -1,7 +1,7 @@
-"""Tests for magnetizer/validate.py — validate_project() and validate_content()"""
+"""Tests for magnetizer/validate.py — validate_project(), validate_content(), validate_config()"""
 
 import pytest
-from magnetizer.validate import validate_content, validate_project
+from magnetizer.validate import validate_config, validate_content, validate_project
 
 
 # ---------------------------------------------------------------------------
@@ -275,3 +275,26 @@ class TestValidateContentUnrecognisedFiles:
         with pytest.raises(SystemExit):
             validate_content(content)
         assert "notes.txt" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------------------
+# validate_config — site_url required
+# ---------------------------------------------------------------------------
+
+class TestValidateConfig:
+
+    def test_passes_with_site_url_set(self):
+        validate_config({"site_url": "https://example.github.io"})  # should not raise
+
+    def test_fails_when_site_url_missing(self):
+        with pytest.raises(SystemExit):
+            validate_config({})
+
+    def test_fails_when_site_url_is_empty_string(self):
+        with pytest.raises(SystemExit):
+            validate_config({"site_url": ""})
+
+    def test_error_message_mentions_site_url(self, capsys):
+        with pytest.raises(SystemExit):
+            validate_config({})
+        assert "site_url" in capsys.readouterr().err

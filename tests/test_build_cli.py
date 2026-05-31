@@ -13,7 +13,7 @@ TEMPLATE = (
     "<!DOCTYPE html><html><head><title>MAGNETIZER_TITLE</title></head>"
     "<body>MAGNETIZER_CONTENT</body></html>"
 )
-CONFIG = "site_title: Test\nposts_per_page: 12\n"
+CONFIG = "site_title: Test\nsite_url: https://example.github.io\nposts_per_page: 12\n"
 MINIMAL_MD = "---\ndate: 2026-05-24\n---\n\nHello world\n"
 
 

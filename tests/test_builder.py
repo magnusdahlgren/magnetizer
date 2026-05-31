@@ -18,7 +18,7 @@ TEMPLATE = (
     "<!DOCTYPE html><html><head><title>MAGNETIZER_TITLE</title></head>"
     "<body>MAGNETIZER_CONTENT</body></html>"
 )
-CONFIG = "site_title: Test Blog\nposts_per_page: 2\n"
+CONFIG = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\n"
 MINIMAL_MD = "---\ndate: 2026-05-24\n---\n\nHello world\n"
 TITLED_MD = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n# My Post\n\nContent here.\n"
 
@@ -110,7 +110,7 @@ class TestImageProcessing:
         assert (p / "dist" / "1-image-01-resized.jpg").exists()
 
     def test_resized_image_long_edge_within_max(self, tmp_path):
-        p = make_project(tmp_path, posts={1: MINIMAL_MD}, config="image_max_dimension: 1200\nposts_per_page: 12\n")
+        p = make_project(tmp_path, posts={1: MINIMAL_MD}, config="site_url: https://example.github.io\nimage_max_dimension: 1200\nposts_per_page: 12\n")
         make_jpg(p / "content" / "1-image-01.jpg", 2400, 1800)
         build(p)
         img = PILImage.open(p / "dist" / "1-image-01-resized.jpg")
@@ -400,3 +400,27 @@ class TestBuildOutcome:
         assert result["created"] == 0
         assert result["updated"] == 0
         assert result["deleted"] == 0
+
+
+# ---------------------------------------------------------------------------
+# Feed generation
+# ---------------------------------------------------------------------------
+
+class TestFeed:
+
+    def test_feed_xml_created_on_full_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert (p / "dist" / "feed.xml").exists()
+
+    def test_feed_xml_not_created_on_single_file_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p, filename="1.md")
+        assert not (p / "dist" / "feed.xml").exists()
+
+    def test_feed_xml_recreated_on_flush(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        (p / "dist" / "feed.xml").write_text("old content")
+        build(p, flush=True)
+        assert "old content" not in (p / "dist" / "feed.xml").read_text()
