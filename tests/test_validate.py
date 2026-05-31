@@ -278,6 +278,38 @@ class TestValidateContentUnrecognisedFiles:
 
 
 # ---------------------------------------------------------------------------
+# validate_content — about page
+# ---------------------------------------------------------------------------
+
+class TestValidateContentAboutPage:
+
+    def test_passes_with_about_md(self, tmp_path):
+        content = make_content(tmp_path, {"1.md": MINIMAL_MD, "about.md": MINIMAL_MD})
+        validate_content(content)  # should not raise
+
+    def test_passes_with_about_md_and_image(self, tmp_path):
+        content = make_content(tmp_path, {
+            "1.md": MINIMAL_MD,
+            "about.md": MINIMAL_MD,
+            "about-image-01.jpg": MINIMAL_IMG,
+        })
+        validate_content(content)  # should not raise
+
+    def test_about_image_without_about_md_fails(self, tmp_path):
+        content = make_content(tmp_path, {
+            "1.md": MINIMAL_MD,
+            "about-image-01.jpg": MINIMAL_IMG,
+        })
+        with pytest.raises(SystemExit):
+            validate_content(content)
+
+    def test_about_md_alone_without_posts_fails(self, tmp_path):
+        content = make_content(tmp_path, {"about.md": MINIMAL_MD})
+        with pytest.raises(SystemExit):
+            validate_content(content)
+
+
+# ---------------------------------------------------------------------------
 # validate_config — site_url required
 # ---------------------------------------------------------------------------
 

@@ -6,7 +6,7 @@ import markdown as _markdown
 
 @dataclass
 class Post:
-    id: int
+    id: int | str
     date: str
     date_uk: str
     title: str | None

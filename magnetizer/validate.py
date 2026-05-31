@@ -5,6 +5,7 @@ from pathlib import Path
 
 _MD_PATTERN = re.compile(r'^([1-9]\d*)\.md$')
 _IMAGE_PATTERN = re.compile(r'^([1-9]\d*)-image-(\d{2})\.(jpg|jpeg|png)$')
+_ABOUT_IMAGE_PATTERN = re.compile(r'^about-image-(\d{2})\.(jpg|jpeg|png)$')
 
 
 def _error(msg):
@@ -34,8 +35,16 @@ def validate_content(content_dir):
 
     md_ids = set()
     image_ids = set()
+    has_about = 'about.md' in files
+    has_about_images = any(_ABOUT_IMAGE_PATTERN.match(n) for n in files)
 
     for name in files:
+        if name == 'about.md':
+            continue
+        if _ABOUT_IMAGE_PATTERN.match(name):
+            if not has_about:
+                _error(f"image file '{name}' has no matching about.md in content/")
+            continue
         if name.endswith('.md'):
             m = _MD_PATTERN.match(name)
             if not m:

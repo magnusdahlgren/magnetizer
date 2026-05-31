@@ -45,9 +45,9 @@ def render_article(post, on_index_page):
     return '\n'.join(parts)
 
 
-def render_post_page_content(post, index_page_url, newer_url=None, older_url=None):
+def render_post_page_content(post, index_page_url, newer_url=None, older_url=None, back_url=None):
     article = render_article(post, on_index_page=False)
-    back_url = f"{index_page_url}#post-{post.id}"
+    back_url = back_url or f"{index_page_url}#post-{post.id}"
 
     parts = [f'<main>\n{article}\n</main>']
 

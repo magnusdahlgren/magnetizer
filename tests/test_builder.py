@@ -458,3 +458,79 @@ class TestPostNavigation:
         html = (p / "dist" / "1.html").read_text()
         assert "Newer post" not in html
         assert "Older post" not in html
+
+
+# ---------------------------------------------------------------------------
+# About page
+# ---------------------------------------------------------------------------
+
+ABOUT_MD = "---\ndate: 2026-05-24\ntitle: About\n---\n\nThis is the about page.\n"
+
+class TestAboutPage:
+
+    def test_about_html_created_when_about_md_exists(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert (p / "dist" / "about.html").exists()
+
+    def test_about_html_not_created_when_about_md_absent(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert not (p / "dist" / "about.html").exists()
+
+    def test_about_html_contains_body_content(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert "about page" in (p / "dist" / "about.html").read_text()
+
+    def test_about_html_uses_template(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert "<html>" in (p / "dist" / "about.html").read_text()
+
+    def test_about_html_title_includes_post_title_and_site_title(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert "About - Test Blog" in (p / "dist" / "about.html").read_text()
+
+    def test_about_not_in_index(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert "about.html" not in (p / "dist" / "index.html").read_text()
+
+    def test_about_not_in_post_navigation(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert "about.html" not in (p / "dist" / "1.html").read_text()
+        assert "about.html" not in (p / "dist" / "2.html").read_text()
+
+    def test_about_back_link_points_to_index(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert 'href="index.html"' in (p / "dist" / "about.html").read_text()
+
+    def test_about_back_link_has_no_anchor(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert 'href="index.html#' not in (p / "dist" / "about.html").read_text()
+
+    def test_single_file_build_about(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p, filename="about.md")
+        assert (p / "dist" / "about.html").exists()
+
+    def test_about_image_resized_and_copied(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        make_jpg(p / "content" / "about-image-01.jpg")
+        build(p)
+        assert (p / "dist" / "about-image-01-resized.jpg").exists()
