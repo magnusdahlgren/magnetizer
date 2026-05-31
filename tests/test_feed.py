@@ -63,18 +63,23 @@ class TestFeedStructure:
         self_link = next(l for l in links if l.get("rel") == "self")
         assert self_link.get("href") == "https://example.github.io/feed.xml"
 
-    def test_feed_id_is_site_url(self):
+    def test_feed_id_has_trailing_slash(self):
         root = parse([make_post()])
-        assert root.find(el("id")).text == "https://example.github.io"
+        assert root.find(el("id")).text == "https://example.github.io/"
+
+    def test_feed_id_trailing_slash_not_doubled(self):
+        config = {**CONFIG, "site_url": "https://example.github.io/"}
+        root = parse([make_post()], config=config)
+        assert root.find(el("id")).text == "https://example.github.io/"
 
     def test_feed_updated_is_most_recent_post_date(self):
         posts = [make_post(id=3, date="2026-05-24"), make_post(id=1, date="2026-01-01")]
         root = parse(posts)
-        assert root.find(el("updated")).text == "2026-05-24T00:00:00Z"
+        assert root.find(el("updated")).text == "2026-05-24T00:00:03Z"
 
     def test_feed_updated_with_single_post(self):
-        root = parse([make_post(date="2026-03-15")])
-        assert root.find(el("updated")).text == "2026-03-15T00:00:00Z"
+        root = parse([make_post(id=1, date="2026-03-15")])
+        assert root.find(el("updated")).text == "2026-03-15T00:00:01Z"
 
 
 # ---------------------------------------------------------------------------
@@ -93,7 +98,14 @@ class TestFeedEntries:
         root = parse(posts)
         entries = root.findall(el("entry"))
         dates = [e.find(el("updated")).text for e in entries]
-        assert dates == ["2026-05-24T00:00:00Z", "2026-01-01T00:00:00Z"]
+        assert dates == ["2026-05-24T00:00:03Z", "2026-01-01T00:00:01Z"]
+
+    def test_entries_on_same_date_have_unique_timestamps(self):
+        posts = [make_post(id=2, date="2026-05-24"), make_post(id=1, date="2026-05-24")]
+        root = parse(posts)
+        entries = root.findall(el("entry"))
+        timestamps = [e.find(el("updated")).text for e in entries]
+        assert len(set(timestamps)) == 2
 
 
 # ---------------------------------------------------------------------------
@@ -125,9 +137,9 @@ class TestEntryStructure:
         assert entry.find(el("id")).text == "https://example.github.io/5.html"
 
     def test_entry_updated_is_rfc3339_date(self):
-        root = parse([make_post(date="2026-03-01")])
+        root = parse([make_post(id=1, date="2026-03-01")])
         entry = root.find(el("entry"))
-        assert entry.find(el("updated")).text == "2026-03-01T00:00:00Z"
+        assert entry.find(el("updated")).text == "2026-03-01T00:00:01Z"
 
     def test_entry_content_type_is_html(self):
         root = parse([make_post()])
@@ -138,3 +150,16 @@ class TestEntryStructure:
         root = parse([make_post(body_html="<p>Hello world</p>")])
         entry = root.find(el("entry"))
         assert "<p>Hello world</p>" in entry.find(el("content")).text
+
+    def test_feed_has_author_element(self):
+        root = parse([make_post()])
+        assert root.find(el("author")) is not None
+
+    def test_feed_author_name_uses_site_title(self):
+        root = parse([make_post()])
+        assert root.find(el("author")).find(el("name")).text == "My Blog"
+
+    def test_entry_does_not_have_author_element(self):
+        root = parse([make_post()])
+        entry = root.find(el("entry"))
+        assert entry.find(el("author")) is None
