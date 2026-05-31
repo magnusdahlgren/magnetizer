@@ -70,8 +70,15 @@ def _post_index_page_url(post_id, all_post_ids_sorted_desc, posts_per_page):
     return index_page_url(page)
 
 
-def _write_post_html(post, index_page_url, dist_dir, config, template):
-    content_html = render_post_page_content(post, index_page_url)
+def _adjacent_post_urls(post_id, all_post_ids_sorted_desc):
+    pos = all_post_ids_sorted_desc.index(post_id)
+    newer_url = f"{all_post_ids_sorted_desc[pos - 1]}.html" if pos > 0 else None
+    older_url = f"{all_post_ids_sorted_desc[pos + 1]}.html" if pos + 1 < len(all_post_ids_sorted_desc) else None
+    return newer_url, older_url
+
+
+def _write_post_html(post, index_page_url, dist_dir, config, template, newer_url=None, older_url=None):
+    content_html = render_post_page_content(post, index_page_url, newer_url=newer_url, older_url=older_url)
     title = render_page_title(config["site_title"], post.title, page_num=None)
     html = render_template(template, title=title, content=content_html)
     (dist_dir / f"{post.id}.html").write_text(html)
@@ -150,7 +157,8 @@ def build(cwd, filename=None, flush=False, resources=False):
         post = _load_post(content_dir, post_id)
         _build_post(post, dist_dir, content_dir, config)
         idx_url = _post_index_page_url(post_id, all_post_ids_sorted_desc, config["posts_per_page"])
-        _write_post_html(post, idx_url, dist_dir, config, template)
+        newer_url, older_url = _adjacent_post_urls(post_id, all_post_ids_sorted_desc)
+        _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url)
 
     if not filename and post_ids_to_build:
         all_posts = [_load_post(content_dir, pid) for pid in all_post_ids_sorted_desc]

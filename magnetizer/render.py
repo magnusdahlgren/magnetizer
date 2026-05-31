@@ -42,13 +42,22 @@ def render_article(post, on_index_page):
     return '\n'.join(parts)
 
 
-def render_post_page_content(post, index_page_url):
+def render_post_page_content(post, index_page_url, newer_url=None, older_url=None):
     article = render_article(post, on_index_page=False)
     back_url = f"{index_page_url}#post-{post.id}"
-    return (
-        f'<main>\n{article}\n</main>\n'
-        f'<nav><a href="{back_url}">← Back to homepage</a></nav>'
-    )
+
+    parts = [f'<main>\n{article}\n</main>']
+
+    if newer_url or older_url:
+        nav_items = []
+        if newer_url:
+            nav_items.append(f'<li class="newer"><a href="{newer_url}">← Newer post</a></li>')
+        if older_url:
+            nav_items.append(f'<li class="older"><a href="{older_url}">Older post →</a></li>')
+        parts.append(f'<nav><ul>{"".join(nav_items)}</ul></nav>')
+
+    parts.append(f'<nav><a href="{back_url}">← Back to homepage</a></nav>')
+    return '\n'.join(parts)
 
 
 def render_index_page_content(posts, page_num, total_pages):
