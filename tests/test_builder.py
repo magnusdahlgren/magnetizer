@@ -546,3 +546,43 @@ class TestAboutPage:
         make_jpg(p / "content" / "about-image-01.jpg")
         build(p)
         assert (p / "dist" / "about-image-01-resized.jpg").exists()
+
+
+# ---------------------------------------------------------------------------
+# Build ID placeholder
+# ---------------------------------------------------------------------------
+
+BUILD_ID_TEMPLATE = (
+    "<!DOCTYPE html><html><head>"
+    "<link rel=\"stylesheet\" href=\"style.css?v=MAGNETIZER_BUILD_ID\">"
+    "<title>MAGNETIZER_TITLE</title></head>"
+    "<body>MAGNETIZER_CONTENT</body></html>"
+)
+
+
+class TestBuildId:
+
+    def test_build_id_placeholder_is_replaced(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "templates" / "index.html").write_text(BUILD_ID_TEMPLATE)
+        build(p)
+        assert "MAGNETIZER_BUILD_ID" not in (p / "dist" / "1.html").read_text()
+
+    def test_build_id_is_numeric(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "templates" / "index.html").write_text(BUILD_ID_TEMPLATE)
+        build(p)
+        html = (p / "dist" / "1.html").read_text()
+        import re
+        m = re.search(r'style\.css\?v=(\S+)"', html)
+        assert m and m.group(1).isdigit()
+
+    def test_build_id_same_across_all_pages(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        (p / "templates" / "index.html").write_text(BUILD_ID_TEMPLATE)
+        build(p)
+        import re
+        def get_build_id(path):
+            m = re.search(r'style\.css\?v=(\d+)', path.read_text())
+            return m.group(1) if m else None
+        assert get_build_id(p / "dist" / "1.html") == get_build_id(p / "dist" / "index.html")
