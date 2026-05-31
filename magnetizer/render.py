@@ -27,7 +27,10 @@ def render_article(post, on_index_page):
         else:
             parts.append(f'<h1>{post.title}</h1>')
 
-    parts.append(f'<div class="post-body">{post.body_html}</div>')
+    if on_index_page and post.excerpt_html is not None:
+        parts.append(f'<div class="post-body">{post.excerpt_html}<a href="{post.url}" class="read-more">Read more →</a></div>')
+    else:
+        parts.append(f'<div class="post-body">{post.body_html}</div>')
 
     if on_index_page:
         date_content = f'<a href="{post.url}">{post.date_uk}</a>'

@@ -393,3 +393,42 @@ class TestRenderTemplate:
         html = render_template(self.TEMPLATE, title="T", content="C")
         assert "<title>" in html
         assert "<body>" in html
+
+
+# ---------------------------------------------------------------------------
+# render_article — read more
+# ---------------------------------------------------------------------------
+
+class TestRenderArticleReadMore:
+
+    def _post_with_excerpt(self):
+        return Post(id=1, date="2026-05-24", date_uk="24 May 2026", title="My Post",
+                    url="1.html", body_html="<p>Intro.</p><p>Rest.</p>",
+                    excerpt_html="<p>Intro.</p>", images=[])
+
+    def test_index_page_shows_excerpt_not_full_body(self):
+        html = render_article(self._post_with_excerpt(), on_index_page=True)
+        assert "<p>Intro.</p>" in html
+        assert "<p>Rest.</p>" not in html
+
+    def test_index_page_shows_read_more_link(self):
+        html = render_article(self._post_with_excerpt(), on_index_page=True)
+        assert "Read more →" in html
+
+    def test_index_page_read_more_link_points_to_post(self):
+        html = render_article(self._post_with_excerpt(), on_index_page=True)
+        assert 'href="1.html"' in html
+        assert 'class="read-more"' in html
+
+    def test_index_page_no_read_more_when_no_excerpt(self):
+        html = render_article(make_post(), on_index_page=True)
+        assert "Read more" not in html
+
+    def test_post_page_shows_full_body_when_excerpt_present(self):
+        html = render_article(self._post_with_excerpt(), on_index_page=False)
+        assert "<p>Intro.</p>" in html
+        assert "<p>Rest.</p>" in html
+
+    def test_post_page_no_read_more_link(self):
+        html = render_article(self._post_with_excerpt(), on_index_page=False)
+        assert "Read more" not in html

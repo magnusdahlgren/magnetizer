@@ -147,3 +147,35 @@ class TestImages:
         post = parse_post(make_md(), 1, ["1-image-02.jpg", "1-image-01.jpg"])
         assert post.images[0] == "1-image-01.jpg"
         assert post.images[1] == "1-image-02.jpg"
+
+
+# ---------------------------------------------------------------------------
+# Read more marker
+# ---------------------------------------------------------------------------
+
+class TestReadMore:
+
+    def test_excerpt_html_is_none_when_no_more_tag(self):
+        post = parse_post(make_md(body="Hello world"), 1, [])
+        assert post.excerpt_html is None
+
+    def test_excerpt_html_contains_content_before_more_tag(self):
+        post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
+        assert "<p>Intro.</p>" in post.excerpt_html
+
+    def test_excerpt_html_excludes_content_after_more_tag(self):
+        post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
+        assert "Rest" not in post.excerpt_html
+
+    def test_body_html_contains_full_content_when_more_tag_present(self):
+        post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
+        assert "<p>Intro.</p>" in post.body_html
+        assert "<p>Rest.</p>" in post.body_html
+
+    def test_more_tag_not_present_in_excerpt_html(self):
+        post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
+        assert "<!-- more -->" not in post.excerpt_html
+
+    def test_more_tag_not_present_in_body_html(self):
+        post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
+        assert "<!-- more -->" not in post.body_html
