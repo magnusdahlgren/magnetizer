@@ -424,3 +424,37 @@ class TestFeed:
         (p / "dist" / "feed.xml").write_text("old content")
         build(p, flush=True)
         assert "old content" not in (p / "dist" / "feed.xml").read_text()
+
+
+# ---------------------------------------------------------------------------
+# Post navigation
+# ---------------------------------------------------------------------------
+
+class TestPostNavigation:
+
+    def test_post_has_link_to_newer_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        assert "2.html" in (p / "dist" / "1.html").read_text()
+
+    def test_post_has_link_to_older_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        assert "1.html" in (p / "dist" / "2.html").read_text()
+
+    def test_newest_post_has_no_newer_link(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        assert "Newer post" not in (p / "dist" / "2.html").read_text()
+
+    def test_oldest_post_has_no_older_link(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        assert "Older post" not in (p / "dist" / "1.html").read_text()
+
+    def test_only_post_has_no_post_navigation(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        html = (p / "dist" / "1.html").read_text()
+        assert "Newer post" not in html
+        assert "Older post" not in html

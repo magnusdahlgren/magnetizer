@@ -322,15 +322,28 @@ The `MAGNETIZER_CONTENT` has the following structure on individual post pages:
 <main>
 	<article>...</article>
 </main>
-<nav><a href="POST_INDEX_PAGE_URL#POST_HTML_ID">Back to homepage</a></nav>
+<nav>
+  <ul>
+    <li class=”newer”><a href=”NEWER_POST_URL”>← Newer post</a></li>
+    <li class=”older”><a href=”OLDER_POST_URL”>Older post →</a></li>
+  </ul>
+</nav>
+<nav><a href=”POST_INDEX_PAGE_URL#POST_HTML_ID”>← Back to homepage</a></nav>
 ```
 
 Where:
 
+- `NEWER_POST_URL` is the URL of the next newer post (higher post ID), e.g. `5.html`
+- `OLDER_POST_URL` is the URL of the next older post (lower post ID), e.g. `3.html`
 - `POST_INDEX_PAGE_URL` is the url of the index page that contains this specific post (e.g. “index-2.html”)
 - `POST_HTML_ID`  is the anchor of the post in the index page
 
-The “Back to homepage” link returns the user to the exact position in the index where the post appears.
+Notes:
+
+- The `<li class=”newer”>` is omitted when this is the newest post
+- The `<li class=”older”>` is omitted when this is the oldest post
+- The entire first `<nav>` is omitted when there is only one post
+- The “← Back to homepage” link returns the user to the exact position in the index where the post appears.
 
 ### Index pages
 

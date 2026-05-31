@@ -11,6 +11,6 @@ N/A
 ## Could
 
 [ ] Read more, using a `<!-- more -->`, showing a shorter version of the post on the index list with a "Read more" link to the full post
-[ ] `<-- Previous post` / `Next post -->` links on individual post pages.
+[x] `<-- Previous post` / `Next post -->` links on individual post pages.
 [ ] Tags - e.g. "travel", "nerdy", "me", etc. Could probably go in the Frontmatter
 [ ] Calendar view - list every day for every month and link days with posts to the posts.
