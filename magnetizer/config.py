@@ -4,6 +4,7 @@ import yaml
 
 DEFAULTS = {
     "site_title": "My Blog",
+    "site_url": "",
     "image_max_dimension": 2000,
     "image_quality": 85,
     "posts_per_page": 12,

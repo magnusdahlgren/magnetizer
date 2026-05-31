@@ -13,7 +13,8 @@ from magnetizer.render import (
     render_post_page_content,
     render_template,
 )
-from magnetizer.validate import validate_content, validate_project
+from magnetizer.feed import render_feed
+from magnetizer.validate import validate_config, validate_content, validate_project
 
 _FLUSH_PRESERVE = {'.git', 'CNAME', '.nojekyll'}
 
@@ -108,6 +109,7 @@ def build(cwd, filename=None, flush=False, resources=False):
     validate_content(content_dir)
 
     config = load_config(cwd / "config.yaml")
+    validate_config(config)
     template = (cwd / "templates" / "index.html").read_text()
 
     if flush:
@@ -153,6 +155,7 @@ def build(cwd, filename=None, flush=False, resources=False):
     if not filename and post_ids_to_build:
         all_posts = [_load_post(content_dir, pid) for pid in all_post_ids_sorted_desc]
         _write_index_pages(all_posts, dist_dir, config, template)
+        (dist_dir / "feed.xml").write_text(render_feed(all_posts, config))
         save_manifest(content_dir, manifest_path)
 
     _copy_resources(cwd / "resources", dist_dir, replace=resources or flush)

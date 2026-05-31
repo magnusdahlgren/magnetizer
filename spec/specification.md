@@ -213,6 +213,7 @@ Examples:
 | Variable | Use | Default, if not specified |
 | --- | --- | --- |
 | `site_title` | The generated pages’ `<title>` | `My Blog` |
+| `site_url` | Absolute base URL of the published site, e.g. `https://example.github.io` | Required — build exits with an error if absent or empty |
 | `image_max_dimension` | Long-edge max size when resizing images | `2000` |
 | `image_quality` | Image quality, when resizing images | `85` |
 | `posts_per_page` | Number of posts per page when generating the index files | `12` |
@@ -393,6 +394,52 @@ The manifest is:
 - Not updated when a single `FILENAME` is specified (preview builds)
 - Deleted and recreated from scratch when `--flush` is used
 - Absent on the first ever build, in which case all files in `content/` are treated as new and a new manifest is created
+
+## Atom feed
+
+Magnetizer generates an Atom 1.0 feed at `dist/feed.xml` on every full build (incremental or `--flush`). Single-file preview builds (`build.py 1.md`) do not update the feed. `site_url` must be set in `config.yaml`; the build will exit with an error if it is absent or empty.
+
+### Configuration
+
+A new configuration variable is required:
+
+| Variable | Use | Default, if not specified |
+| --- | --- | --- |
+| `site_url` | The absolute base URL of the published site, e.g. `https://example.github.io` | Required — build exits with an error if absent or empty |
+
+### Feed structure
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>SITE_TITLE</title>
+  <link href="SITE_URL" />
+  <link rel="self" href="FEED_URL" />
+  <id>SITE_URL</id>
+  <updated>MOST_RECENT_DATE</updated>
+  <entry>
+    <title>POST_TITLE</title>
+    <link href="POST_URL" />
+    <id>POST_URL</id>
+    <updated>POST_DATE</updated>
+    <content type="html"><![CDATA[POST_BODY_HTML]]></content>
+  </entry>
+  ...
+</feed>
+```
+
+Where:
+
+- `SITE_TITLE` is `site_title` from config
+- `SITE_URL` is `site_url` from config
+- `FEED_URL` is `site_url + "/feed.xml"`
+- `MOST_RECENT_DATE` is the date of the most recent post in RFC 3339 format, e.g. `2026-05-24T00:00:00Z`
+- `POST_TITLE` is the `title` from the post's frontmatter, or the UK-formatted date (e.g. `24 May 2026`) for untitled posts
+- `POST_URL` is the absolute URL of the post page, e.g. `https://example.github.io/1.html`
+- `POST_DATE` is the post date in RFC 3339 format, e.g. `2026-05-24T00:00:00Z`
+- `POST_BODY_HTML` is the HTML generated from the post's Markdown body
+
+Posts are listed in reverse chronological order (highest post ID first). All posts are included.
 
 ## GitHub integration
 
