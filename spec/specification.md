@@ -368,7 +368,7 @@ Notes:
 
 If `about.md` is present in `content/`, Magnetizer generates `dist/about.html` on every full build. The about page is not included in index pages, the feed, or the newer/older post navigation.
 
-The about page supports the same frontmatter fields (`date`, `title`) and image conventions as posts. It is rebuilt whenever `about.md` or any of its images change. Single-file preview builds (`build.py about.md`) are also supported.
+The about page supports the same frontmatter fields (`date`, `title`) and image conventions as posts. Unlike posts, `date` is optional — if omitted, no date footer is rendered. It is rebuilt whenever `about.md` or any of its images change. Single-file preview builds (`build.py about.md`) are also supported.
 
 The `MAGNETIZER_CONTENT` has the following structure:
 
