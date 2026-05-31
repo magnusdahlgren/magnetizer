@@ -13,6 +13,7 @@ class Post:
     url: str
     body_html: str
     images: list[str]
+    excerpt_html: str | None = None
 
 
 def _parse_frontmatter(text):
@@ -38,7 +39,10 @@ def parse_post(md_text, post_id, image_filenames):
 
     date_str = fm.get('date', '')
     title = fm.get('title') or None
-    body_html = _markdown.markdown(body) if body else ''
+
+    more_parts = body.split('<!-- more -->', 1)
+    body_html = _markdown.markdown(more_parts[0] + more_parts[1]) if len(more_parts) == 2 else _markdown.markdown(body) if body else ''
+    excerpt_html = _markdown.markdown(more_parts[0].strip()) if len(more_parts) == 2 else None
 
     images = sorted(
         image_filenames,
@@ -53,4 +57,5 @@ def parse_post(md_text, post_id, image_filenames):
         url=f"{post_id}.html",
         body_html=body_html,
         images=images,
+        excerpt_html=excerpt_html,
     )

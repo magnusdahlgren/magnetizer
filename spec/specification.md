@@ -292,6 +292,23 @@ Notes:
 - The `<h1>` is only included if the post has a title.
 - If the post is displayed on an index page, the contents of the `<h1>` and the `<time>` contain a link to the post page. On the individual post page, no links are included.
 
+### Read more
+
+If a post's Markdown body contains `<!-- more -->`, the content is split at that marker:
+
+- On **index pages**, only the content before `<!-- more -->` is shown, followed by a "Read more →" link:
+
+```html
+<div class="post-body">
+  EXCERPT_HTML
+  <a href="POST_URL" class="read-more">Read more →</a>
+</div>
+```
+
+- On **individual post pages**, the full content is shown as normal and `<!-- more -->` has no effect.
+
+If a post contains no `<!-- more -->`, the full body is shown on both index and post pages.
+
 When there is one or more images for the post, each is included as a `<figure>` before `<h1>`, ordered by the image number in the filename (e.g. `2-image-01-resized.jpg`, `2-image-02-resized.jpg`, etc)
 
 ```html
