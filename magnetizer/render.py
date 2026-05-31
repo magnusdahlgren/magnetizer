@@ -56,7 +56,7 @@ def render_post_page_content(post, index_page_url, newer_url=None, older_url=Non
             nav_items.append(f'<li class="older"><a href="{older_url}">Older post →</a></li>')
         parts.append(f'<nav><ul>{"".join(nav_items)}</ul></nav>')
 
-    parts.append(f'<nav><a href="{back_url}">← Back to homepage</a></nav>')
+    parts.append(f'<nav><a href="{back_url}">⌂ Back to homepage</a></nav>')
     return '\n'.join(parts)
 
 

@@ -205,9 +205,9 @@ class TestRenderPostPageContent:
         html = render_post_page_content(make_post(), index_page_url="index.html")
         assert "Back to homepage" in html
 
-    def test_back_link_has_left_arrow(self):
+    def test_back_link_has_house_symbol(self):
         html = render_post_page_content(make_post(), index_page_url="index.html")
-        assert "← Back to homepage" in html
+        assert "⌂ Back to homepage" in html
 
     def test_article_rendered_without_links(self):
         html = render_post_page_content(make_post(id=1, title="T"), index_page_url="index.html")
