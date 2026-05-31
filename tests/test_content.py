@@ -179,3 +179,22 @@ class TestReadMore:
     def test_more_tag_not_present_in_body_html(self):
         post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
         assert "<!-- more -->" not in post.body_html
+
+
+# ---------------------------------------------------------------------------
+# Optional date
+# ---------------------------------------------------------------------------
+
+class TestOptionalDate:
+
+    def test_date_is_none_when_not_in_frontmatter(self):
+        post = parse_post("---\n---\n", 1, [])
+        assert post.date is None
+
+    def test_date_uk_is_none_when_not_in_frontmatter(self):
+        post = parse_post("---\n---\n", 1, [])
+        assert post.date_uk is None
+
+    def test_date_set_when_present_in_frontmatter(self):
+        post = parse_post(make_md(date="2026-05-24"), 1, [])
+        assert post.date == "2026-05-24"

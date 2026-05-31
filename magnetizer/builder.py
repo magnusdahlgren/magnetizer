@@ -98,6 +98,31 @@ def _write_index_pages(posts_sorted_desc, dist_dir, config, template):
         (dist_dir / filename).write_text(html)
 
 
+def _about_image_filenames(content_dir):
+    pattern = re.compile(r'^about-image-\d{2}\.(jpg|jpeg|png)$')
+    return sorted(f.name for f in content_dir.iterdir() if pattern.match(f.name))
+
+
+def _build_about_page(content_dir, dist_dir, config, template):
+    md_text = (content_dir / "about.md").read_text()
+    images = _about_image_filenames(content_dir)
+    post = parse_post(md_text, "about", images)
+
+    for img_name in images:
+        stem, dot, ext = img_name.rpartition('.')
+        resize_image(
+            content_dir / img_name,
+            dist_dir / f"{stem}-resized.{ext}",
+            max_dimension=config["image_max_dimension"],
+            quality=config["image_quality"],
+        )
+
+    content_html = render_post_page_content(post, "index.html", back_url="index.html")
+    title = render_page_title(config["site_title"], post.title, page_num=None)
+    html = render_template(template, title=title, content=content_html)
+    (dist_dir / "about.html").write_text(html)
+
+
 def _copy_resources(resources_dir, dist_dir, replace=False):
     dest = dist_dir / "resources"
     if replace and dest.exists():
@@ -132,7 +157,13 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     manifest = load_manifest(manifest_path)
 
+    about_md = content_dir / "about.md"
+
     if filename:
+        if Path(filename).stem == "about":
+            if about_md.exists():
+                _build_about_page(content_dir, dist_dir, config, template)
+            return {"created": 0, "updated": 0, "deleted": 0}
         post_id = int(Path(filename).stem)
         post_ids_to_build = {post_id}
     else:
@@ -159,6 +190,9 @@ def build(cwd, filename=None, flush=False, resources=False):
         idx_url = _post_index_page_url(post_id, all_post_ids_sorted_desc, config["posts_per_page"])
         newer_url, older_url = _adjacent_post_urls(post_id, all_post_ids_sorted_desc)
         _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url)
+
+    if about_md.exists():
+        _build_about_page(content_dir, dist_dir, config, template)
 
     if not filename and post_ids_to_build:
         all_posts = [_load_post(content_dir, pid) for pid in all_post_ids_sorted_desc]
