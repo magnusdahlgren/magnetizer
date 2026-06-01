@@ -475,15 +475,15 @@ class TestRenderArchivePageContent:
 
     def test_titled_post_shows_day_dash_title(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Sunny day")])
-        assert "24 - Sunny day" in html
+        assert "<strong>24</strong> - Sunny day" in html
 
     def test_untitled_post_shows_day_only(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
-        assert ">3<" in html
+        assert "<strong>3</strong>" in html
 
     def test_day_has_no_leading_zero(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
-        assert ">03<" not in html
+        assert "<strong>03</strong>" not in html
 
     def test_each_entry_is_a_link_to_post(self):
         html = render_archive_page_content([make_dated_post(5, "2026-05-24", title="Hello")])
