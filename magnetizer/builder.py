@@ -9,6 +9,7 @@ from magnetizer.image import resize_image
 from magnetizer.manifest import get_changed_post_ids, load_manifest, save_manifest
 from magnetizer.render import (
     index_page_url,
+    render_archive_page_content,
     render_index_page_content,
     render_page_title,
     render_post_page_content,
@@ -201,6 +202,12 @@ def build(cwd, filename=None, flush=False, resources=False):
         all_posts = [_load_post(content_dir, pid) for pid in all_post_ids_sorted_desc]
         _write_index_pages(all_posts, dist_dir, config, template)
         (dist_dir / "feed.xml").write_text(render_feed(all_posts, config))
+        archive_html = render_template(
+            template,
+            title=render_page_title(config["site_title"], "Archive", page_num=None),
+            content=render_archive_page_content(all_posts),
+        )
+        (dist_dir / "archive.html").write_text(archive_html)
         save_manifest(content_dir, manifest_path)
 
     _copy_resources(cwd / "resources", dist_dir, replace=resources or flush)

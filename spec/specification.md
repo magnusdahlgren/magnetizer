@@ -382,6 +382,36 @@ The `MAGNETIZER_CONTENT` has the following structure:
 
 The back link always points to `index.html` with no anchor, since the about page has no position in the index.
 
+### Archive page
+
+Magnetizer generates `dist/archive.html` under the same conditions as index pages — on full builds where post changes are detected, but not during single-file preview builds.
+
+The archive lists all posts grouped by month, newest month first. Within each month, posts appear in reverse chronological order (highest post ID first). Posts without a `date` are excluded. The archive is not included in index pages, the feed, or the newer/older post navigation.
+
+The page title is `Archive - {site_title}`.
+
+The `MAGNETIZER_CONTENT` has the following structure:
+
+```html
+<main>
+  <section>
+    <h2>May 2026</h2>
+    <ul>
+      <li><a href="POST_URL">DAY - POST_TITLE</a></li>
+      <li><a href="POST_URL">DAY</a></li>
+    </ul>
+  </section>
+  ...
+</main>
+<nav><a href="index.html">⌂ Back to homepage</a></nav>
+```
+
+Where:
+
+- `DAY` is the day of the month with no leading zero, e.g. `16`
+- Titled posts use `DAY - POST_TITLE` as link text
+- Untitled posts use just `DAY` as link text
+
 ### Index pages
 
 The index pages are a reverse-chronological representation of all posts, in full, with `posts_per_page` posts per page. The first index page (the latest posts) is named `index.html,` then `index-2.html`, `index-3.html` etc.

@@ -1,3 +1,6 @@
+from datetime import date as _date
+
+
 def _resized_filename(original):
     stem, dot, ext = original.rpartition('.')
     return f"{stem}-resized.{ext}"
@@ -92,3 +95,30 @@ def render_page_title(site_title, post_title, page_num):
 
 def render_template(template_html, title, content):
     return template_html.replace('MAGNETIZER_TITLE', title).replace('MAGNETIZER_CONTENT', content)
+
+
+def render_archive_page_content(posts):
+    dated_posts = [p for p in posts if p.date]
+
+    months = {}
+    for post in dated_posts:
+        d = _date.fromisoformat(post.date)
+        key = (d.year, d.month)
+        months.setdefault(key, []).append(post)
+
+    parts = ['<main>']
+    for year, month in sorted(months.keys(), reverse=True):
+        label = _date(year, month, 1).strftime('%B %Y')
+        parts.append('<section>')
+        parts.append(f'<h2>{label}</h2>')
+        parts.append('<ul>')
+        for post in months[(year, month)]:
+            day = _date.fromisoformat(post.date).strftime('%-d')
+            text = f'{day} - {post.title}' if post.title else day
+            parts.append(f'<li><a href="{post.url}">{text}</a></li>')
+        parts.append('</ul>')
+        parts.append('</section>')
+    parts.append('</main>')
+    parts.append('<nav><a href="index.html">⌂ Back to homepage</a></nav>')
+
+    return '\n'.join(parts)

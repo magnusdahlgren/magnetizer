@@ -586,3 +586,37 @@ class TestBuildId:
             m = re.search(r'style\.css\?v=(\d+)', path.read_text())
             return m.group(1) if m else None
         assert get_build_id(p / "dist" / "1.html") == get_build_id(p / "dist" / "index.html")
+
+
+# ---------------------------------------------------------------------------
+# Archive page
+# ---------------------------------------------------------------------------
+
+class TestArchivePage:
+
+    def test_archive_html_created_after_build_with_changes(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert (p / "dist" / "archive.html").exists()
+
+    def test_archive_html_not_created_on_single_file_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p, filename="1.md")
+        assert not (p / "dist" / "archive.html").exists()
+
+    def test_archive_html_not_created_when_no_changes(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        (p / "dist" / "archive.html").unlink()
+        build(p)  # no changes — archive should not be recreated
+        assert not (p / "dist" / "archive.html").exists()
+
+    def test_archive_contains_post_link(self, tmp_path):
+        p = make_project(tmp_path, posts={1: TITLED_MD})
+        build(p)
+        assert "1.html" in (p / "dist" / "archive.html").read_text()
+
+    def test_archive_title_includes_site_title(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "Archive" in (p / "dist" / "archive.html").read_text()

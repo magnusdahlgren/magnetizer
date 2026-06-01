@@ -3,6 +3,7 @@
 import pytest
 from magnetizer.content import Post
 from magnetizer.render import (
+    render_archive_page_content,
     render_article,
     render_index_page_content,
     render_page_title,
@@ -438,3 +439,73 @@ class TestRenderArticleReadMore:
     def test_post_page_no_read_more_link(self):
         html = render_article(self._post_with_excerpt(), on_index_page=False)
         assert "Read more" not in html
+
+
+# ---------------------------------------------------------------------------
+# render_archive_page_content
+# ---------------------------------------------------------------------------
+
+def make_dated_post(id, date, title=None):
+    return Post(id=id, date=date, date_uk="", title=title,
+                url=f"{id}.html", body_html="", images=[])
+
+
+class TestRenderArchivePageContent:
+
+    def test_has_main_element(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert "<main>" in html and "</main>" in html
+
+    def test_has_back_link_to_homepage(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert 'href="index.html"' in html
+        assert "Back to homepage" in html
+
+    def test_month_heading(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert "<h2>May 2026</h2>" in html
+
+    def test_multiple_months_in_reverse_order(self):
+        posts = [
+            make_dated_post(2, "2026-05-24"),
+            make_dated_post(1, "2026-04-10"),
+        ]
+        html = render_archive_page_content(posts)
+        assert html.index("May 2026") < html.index("April 2026")
+
+    def test_titled_post_shows_day_dash_title(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Sunny day")])
+        assert "24 - Sunny day" in html
+
+    def test_untitled_post_shows_day_only(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
+        assert ">3<" in html
+
+    def test_day_has_no_leading_zero(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
+        assert ">03<" not in html
+
+    def test_each_entry_is_a_link_to_post(self):
+        html = render_archive_page_content([make_dated_post(5, "2026-05-24", title="Hello")])
+        assert 'href="5.html"' in html
+
+    def test_posts_within_month_in_reverse_order(self):
+        posts = [
+            make_dated_post(3, "2026-05-30"),
+            make_dated_post(1, "2026-05-10"),
+        ]
+        html = render_archive_page_content(posts)
+        assert html.index("30") < html.index("10")
+
+    def test_post_without_date_excluded(self):
+        posts = [
+            make_dated_post(2, "2026-05-24"),
+            Post(id=1, date=None, date_uk=None, title="No date",
+                 url="1.html", body_html="", images=[]),
+        ]
+        html = render_archive_page_content(posts)
+        assert "No date" not in html
+
+    def test_empty_posts_list(self):
+        html = render_archive_page_content([])
+        assert "<main>" in html
