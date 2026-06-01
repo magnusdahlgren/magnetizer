@@ -181,6 +181,7 @@ def build(cwd, filename=None, flush=False, resources=False):
     all_post_ids_sorted_desc = sorted(_post_ids_in_content(content_dir), reverse=True)
 
     created = updated = deleted = 0
+    posts_cache = {}
 
     for post_id in post_ids_to_build:
         md_path = content_dir / f"{post_id}.md"
@@ -195,6 +196,7 @@ def build(cwd, filename=None, flush=False, resources=False):
             created += 1
 
         post = _load_post(content_dir, post_id)
+        posts_cache[post_id] = post
         _warn_if_missing_alt_texts(post)
         _build_post(post, dist_dir, content_dir, config)
         idx_url = _post_index_page_url(post_id, all_post_ids_sorted_desc, config["posts_per_page"])
@@ -205,7 +207,10 @@ def build(cwd, filename=None, flush=False, resources=False):
         _build_about_page(content_dir, dist_dir, config, template)
 
     if not filename and post_ids_to_build:
-        all_posts = [_load_post(content_dir, pid) for pid in all_post_ids_sorted_desc]
+        all_posts = [
+            posts_cache[pid] if pid in posts_cache else _load_post(content_dir, pid)
+            for pid in all_post_ids_sorted_desc
+        ]
         _write_index_pages(all_posts, dist_dir, config, template)
         (dist_dir / "feed.xml").write_text(render_feed(all_posts, config))
         archive_html = render_template(

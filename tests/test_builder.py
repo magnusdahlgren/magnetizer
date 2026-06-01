@@ -645,3 +645,12 @@ class TestAltTextWarnings:
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         build(p)
         assert "Warning" not in capsys.readouterr().out
+
+    def test_each_warning_printed_only_once(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\nimage:\n  - Alt\n---\n\nHello\n"
+        p = make_project(tmp_path, posts={1: md})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        build(p)
+        output = capsys.readouterr().out
+        assert output.count("unknown frontmatter key") == 1
+        assert output.count("missing one or more alt texts") == 1
