@@ -1,5 +1,6 @@
 import re
 import shutil
+import time
 from pathlib import Path
 
 from magnetizer.config import load_config
@@ -142,7 +143,9 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     config = load_config(cwd / "config.yaml")
     validate_config(config)
-    template = (cwd / "templates" / "index.html").read_text()
+    template = (cwd / "templates" / "index.html").read_text().replace(
+        'MAGNETIZER_BUILD_ID', str(int(time.time()))
+    )
 
     if flush:
         for item in dist_dir.iterdir():

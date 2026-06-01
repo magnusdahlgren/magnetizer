@@ -228,16 +228,17 @@ For each image in a post, Magnetizer resizes it before writing it to `dist/`. Th
 
 Magnetizer uses a simple placeholder-based templating system. Templates are plain HTML files stored in `templates/`. At build time, Magnetizer replaces placeholders in the template with generated content.
 
-The following placeholders are available and required:
+The following placeholders are available:
 
-| Placeholder | Replaced with |
-| --- | --- |
-| `MAGNETIZER_TITLE`  | The title of the page, made up from the `site_title` (from config) plus contextual information, e.g:
+| Placeholder | Required | Replaced with |
+| --- | --- | --- |
+| `MAGNETIZER_TITLE`  | Yes | The title of the page, made up from the `site_title` (from config) plus contextual information, e.g:
   • `site_title` (for index.html)
   • `site_title - Page 2` (for index-2.html)
   • `post_title - site_title` (for individual post page)
   • `site_title` (for individual post without a title) |
-| `MAGNETIZER_CONTENT` | The generated page content — one post for an individual post page or multiple posts for an index page. |
+| `MAGNETIZER_CONTENT` | Yes | The generated page content — one post for an individual post page or multiple posts for an index page. |
+| `MAGNETIZER_BUILD_ID` | No | A Unix timestamp generated at build time, e.g. `1748123456`. Useful for cache-busting static assets: `<link rel="stylesheet" href="resources/style.css?v=MAGNETIZER_BUILD_ID">`. The same value is used across all pages in a single build. |
 
 The following template is required in `templates/`:
 
