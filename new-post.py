@@ -28,8 +28,8 @@ def main():
     title = non_images[0] if non_images else None
 
     post_id = get_next_post_id(content_dir)
-    (content_dir / f"{post_id}.md").write_text(build_markdown(date.today().isoformat(), title))
-    copy_images(images, content_dir, post_id)
+    image_count = copy_images(images, content_dir, post_id)
+    (content_dir / f"{post_id}.md").write_text(build_markdown(date.today().isoformat(), title, image_count))
     print(f"Post {post_id} successfully created.")
 
 

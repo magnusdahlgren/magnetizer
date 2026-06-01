@@ -1,7 +1,7 @@
 """Tests for magnetizer/render.py — all HTML generation functions"""
 
 import pytest
-from magnetizer.content import Post
+from magnetizer.content import Image, Post
 from magnetizer.render import (
     render_archive_page_content,
     render_article,
@@ -24,6 +24,10 @@ def make_post(
     body_html="<p>Hello</p>",
     images=None,
 ):
+    image_objects = [
+        img if isinstance(img, Image) else Image(filename=img, alt="")
+        for img in (images or [])
+    ]
     return Post(
         id=id,
         date=date,
@@ -31,7 +35,7 @@ def make_post(
         title=title,
         url=f"{id}.html",
         body_html=body_html,
-        images=images or [],
+        images=image_objects,
     )
 
 
@@ -174,12 +178,25 @@ class TestRenderArticleImages:
 
     def test_images_wrapped_in_link_on_index_page(self):
         html = render_article(make_post(id=1, images=["1-image-01.jpg"]), on_index_page=True)
-        assert '<a href="1.html"><img src="1-image-01-resized.jpg"></a>' in html
+        assert '<a href="1.html"><img src="1-image-01-resized.jpg" alt=""></a>' in html
 
     def test_images_not_wrapped_in_link_on_post_page(self):
         html = render_article(make_post(id=1, images=["1-image-01.jpg"]), on_index_page=False)
         assert '<a href="1.html"><img' not in html
-        assert '<img src="1-image-01-resized.jpg">' in html
+        assert 'src="1-image-01-resized.jpg"' in html
+
+    def test_img_has_alt_attribute(self):
+        html = render_article(make_post(id=1, images=["1-image-01.jpg"]), on_index_page=False)
+        assert 'alt=' in html
+
+    def test_img_alt_text_from_image_object(self):
+        img = Image(filename="1-image-01.jpg", alt="A sunny beach")
+        html = render_article(make_post(id=1, images=[img]), on_index_page=False)
+        assert 'alt="A sunny beach"' in html
+
+    def test_img_empty_alt_when_no_alt_text(self):
+        html = render_article(make_post(id=1, images=["1-image-01.jpg"]), on_index_page=False)
+        assert 'alt=""' in html
 
 
 # ---------------------------------------------------------------------------

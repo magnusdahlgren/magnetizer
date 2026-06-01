@@ -102,21 +102,25 @@ This will:
 4. Populate the .md file with the appropriate information:
     1. The post date (i.e. the date when running the script) in ISO 8601 format (`YYYY-MM-DD`) in the .md frontmatter
     2. If a title was provided, include this in the .md frontmatter.
-    
-    Example:
-    
+    3. If any images were provided, include an `images:` list in the frontmatter with a numbered placeholder alt text for each image, e.g. `Image 1`, `Image 2`, etc.
+
+    Example with two images and a title:
+
     ```
     ---
     date: 2026-05-21
     title: This is my title
+    images:
+      - Image 1
+      - Image 2
     ---
-    
+
     ```
-    
+
 5. If any image file names (strings ending with an image file name extension, e.g. `.jpg`) were provided, do the following for each `{image-file-name}`, in the order in which they were provided:
     1. If a file with the `{image-file-name}`, copy it as `{post-id}-image-{image-number}.{image-file-extension}` into the `content/` directory.  `{image-number}` is an incremental two-digit number (starting from `01` for the post) and `{image-file-extension}` is the extension of the original file.
-    2. If not, output a warning on the command line: `Image {image-file-name} could not be found!` 
-    
+    2. If not, output a warning on the command line: `Image {image-file-name} could not be found!`
+
     Note: `{image-file-name}`  may include a path (so it could, for example, be `../photos/my-photo.jpg`). If no path specified, the current directory (the project root) is assumed.
     
 6. Exit and return to the command line, stating: `Post {post-id} successfully created.` 
@@ -295,6 +299,29 @@ Notes:
 - The `<h1>` is only included if the post has a title.
 - If the post is displayed on an index page, the contents of the `<h1>` and the `<time>` contain a link to the post page. On the individual post page, no links are included.
 
+### Alt texts
+
+Alt texts for images are specified in the post's frontmatter using an optional `images:` list, with one entry per image in file order:
+
+```
+---
+date: 2026-05-21
+images:
+  - Beach hut in the rain
+  - A bowl of bananas
+---
+```
+
+Each `<img>` tag includes an `alt` attribute using the corresponding entry from the `images:` list. If the list is absent or has fewer entries than the post has image files, the remaining images receive `alt=””` (marking them as decorative to screen readers).
+
+If a post has images but the `images:` list is absent or incomplete, a warning is printed during the build:
+
+```
+Warning: Post {post-id} is missing one or more alt texts
+```
+
+The build continues normally — this is a warning, not an error.
+
 ### Read more
 
 If a post's Markdown body contains `<!-- more -->`, the content is split at that marker:
@@ -319,7 +346,7 @@ When there is one or more images for the post, each is included as a `<figure>` 
 <article class="single-post">
   <div class="post-images">
 	  <figure>
-		  <img src="{post-id}-image-{image-number}-resized.{image-file-extension}">
+		  <img src="{post-id}-image-{image-number}-resized.{image-file-extension}" alt="ALT_TEXT">
 	  </figure>
 	  ...
   </div>

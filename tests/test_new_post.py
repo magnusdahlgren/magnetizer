@@ -171,6 +171,44 @@ class TestMarkdownFileCreation:
         expected = f"---\ndate: {today}\ntitle: This is my title\n---\n"
         assert content == expected
 
+    def test_md_images_list_included_when_images_provided(self, project_dir, sample_jpg):
+        run_new_post([str(sample_jpg)], cwd=project_dir)
+        content = (project_dir / "content" / "1.md").read_text()
+        assert "images:" in content
+
+    def test_md_images_placeholder_alt_text(self, project_dir, sample_jpg):
+        run_new_post([str(sample_jpg)], cwd=project_dir)
+        content = (project_dir / "content" / "1.md").read_text()
+        assert "- Image 1" in content
+
+    def test_md_images_placeholder_numbered_correctly(self, project_dir):
+        img1 = project_dir / "photo1.jpg"
+        img2 = project_dir / "photo2.jpg"
+        img1.write_bytes(b"\xff\xd8\xff")
+        img2.write_bytes(b"\xff\xd8\xff")
+        run_new_post([str(img1), str(img2)], cwd=project_dir)
+        content = (project_dir / "content" / "1.md").read_text()
+        assert "- Image 1" in content
+        assert "- Image 2" in content
+
+    def test_md_exact_format_with_image(self, project_dir, sample_jpg):
+        today = date.today().isoformat()
+        run_new_post([str(sample_jpg)], cwd=project_dir)
+        content = (project_dir / "content" / "1.md").read_text()
+        expected = f"---\ndate: {today}\nimages:\n  - Image 1\n---\n"
+        assert content == expected
+
+    def test_md_no_images_key_when_no_images(self, project_dir):
+        run_new_post([], cwd=project_dir)
+        content = (project_dir / "content" / "1.md").read_text()
+        assert "images:" not in content
+
+    def test_md_images_count_matches_copied_not_missing(self, project_dir, sample_jpg):
+        run_new_post([str(sample_jpg), "missing.jpg"], cwd=project_dir)
+        content = (project_dir / "content" / "1.md").read_text()
+        assert "- Image 1" in content
+        assert "- Image 2" not in content
+
     def test_md_frontmatter_wrapped_in_triple_dashes(self, project_dir):
         run_new_post([], cwd=project_dir)
         content = (project_dir / "content" / "1.md").read_text()

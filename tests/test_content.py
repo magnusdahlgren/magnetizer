@@ -133,20 +133,20 @@ class TestImages:
 
     def test_single_image_included(self):
         post = parse_post(make_md(), 1, ["1-image-01.jpg"])
-        assert post.images == ["1-image-01.jpg"]
+        assert post.images[0].filename == "1-image-01.jpg"
 
     def test_multiple_images_in_correct_order(self):
         post = parse_post(make_md(), 1, ["1-image-01.jpg", "1-image-02.png"])
-        assert post.images == ["1-image-01.jpg", "1-image-02.png"]
+        assert [img.filename for img in post.images] == ["1-image-01.jpg", "1-image-02.png"]
 
     def test_images_sorted_by_image_number(self):
         post = parse_post(make_md(), 1, ["1-image-03.jpg", "1-image-01.png", "1-image-02.jpg"])
-        assert post.images == ["1-image-01.png", "1-image-02.jpg", "1-image-03.jpg"]
+        assert [img.filename for img in post.images] == ["1-image-01.png", "1-image-02.jpg", "1-image-03.jpg"]
 
     def test_images_provided_out_of_order_are_sorted(self):
         post = parse_post(make_md(), 1, ["1-image-02.jpg", "1-image-01.jpg"])
-        assert post.images[0] == "1-image-01.jpg"
-        assert post.images[1] == "1-image-02.jpg"
+        assert post.images[0].filename == "1-image-01.jpg"
+        assert post.images[1].filename == "1-image-02.jpg"
 
 
 # ---------------------------------------------------------------------------
@@ -198,3 +198,46 @@ class TestOptionalDate:
     def test_date_set_when_present_in_frontmatter(self):
         post = parse_post(make_md(date="2026-05-24"), 1, [])
         assert post.date == "2026-05-24"
+
+
+# ---------------------------------------------------------------------------
+# Image dataclass and alt texts
+# ---------------------------------------------------------------------------
+
+class TestImageAltTexts:
+
+    def test_images_are_image_objects(self):
+        from magnetizer.content import Image
+        post = parse_post(make_md(), 1, ["1-image-01.jpg"])
+        assert isinstance(post.images[0], Image)
+
+    def test_image_has_filename(self):
+        post = parse_post(make_md(), 1, ["1-image-01.jpg"])
+        assert post.images[0].filename == "1-image-01.jpg"
+
+    def test_image_alt_from_frontmatter(self):
+        md = "---\ndate: 2026-05-24\nimages:\n  - A sunny beach\n---\n"
+        post = parse_post(md, 1, ["1-image-01.jpg"])
+        assert post.images[0].alt == "A sunny beach"
+
+    def test_image_alt_empty_when_no_images_key(self):
+        post = parse_post(make_md(), 1, ["1-image-01.jpg"])
+        assert post.images[0].alt == ""
+
+    def test_image_alt_empty_for_extra_images_beyond_alt_list(self):
+        md = "---\ndate: 2026-05-24\nimages:\n  - First alt\n---\n"
+        post = parse_post(md, 1, ["1-image-01.jpg", "1-image-02.jpg"])
+        assert post.images[0].alt == "First alt"
+        assert post.images[1].alt == ""
+
+    def test_multiple_alts_assigned_in_order(self):
+        md = "---\ndate: 2026-05-24\nimages:\n  - First\n  - Second\n---\n"
+        post = parse_post(md, 1, ["1-image-01.jpg", "1-image-02.jpg"])
+        assert post.images[0].alt == "First"
+        assert post.images[1].alt == "Second"
+
+    def test_colon_in_title_preserved_alongside_images_list(self):
+        md = "---\ndate: 2026-05-24\ntitle: Title: with colon\nimages:\n  - Alt text\n---\n"
+        post = parse_post(md, 1, ["1-image-01.jpg"])
+        assert post.title == "Title: with colon"
+        assert post.images[0].alt == "Alt text"
