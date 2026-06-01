@@ -114,7 +114,7 @@ def render_archive_page_content(posts):
         parts.append('<ul>')
         for post in months[(year, month)]:
             day = _date.fromisoformat(post.date).strftime('%-d')
-            text = f'<strong>{day}</strong> - {post.title}' if post.title else f'<strong>{day}</strong>'
+            text = f'{day} - {post.title}' if post.title else day
             parts.append(f'<li><a href="{post.url}">{text}</a></li>')
         parts.append('</ul>')
         parts.append('</section>')
