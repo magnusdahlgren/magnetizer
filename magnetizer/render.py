@@ -16,12 +16,13 @@ def render_article(post, on_index_page):
 
     if post.images:
         parts.append('<div class="post-images">')
-        for img in post.images:
-            resized = _resized_filename(img)
+        for image in post.images:
+            resized = _resized_filename(image.filename)
+            alt = f' alt="{image.alt}"'
             if on_index_page:
-                parts.append(f'<figure><a href="{post.url}"><img src="{resized}"></a></figure>')
+                parts.append(f'<figure><a href="{post.url}"><img src="{resized}"{alt}></a></figure>')
             else:
-                parts.append(f'<figure><img src="{resized}"></figure>')
+                parts.append(f'<figure><img src="{resized}"{alt}></figure>')
         parts.append('</div>')
 
     if post.title:

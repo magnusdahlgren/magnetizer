@@ -620,3 +620,37 @@ class TestArchivePage:
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         build(p)
         assert "Archive" in (p / "dist" / "archive.html").read_text()
+
+
+# ---------------------------------------------------------------------------
+# Alt text warnings
+# ---------------------------------------------------------------------------
+
+class TestAltTextWarnings:
+
+    def test_warning_printed_when_post_has_images_without_alt_texts(self, tmp_path, capsys):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        build(p)
+        assert "Warning: Post 1 is missing one or more alt texts" in capsys.readouterr().out
+
+    def test_no_warning_when_all_images_have_alt_texts(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\nimages:\n  - Alt text\n---\n\nHello\n"
+        p = make_project(tmp_path, posts={1: md})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        build(p)
+        assert "Warning" not in capsys.readouterr().out
+
+    def test_no_warning_when_post_has_no_images(self, tmp_path, capsys):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "Warning" not in capsys.readouterr().out
+
+    def test_each_warning_printed_only_once(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\nimage:\n  - Alt\n---\n\nHello\n"
+        p = make_project(tmp_path, posts={1: md})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        build(p)
+        output = capsys.readouterr().out
+        assert output.count("unknown frontmatter key") == 1
+        assert output.count("missing one or more alt texts") == 1

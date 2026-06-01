@@ -1,7 +1,16 @@
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import date as _date
 import markdown as _markdown
+
+
+_ALLOWED_FRONTMATTER_KEYS = frozenset({'date', 'title', 'images'})
+
+
+@dataclass
+class Image:
+    filename: str
+    alt: str = ""
 
 
 @dataclass
@@ -12,7 +21,7 @@ class Post:
     title: str | None
     url: str
     body_html: str
-    images: list[str]
+    images: list
     excerpt_html: str | None = None
 
 
@@ -21,10 +30,28 @@ def _parse_frontmatter(text):
     if len(parts) < 3:
         return {}, text.strip()
     fm = {}
-    for line in parts[1].strip().splitlines():
+    lines = parts[1].splitlines()
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        if not line.strip():
+            i += 1
+            continue
         key, sep, value = line.partition(':')
         if sep:
-            fm[key.strip()] = value.strip()
+            key = key.strip()
+            value = value.strip()
+            if not value:
+                items = []
+                i += 1
+                while i < len(lines) and lines[i].strip().startswith('- '):
+                    items.append(lines[i].strip()[2:])
+                    i += 1
+                fm[key] = items
+                continue
+            else:
+                fm[key] = value
+        i += 1
     body = '---'.join(parts[2:]).strip()
     return fm, body
 
@@ -37,17 +64,27 @@ def _format_date_uk(date_str):
 def parse_post(md_text, post_id, image_filenames):
     fm, body = _parse_frontmatter(md_text)
 
+    for key in fm:
+        if key not in _ALLOWED_FRONTMATTER_KEYS:
+            print(f"Warning: Post {post_id} has unknown frontmatter key: '{key}'")
+
     date_str = fm.get('date') or None
     title = fm.get('title') or None
+    alt_texts = fm.get('images') or []
 
     more_parts = body.split('<!-- more -->', 1)
     body_html = _markdown.markdown(more_parts[0] + more_parts[1]) if len(more_parts) == 2 else _markdown.markdown(body) if body else ''
     excerpt_html = _markdown.markdown(more_parts[0].strip()) if len(more_parts) == 2 else None
 
-    images = sorted(
+    sorted_filenames = sorted(
         image_filenames,
         key=lambda f: int(re.search(r'-image-(\d+)', f).group(1)),
     )
+
+    images = [
+        Image(filename=f, alt=str(alt_texts[i]) if i < len(alt_texts) else "")
+        for i, f in enumerate(sorted_filenames)
+    ]
 
     return Post(
         id=post_id,

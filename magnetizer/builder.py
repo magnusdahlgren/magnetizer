@@ -53,11 +53,11 @@ def _delete_post_files(dist_dir, post_id):
 def _build_post(post, dist_dir, content_dir, config):
     _delete_post_files(dist_dir, post.id)
 
-    for img_name in post.images:
-        stem, dot, ext = img_name.rpartition('.')
+    for image in post.images:
+        stem, dot, ext = image.filename.rpartition('.')
         resized_name = f"{stem}-resized.{ext}"
         resize_image(
-            content_dir / img_name,
+            content_dir / image.filename,
             dist_dir / resized_name,
             max_dimension=config["image_max_dimension"],
             quality=config["image_quality"],
@@ -70,6 +70,11 @@ def _post_index_page_url(post_id, all_post_ids_sorted_desc, posts_per_page):
     pos = all_post_ids_sorted_desc.index(post_id)
     page = pos // posts_per_page + 1
     return index_page_url(page)
+
+
+def _warn_if_missing_alt_texts(post):
+    if post.images and any(not img.alt for img in post.images):
+        print(f"Warning: Post {post.id} is missing one or more alt texts")
 
 
 def _adjacent_post_urls(post_id, all_post_ids_sorted_desc):
@@ -110,10 +115,10 @@ def _build_about_page(content_dir, dist_dir, config, template):
     images = _about_image_filenames(content_dir)
     post = parse_post(md_text, "about", images)
 
-    for img_name in images:
-        stem, dot, ext = img_name.rpartition('.')
+    for image in post.images:
+        stem, dot, ext = image.filename.rpartition('.')
         resize_image(
-            content_dir / img_name,
+            content_dir / image.filename,
             dist_dir / f"{stem}-resized.{ext}",
             max_dimension=config["image_max_dimension"],
             quality=config["image_quality"],
@@ -176,6 +181,7 @@ def build(cwd, filename=None, flush=False, resources=False):
     all_post_ids_sorted_desc = sorted(_post_ids_in_content(content_dir), reverse=True)
 
     created = updated = deleted = 0
+    posts_cache = {}
 
     for post_id in post_ids_to_build:
         md_path = content_dir / f"{post_id}.md"
@@ -190,6 +196,8 @@ def build(cwd, filename=None, flush=False, resources=False):
             created += 1
 
         post = _load_post(content_dir, post_id)
+        posts_cache[post_id] = post
+        _warn_if_missing_alt_texts(post)
         _build_post(post, dist_dir, content_dir, config)
         idx_url = _post_index_page_url(post_id, all_post_ids_sorted_desc, config["posts_per_page"])
         newer_url, older_url = _adjacent_post_urls(post_id, all_post_ids_sorted_desc)
@@ -199,7 +207,10 @@ def build(cwd, filename=None, flush=False, resources=False):
         _build_about_page(content_dir, dist_dir, config, template)
 
     if not filename and post_ids_to_build:
-        all_posts = [_load_post(content_dir, pid) for pid in all_post_ids_sorted_desc]
+        all_posts = [
+            posts_cache[pid] if pid in posts_cache else _load_post(content_dir, pid)
+            for pid in all_post_ids_sorted_desc
+        ]
         _write_index_pages(all_posts, dist_dir, config, template)
         (dist_dir / "feed.xml").write_text(render_feed(all_posts, config))
         archive_html = render_template(
