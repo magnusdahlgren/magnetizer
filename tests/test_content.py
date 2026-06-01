@@ -241,3 +241,41 @@ class TestImageAltTexts:
         post = parse_post(md, 1, ["1-image-01.jpg"])
         assert post.title == "Title: with colon"
         assert post.images[0].alt == "Alt text"
+
+
+# ---------------------------------------------------------------------------
+# Frontmatter key validation
+# ---------------------------------------------------------------------------
+
+class TestFrontmatterKeyValidation:
+
+    def test_no_warning_for_valid_keys(self, capsys):
+        parse_post(make_md(date="2026-05-24", title="Hello"), 1, [])
+        assert "Warning" not in capsys.readouterr().out
+
+    def test_warning_for_unknown_key(self, capsys):
+        md = "---\ndate: 2026-05-24\nfoo: bar\n---\n"
+        parse_post(md, 1, [])
+        assert "Warning" in capsys.readouterr().out
+
+    def test_warning_mentions_post_id(self, capsys):
+        md = "---\ndate: 2026-05-24\nfoo: bar\n---\n"
+        parse_post(md, 12, [])
+        assert "12" in capsys.readouterr().out
+
+    def test_warning_mentions_unknown_key(self, capsys):
+        md = "---\ndate: 2026-05-24\nfoo: bar\n---\n"
+        parse_post(md, 1, [])
+        assert "foo" in capsys.readouterr().out
+
+    def test_warning_for_each_unknown_key(self, capsys):
+        md = "---\ndate: 2026-05-24\nfoo: bar\nbaz: qux\n---\n"
+        parse_post(md, 1, [])
+        output = capsys.readouterr().out
+        assert "foo" in output
+        assert "baz" in output
+
+    def test_images_key_is_allowed(self, capsys):
+        md = "---\ndate: 2026-05-24\nimages:\n  - Alt text\n---\n"
+        parse_post(md, 1, ["1-image-01.jpg"])
+        assert "Warning" not in capsys.readouterr().out

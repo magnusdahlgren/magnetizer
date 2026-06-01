@@ -4,6 +4,9 @@ from datetime import date as _date
 import markdown as _markdown
 
 
+_ALLOWED_FRONTMATTER_KEYS = frozenset({'date', 'title', 'images'})
+
+
 @dataclass
 class Image:
     filename: str
@@ -60,6 +63,10 @@ def _format_date_uk(date_str):
 
 def parse_post(md_text, post_id, image_filenames):
     fm, body = _parse_frontmatter(md_text)
+
+    for key in fm:
+        if key not in _ALLOWED_FRONTMATTER_KEYS:
+            print(f"Warning: Post {post_id} has unknown frontmatter key: '{key}'")
 
     date_str = fm.get('date') or None
     title = fm.get('title') or None
