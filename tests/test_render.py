@@ -62,6 +62,24 @@ class TestRenderArticleStructure:
         html = render_article(make_post(), on_index_page=True)
         assert 'class="multiple-posts"' in html
 
+    def test_article_no_aria_label_when_titled(self):
+        html = render_article(make_post(title="My Post"), on_index_page=False)
+        assert 'aria-label' not in html
+
+    def test_article_has_aria_label_when_untitled(self):
+        html = render_article(make_post(title=None, id=12, date_uk="5 May 2026"), on_index_page=False)
+        assert 'aria-label=' in html
+
+    def test_article_aria_label_includes_post_id_and_date(self):
+        html = render_article(make_post(title=None, id=12, date_uk="5 May 2026"), on_index_page=False)
+        assert 'aria-label="Post 12 (5 May 2026)"' in html
+
+    def test_article_aria_label_without_date_when_no_date(self):
+        post = Post(id=12, date=None, date_uk=None, title=None,
+                    url="12.html", body_html="", images=[])
+        html = render_article(post, on_index_page=False)
+        assert 'aria-label="Post 12"' in html
+
     def test_post_body_present(self):
         html = render_article(make_post(body_html="<p>Hello</p>"), on_index_page=False)
         assert "<p>Hello</p>" in html
