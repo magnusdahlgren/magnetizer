@@ -210,6 +210,26 @@ class TestRenderArticleImages:
 
 
 # ---------------------------------------------------------------------------
+# render_article — title HTML escaping
+# ---------------------------------------------------------------------------
+
+class TestRenderArticleTitleEscaping:
+
+    def test_title_ampersand_escaped_on_post_page(self):
+        html = render_article(make_post(title="A & B"), on_index_page=False)
+        assert "&amp;" in html
+        assert "<h1>A & B</h1>" not in html
+
+    def test_title_ampersand_escaped_on_index_page(self):
+        html = render_article(make_post(title="A & B"), on_index_page=True)
+        assert "&amp;" in html
+
+    def test_title_angle_bracket_escaped_on_post_page(self):
+        html = render_article(make_post(title="A > B"), on_index_page=False)
+        assert "&gt;" in html
+
+
+# ---------------------------------------------------------------------------
 # render_post_page_content
 # ---------------------------------------------------------------------------
 
@@ -541,3 +561,8 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
         assert ">3<" in html
         assert ">03<" not in html
+
+    def test_titled_post_title_escaped_in_archive(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="A & B")])
+        assert "&amp;" in html
+        assert ">A & B<" not in html

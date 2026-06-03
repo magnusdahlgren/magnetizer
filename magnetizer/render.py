@@ -28,9 +28,9 @@ def render_article(post, on_index_page):
 
     if post.title:
         if on_index_page:
-            parts.append(f'<h1><a href="{post.url}">{post.title}</a></h1>')
+            parts.append(f'<h1><a href="{post.url}">{_escape(post.title)}</a></h1>')
         else:
-            parts.append(f'<h1>{post.title}</h1>')
+            parts.append(f'<h1>{_escape(post.title)}</h1>')
 
     if on_index_page and post.excerpt_html is not None:
         parts.append(f'<div class="post-body">{post.excerpt_html}<a href="{post.url}" class="read-more">Read more →</a></div>')
@@ -116,7 +116,7 @@ def render_archive_page_content(posts):
         parts.append('<ul>')
         for post in months[(year, month)]:
             day = str(_date.fromisoformat(post.date).day)
-            text = f'{day} - {post.title}' if post.title else day
+            text = f'{day} - {_escape(post.title)}' if post.title else day
             parts.append(f'<li><a href="{post.url}">{text}</a></li>')
         parts.append('</ul>')
         parts.append('</section>')
