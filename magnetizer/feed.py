@@ -1,3 +1,6 @@
+import html as _html
+
+
 def _rfc3339(date_str, post_id):
     h = (post_id // 3600) % 24
     m = (post_id // 60) % 60
@@ -7,9 +10,10 @@ def _rfc3339(date_str, post_id):
 
 def render_feed(posts, config):
     site_url = config["site_url"].rstrip('/')
-    site_title = config["site_title"]
+    site_title = _html.escape(config["site_title"])
     feed_url = f"{site_url}/feed.xml"
-    most_recent_date = _rfc3339(posts[0].date, posts[0].id) if posts else ""
+    dated_posts = [p for p in posts if p.date]
+    most_recent_date = _rfc3339(dated_posts[0].date, dated_posts[0].id) if dated_posts else ""
 
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
@@ -22,9 +26,9 @@ def render_feed(posts, config):
         f'  <author><name>{site_title}</name></author>',
     ]
 
-    for post in posts:
+    for post in dated_posts:
         post_url = f"{site_url}/{post.url}"
-        title = post.title if post.title else post.date_uk
+        title = _html.escape(post.title if post.title else post.date_uk)
         lines += [
             '  <entry>',
             f'    <title>{title}</title>',

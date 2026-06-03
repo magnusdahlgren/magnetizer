@@ -58,7 +58,7 @@ def _parse_frontmatter(text):
 
 def _format_date_uk(date_str):
     d = _date.fromisoformat(date_str)
-    return d.strftime('%-d %B %Y')
+    return f"{d.day} {d.strftime('%B %Y')}"
 
 
 def parse_post(md_text, post_id, image_filenames):
@@ -73,8 +73,12 @@ def parse_post(md_text, post_id, image_filenames):
     alt_texts = fm.get('images') or []
 
     more_parts = body.split('<!-- more -->', 1)
-    body_html = _markdown.markdown(more_parts[0] + more_parts[1]) if len(more_parts) == 2 else _markdown.markdown(body) if body else ''
-    excerpt_html = _markdown.markdown(more_parts[0].strip()) if len(more_parts) == 2 else None
+    if len(more_parts) == 2:
+        body_html = _markdown.markdown(more_parts[0] + '\n\n' + more_parts[1])
+        excerpt_html = _markdown.markdown(more_parts[0].strip())
+    else:
+        body_html = _markdown.markdown(body) if body else ''
+        excerpt_html = None
 
     sorted_filenames = sorted(
         image_filenames,

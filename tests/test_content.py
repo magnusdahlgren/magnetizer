@@ -180,6 +180,11 @@ class TestReadMore:
         post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
         assert "<!-- more -->" not in post.body_html
 
+    def test_body_html_preserves_paragraph_break_when_more_tag_inline(self):
+        post = parse_post(make_md(body="Intro.<!-- more -->Rest."), 1, [])
+        assert "<p>Intro.</p>" in post.body_html
+        assert "<p>Rest.</p>" in post.body_html
+
 
 # ---------------------------------------------------------------------------
 # Optional date
