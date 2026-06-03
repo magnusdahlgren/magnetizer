@@ -1,4 +1,5 @@
 from datetime import date as _date
+from html import escape as _escape
 
 
 def _resized_filename(original):
@@ -18,7 +19,7 @@ def render_article(post, on_index_page):
         parts.append('<div class="post-images">')
         for image in post.images:
             resized = _resized_filename(image.filename)
-            alt = f' alt="{image.alt}"'
+            alt = f' alt="{_escape(image.alt, quote=True)}"'
             if on_index_page:
                 parts.append(f'<figure><a href="{post.url}"><img src="{resized}"{alt}></a></figure>')
             else:
@@ -114,7 +115,7 @@ def render_archive_page_content(posts):
         parts.append(f'<h2>{label}</h2>')
         parts.append('<ul>')
         for post in months[(year, month)]:
-            day = _date.fromisoformat(post.date).strftime('%-d')
+            day = str(_date.fromisoformat(post.date).day)
             text = f'{day} - {post.title}' if post.title else day
             parts.append(f'<li><a href="{post.url}">{text}</a></li>')
         parts.append('</ul>')

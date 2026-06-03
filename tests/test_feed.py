@@ -163,3 +163,53 @@ class TestEntryStructure:
         root = parse([make_post()])
         entry = root.find(el("entry"))
         assert entry.find(el("author")) is None
+
+
+# ---------------------------------------------------------------------------
+# XML safety
+# ---------------------------------------------------------------------------
+
+class TestFeedXmlSafety:
+
+    def test_site_title_with_ampersand_produces_valid_xml(self):
+        config = {**CONFIG, "site_title": "Photos & Notes"}
+        xml = render_feed([make_post()], config)
+        ET.fromstring(xml)  # would raise ParseError if invalid
+
+    def test_post_title_with_ampersand_produces_valid_xml(self):
+        xml = render_feed([make_post(title="A & B")], CONFIG)
+        ET.fromstring(xml)
+
+    def test_post_title_with_angle_bracket_produces_valid_xml(self):
+        xml = render_feed([make_post(title="A > B")], CONFIG)
+        ET.fromstring(xml)
+
+    def test_site_title_special_chars_escaped_in_feed_title(self):
+        config = {**CONFIG, "site_title": "Photos & Notes"}
+        root = parse([make_post()], config=config)
+        assert root.find(el("title")).text == "Photos & Notes"
+
+    def test_post_title_special_chars_escaped_in_entry_title(self):
+        root = parse([make_post(title="A & B")])
+        entry = root.find(el("entry"))
+        assert entry.find(el("title")).text == "A & B"
+
+    def test_undated_post_excluded_from_feed(self):
+        dated = make_post(id=2, date="2026-05-24")
+        undated = Post(id=1, date=None, date_uk=None, title="No date",
+                       url="1.html", body_html="", images=[])
+        root = parse([dated, undated])
+        assert len(root.findall(el("entry"))) == 1
+
+    def test_feed_valid_xml_when_all_posts_undated(self):
+        undated = Post(id=1, date=None, date_uk=None, title=None,
+                       url="1.html", body_html="", images=[])
+        xml = render_feed([undated], CONFIG)
+        ET.fromstring(xml)  # must not raise
+
+    def test_feed_updated_uses_most_recent_dated_post(self):
+        dated = make_post(id=2, date="2026-05-24")
+        undated = Post(id=3, date=None, date_uk=None, title=None,
+                       url="3.html", body_html="", images=[])
+        root = parse([undated, dated])
+        assert root.find(el("updated")).text == "2026-05-24T00:00:02Z"

@@ -198,6 +198,16 @@ class TestRenderArticleImages:
         html = render_article(make_post(id=1, images=["1-image-01.jpg"]), on_index_page=False)
         assert 'alt=""' in html
 
+    def test_img_alt_double_quote_escaped(self):
+        img = Image(filename="1-image-01.jpg", alt='Say "hello"')
+        html = render_article(make_post(id=1, images=[img]), on_index_page=False)
+        assert 'alt="Say &quot;hello&quot;"' in html
+
+    def test_img_alt_ampersand_escaped(self):
+        img = Image(filename="1-image-01.jpg", alt="A & B")
+        html = render_article(make_post(id=1, images=[img]), on_index_page=False)
+        assert 'alt="A &amp; B"' in html
+
 
 # ---------------------------------------------------------------------------
 # render_post_page_content
@@ -526,3 +536,8 @@ class TestRenderArchivePageContent:
     def test_empty_posts_list(self):
         html = render_archive_page_content([])
         assert "<main>" in html
+
+    def test_day_is_plain_integer_string(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
+        assert ">3<" in html
+        assert ">03<" not in html

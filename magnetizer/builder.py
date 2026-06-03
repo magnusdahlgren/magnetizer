@@ -54,7 +54,7 @@ def _build_post(post, dist_dir, content_dir, config):
     _delete_post_files(dist_dir, post.id)
 
     for image in post.images:
-        stem, dot, ext = image.filename.rpartition('.')
+        stem, _, ext = image.filename.rpartition('.')
         resized_name = f"{stem}-resized.{ext}"
         resize_image(
             content_dir / image.filename,
@@ -62,8 +62,6 @@ def _build_post(post, dist_dir, content_dir, config):
             max_dimension=config["image_max_dimension"],
             quality=config["image_quality"],
         )
-
-    return post
 
 
 def _post_index_page_url(post_id, all_post_ids_sorted_desc, posts_per_page):
@@ -116,7 +114,7 @@ def _build_about_page(content_dir, dist_dir, config, template):
     post = parse_post(md_text, "about", images)
 
     for image in post.images:
-        stem, dot, ext = image.filename.rpartition('.')
+        stem, _, ext = image.filename.rpartition('.')
         resize_image(
             content_dir / image.filename,
             dist_dir / f"{stem}-resized.{ext}",
