@@ -526,9 +526,9 @@ class TestRenderArticleReadMore:
 # render_archive_page_content
 # ---------------------------------------------------------------------------
 
-def make_dated_post(id, date, title=None):
+def make_dated_post(id, date, title=None, body_html="", images=None):
     return Post(id=id, date=date, date_uk="", title=title,
-                url=f"{id}.html", body_html="", images=[])
+                url=f"{id}.html", body_html=body_html, images=images or [])
 
 
 class TestRenderArchivePageContent:
@@ -558,9 +558,9 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Sunny day")])
         assert "24 - Sunny day" in html
 
-    def test_untitled_post_shows_day_only(self):
+    def test_untitled_imageless_post_shows_photo(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
-        assert ">3<" in html
+        assert "Photo" in html
 
     def test_day_has_no_leading_zero(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
@@ -591,12 +591,98 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([])
         assert "<main>" in html
 
-    def test_day_is_plain_integer_string(self):
-        html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
-        assert ">3<" in html
-        assert ">03<" not in html
+    def test_day_has_no_leading_zero_in_description(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-03", title="Post")])
+        assert "3 - Post" in html
+        assert "03 - Post" not in html
 
     def test_titled_post_title_escaped_in_archive(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="A & B")])
         assert "&amp;" in html
         assert ">A & B<" not in html
+
+
+# ---------------------------------------------------------------------------
+# render_archive_page_content — post descriptions
+# ---------------------------------------------------------------------------
+
+class TestArchiveDescriptions:
+
+    def test_titled_post_shows_title(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="My Title")])
+        assert "My Title" in html
+
+    def test_untitled_post_with_short_text_shows_full_text(self):
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24", body_html="<p>A short thought.</p>")
+        ])
+        assert "A short thought." in html
+
+    def test_untitled_post_with_text_at_36_chars_not_truncated(self):
+        text = "a" * 36
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24", body_html=f"<p>{text}</p>")
+        ])
+        assert text in html
+        assert "…" not in html
+
+    def test_untitled_post_with_text_over_36_chars_truncated(self):
+        text = "a" * 37
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24", body_html=f"<p>{text}</p>")
+        ])
+        assert "a" * 36 + "…" in html
+
+    def test_truncation_breaks_at_word_boundary(self):
+        # 36-char cut falls mid-word in "lazy" — should truncate before it
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24",
+                            body_html="<p>The quick brown fox jumps over the lazy dog.</p>")
+        ])
+        assert "The quick brown fox jumps over the…" in html
+
+    def test_truncation_does_not_cut_mid_word(self):
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24",
+                            body_html="<p>The quick brown fox jumps over the lazy dog.</p>")
+        ])
+        assert "the l…" not in html
+
+    def test_untitled_post_with_only_images_shows_photo(self):
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg")])
+        ])
+        assert "Photo" in html
+
+    def test_untitled_post_with_no_content_shows_photo(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert "Photo" in html
+
+    def test_untitled_post_with_text_and_images_shows_text_not_photo(self):
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24",
+                            body_html="<p>Has text.</p>",
+                            images=[Image("1-image-01.jpg")])
+        ])
+        assert "Has text." in html
+        assert "Photo" not in html
+
+    def test_uses_first_paragraph_only(self):
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24", body_html="<p>First.</p><p>Second.</p>")
+        ])
+        assert "First." in html
+        assert "Second." not in html
+
+    def test_inline_html_stripped_from_description(self):
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24", body_html="<p>Hello <strong>world</strong>.</p>")
+        ])
+        assert "Hello world." in html
+        assert "<strong>" not in html
+
+    def test_description_html_escaped(self):
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24", body_html="<p>A &amp; B</p>")
+        ])
+        assert "A &amp; B" in html

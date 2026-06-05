@@ -1,5 +1,6 @@
+import re
 from datetime import date as _date
-from html import escape as _escape
+from html import escape as _escape, unescape as _unescape
 
 
 def _resized_filename(original):
@@ -105,6 +106,21 @@ def render_template(template_html, title, content):
     return template_html.replace('MAGNETIZER_TITLE', title).replace('MAGNETIZER_CONTENT', content)
 
 
+def _archive_description(post):
+    if post.title:
+        return _escape(post.title)
+    if post.body_html:
+        m = re.search(r'<p\b[^>]*>(.*?)</p>', post.body_html, re.DOTALL | re.IGNORECASE)
+        if m:
+            text = _unescape(re.sub(r'<[^>]+>', '', m.group(1))).strip()
+            if text:
+                if len(text) <= 36:
+                    return _escape(text)
+                truncated = text[:36].rsplit(' ', 1)[0]
+                return _escape(truncated) + '…'
+    return 'Photo'
+
+
 def render_archive_page_content(posts):
     dated_posts = [p for p in posts if p.date]
 
@@ -122,8 +138,7 @@ def render_archive_page_content(posts):
         parts.append('<ul>')
         for post in months[(year, month)]:
             day = str(_date.fromisoformat(post.date).day)
-            text = f'{day} - {_escape(post.title)}' if post.title else day
-            parts.append(f'<li><a href="{post.url}">{text}</a></li>')
+            parts.append(f'<li><a href="{post.url}">{day} - {_archive_description(post)}</a></li>')
         parts.append('</ul>')
         parts.append('</section>')
     parts.append('</main>')
