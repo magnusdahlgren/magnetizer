@@ -110,13 +110,14 @@ def _archive_description(post):
     if post.title:
         return _escape(post.title)
     if post.body_html:
-        m = re.search(r'<p>(.*?)</p>', post.body_html, re.DOTALL)
+        m = re.search(r'<p\b[^>]*>(.*?)</p>', post.body_html, re.DOTALL | re.IGNORECASE)
         if m:
             text = _unescape(re.sub(r'<[^>]+>', '', m.group(1))).strip()
             if text:
                 if len(text) <= 36:
                     return _escape(text)
-                return _escape(text[:36].rstrip()) + '…'
+                truncated = text[:36].rsplit(' ', 1)[0]
+                return _escape(truncated) + '…'
     return 'Photo'
 
 

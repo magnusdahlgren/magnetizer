@@ -633,11 +633,20 @@ class TestArchiveDescriptions:
         ])
         assert "a" * 36 + "…" in html
 
-    def test_untitled_post_with_long_text_strips_to_36_chars(self):
+    def test_truncation_breaks_at_word_boundary(self):
+        # 36-char cut falls mid-word in "lazy" — should truncate before it
         html = render_archive_page_content([
-            make_dated_post(1, "2026-05-24", body_html="<p>This is a longer text that will need truncating.</p>")
+            make_dated_post(1, "2026-05-24",
+                            body_html="<p>The quick brown fox jumps over the lazy dog.</p>")
         ])
-        assert "This is a longer text that will need…" in html
+        assert "The quick brown fox jumps over the…" in html
+
+    def test_truncation_does_not_cut_mid_word(self):
+        html = render_archive_page_content([
+            make_dated_post(1, "2026-05-24",
+                            body_html="<p>The quick brown fox jumps over the lazy dog.</p>")
+        ])
+        assert "the l…" not in html
 
     def test_untitled_post_with_only_images_shows_photo(self):
         html = render_archive_page_content([
