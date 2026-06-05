@@ -80,6 +80,22 @@ class TestRenderArticleStructure:
         html = render_article(post, on_index_page=False)
         assert 'aria-label="Post 12"' in html
 
+    def test_micro_post_has_micro_post_class_on_post_page(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title=None,
+                    url="1.html", body_html="<p>Short.</p>", images=[], is_micro=True)
+        html = render_article(post, on_index_page=False)
+        assert 'class="single-post micro-post"' in html
+
+    def test_micro_post_has_micro_post_class_on_index_page(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title=None,
+                    url="1.html", body_html="<p>Short.</p>", images=[], is_micro=True)
+        html = render_article(post, on_index_page=True)
+        assert 'class="multiple-posts micro-post"' in html
+
+    def test_non_micro_post_has_no_micro_post_class(self):
+        html = render_article(make_post(), on_index_page=False)
+        assert "micro-post" not in html
+
     def test_post_body_present(self):
         html = render_article(make_post(body_html="<p>Hello</p>"), on_index_page=False)
         assert "<p>Hello</p>" in html
