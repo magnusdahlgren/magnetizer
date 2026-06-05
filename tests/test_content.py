@@ -284,3 +284,44 @@ class TestFrontmatterKeyValidation:
         md = "---\ndate: 2026-05-24\nimages:\n  - Alt text\n---\n"
         parse_post(md, 1, ["1-image-01.jpg"])
         assert "Warning" not in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
+# Micro-post detection
+# ---------------------------------------------------------------------------
+
+class TestMicroPost:
+
+    def test_is_micro_when_no_title_no_images_short_body(self):
+        post = parse_post(make_md(body="A short post."), 1, [])
+        assert post.is_micro is True
+
+    def test_not_micro_when_title_present(self):
+        post = parse_post(make_md(title="My Title", body="A short post."), 1, [])
+        assert post.is_micro is False
+
+    def test_not_micro_when_images_present(self):
+        post = parse_post(make_md(body="A short post."), 1, ["1-image-01.jpg"])
+        assert post.is_micro is False
+
+    def test_not_micro_when_body_exceeds_limit(self):
+        post = parse_post(make_md(body="x" * 181), 1, [])
+        assert post.is_micro is False
+
+    def test_is_micro_at_exactly_180_characters(self):
+        post = parse_post(make_md(body="x" * 180), 1, [])
+        assert post.is_micro is True
+
+    def test_not_micro_at_181_characters(self):
+        post = parse_post(make_md(body="x" * 181), 1, [])
+        assert post.is_micro is False
+
+    def test_character_count_uses_normalised_whitespace(self):
+        # Extra newlines and spaces should not inflate the count
+        body = "Short post.\n\n\n\n"
+        post = parse_post(make_md(body=body), 1, [])
+        assert post.is_micro is True
+
+    def test_not_micro_when_body_is_empty(self):
+        post = parse_post(make_md(), 1, [])
+        assert post.is_micro is False

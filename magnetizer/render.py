@@ -13,6 +13,8 @@ def index_page_url(page_num):
 
 def render_article(post, on_index_page):
     article_class = "multiple-posts" if on_index_page else "single-post"
+    if post.is_micro:
+        article_class += " micro-post"
     if not post.title:
         aria = f' aria-label="Post {post.id} ({post.date_uk})"' if post.date_uk else f' aria-label="Post {post.id}"'
     else:

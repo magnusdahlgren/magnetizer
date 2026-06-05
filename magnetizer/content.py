@@ -23,6 +23,7 @@ class Post:
     body_html: str
     images: list
     excerpt_html: str | None = None
+    is_micro: bool = False
 
 
 def _parse_frontmatter(text):
@@ -90,6 +91,9 @@ def parse_post(md_text, post_id, image_filenames):
         for i, f in enumerate(sorted_filenames)
     ]
 
+    text = re.sub(r'\s+', ' ', body).strip()
+    is_micro = title is None and not image_filenames and 0 < len(text) <= 180
+
     return Post(
         id=post_id,
         date=date_str,
@@ -99,4 +103,5 @@ def parse_post(md_text, post_id, image_filenames):
         body_html=body_html,
         images=images,
         excerpt_html=excerpt_html,
+        is_micro=is_micro,
     )
