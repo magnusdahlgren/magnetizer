@@ -18,6 +18,7 @@ def main():
     parser.add_argument("--flush", action="store_true")
     parser.add_argument("--resources", action="store_true")
     parser.add_argument("--push", action="store_true")
+    parser.add_argument("--verbose", action="store_true")
     args = parser.parse_args()
 
     if args.filename and any([args.flush, args.resources, args.push]):
@@ -30,6 +31,10 @@ def main():
         flush=args.flush,
         resources=args.resources,
     )
+
+    if args.verbose:
+        for action, name in outcome["log"]:
+            print(f"{action}: {name}")
 
     print(
         f"{outcome['created']} post(s) created, "

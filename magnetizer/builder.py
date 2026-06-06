@@ -159,6 +159,8 @@ def _copy_resources(resources_dir, dist_dir, replace=False):
         shutil.rmtree(dest)
     if not dest.exists():
         shutil.copytree(resources_dir, dest)
+        return True
+    return False
 
 
 def build(cwd, filename=None, flush=False, resources=False):
@@ -188,6 +190,7 @@ def build(cwd, filename=None, flush=False, resources=False):
             manifest_path.unlink()
 
     manifest = load_manifest(manifest_path)
+    log = []
 
     about_md = content_dir / "about.md"
     cookies_md = content_dir / "cookies.md"
@@ -197,11 +200,13 @@ def build(cwd, filename=None, flush=False, resources=False):
         if stem == "about":
             if about_md.exists():
                 _build_about_page(content_dir, dist_dir, config, template)
-            return {"created": 0, "updated": 0, "deleted": 0}
+                log.append(("UPDATED", "about.html"))
+            return {"created": 0, "updated": 0, "deleted": 0, "log": log}
         if stem == "cookies":
             if cookies_md.exists():
                 _build_cookies_page(content_dir, dist_dir, config, template)
-            return {"created": 0, "updated": 0, "deleted": 0}
+                log.append(("UPDATED", "cookies.html"))
+            return {"created": 0, "updated": 0, "deleted": 0, "log": log}
         post_id = int(Path(filename).stem)
         changed_post_ids = {post_id}
         post_ids_to_build = {post_id}
@@ -227,10 +232,12 @@ def build(cwd, filename=None, flush=False, resources=False):
             if post_id in changed_post_ids:
                 _delete_post_files(dist_dir, post_id)
                 deleted += 1
+                log.append(("REMOVED", f"{post_id}.html"))
             continue
 
+        action = "UPDATED" if f"{post_id}.md" in manifest else "CREATED"
         if post_id in changed_post_ids:
-            if f"{post_id}.md" in manifest:
+            if action == "UPDATED":
                 updated += 1
             else:
                 created += 1
@@ -239,23 +246,31 @@ def build(cwd, filename=None, flush=False, resources=False):
         posts_cache[post_id] = post
         _warn_if_missing_alt_texts(post)
         _build_post(post, dist_dir, content_dir, config)
+        for image in post.images:
+            stem, _, ext = image.filename.rpartition('.')
+            log.append(("RESIZED", f"{stem}-resized.{ext}"))
         idx_url = _post_index_page_url(post_id, all_post_ids_sorted_desc, config["posts_per_page"])
         newer_url, older_url = _adjacent_post_urls(post_id, all_post_ids_sorted_desc)
         _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url)
+        log.append((action, f"{post_id}.html"))
 
     if about_md.exists():
         _build_about_page(content_dir, dist_dir, config, template)
+        log.append(("UPDATED", "about.html"))
     elif not filename:
         about_html = dist_dir / "about.html"
         if about_html.exists():
             about_html.unlink()
+            log.append(("REMOVED", "about.html"))
 
     if cookies_md.exists():
         _build_cookies_page(content_dir, dist_dir, config, template)
+        log.append(("UPDATED", "cookies.html"))
     elif not filename:
         cookies_html = dist_dir / "cookies.html"
         if cookies_html.exists():
             cookies_html.unlink()
+            log.append(("REMOVED", "cookies.html"))
 
     if not filename and post_ids_to_build:
         all_posts = [
@@ -263,15 +278,22 @@ def build(cwd, filename=None, flush=False, resources=False):
             for pid in all_post_ids_sorted_desc
         ]
         _write_index_pages(all_posts, dist_dir, config, template)
+        per_page = config["posts_per_page"]
+        total_pages = max(1, (len(all_posts) + per_page - 1) // per_page)
+        for page_num in range(1, total_pages + 1):
+            log.append(("UPDATED", index_page_url(page_num)))
         (dist_dir / "feed.xml").write_text(render_feed(all_posts, config))
+        log.append(("UPDATED", "feed.xml"))
         archive_html = render_template(
             template,
             title=render_page_title(config["site_title"], "Archive", page_num=None),
             content=render_archive_page_content(all_posts),
         )
         (dist_dir / "archive.html").write_text(archive_html)
+        log.append(("UPDATED", "archive.html"))
         save_manifest(content_dir, manifest_path)
 
-    _copy_resources(cwd / "resources", dist_dir, replace=resources or flush)
+    if _copy_resources(cwd / "resources", dist_dir, replace=resources or flush):
+        log.append(("COPIED", "resources/"))
 
-    return {"created": created, "updated": updated, "deleted": deleted}
+    return {"created": created, "updated": updated, "deleted": deleted, "log": log}

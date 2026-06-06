@@ -196,3 +196,41 @@ class TestCLIOutcome:
         assert "0 post(s) created" in result.stdout
         assert "0 post(s) updated" in result.stdout
         assert "0 post(s) deleted" in result.stdout
+
+
+# ---------------------------------------------------------------------------
+# --verbose
+# ---------------------------------------------------------------------------
+
+class TestCLIVerbose:
+
+    def test_verbose_shows_created_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build(["--verbose"], cwd=p)
+        assert "CREATED: 1.html" in result.stdout
+
+    def test_verbose_shows_index_page(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build(["--verbose"], cwd=p)
+        assert "UPDATED: index.html" in result.stdout
+
+    def test_verbose_shows_feed(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build(["--verbose"], cwd=p)
+        assert "UPDATED: feed.xml" in result.stdout
+
+    def test_verbose_shows_resources(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build(["--verbose"], cwd=p)
+        assert "COPIED: resources/" in result.stdout
+
+    def test_no_action_lines_without_verbose(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build([], cwd=p)
+        assert "CREATED:" not in result.stdout
+        assert "UPDATED:" not in result.stdout
+
+    def test_verbose_compatible_with_single_file(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        result = run_build(["1.md", "--verbose"], cwd=p)
+        assert result.returncode == 0
