@@ -269,7 +269,8 @@ class TestIncrementalBuild:
         build(p)
         mtime_before = (p / "dist" / "4.html").stat().st_mtime
 
-        import time; time.sleep(0.01)
+        import time
+        time.sleep(0.01)
         (p / "content" / "2.md").write_text(MINIMAL_MD)
 
         build(p)
@@ -280,7 +281,8 @@ class TestIncrementalBuild:
         build(p)
         mtime_before = (p / "dist" / "2.html").stat().st_mtime
 
-        import time; time.sleep(0.01)
+        import time
+        time.sleep(0.01)
         (p / "content" / "2.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
 
         build(p)
@@ -290,7 +292,8 @@ class TestIncrementalBuild:
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         build(p)
 
-        import time; time.sleep(0.01)
+        import time
+        time.sleep(0.01)
         (p / "content" / "1.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
         new_mtime = (p / "content" / "1.md").stat().st_mtime
 
