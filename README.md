@@ -73,7 +73,7 @@ Run `build.py` from your project directory.
 | `build.py --flush` | Delete all output and rebuild everything from scratch |
 | `build.py --resources` | Replace `dist/resources/` with the current `resources/` |
 | `build.py --push` | Build, then push `dist/` to GitHub Pages |
-| `build.py 1.md` | Preview a single post (does not update index pages) |
+| `build.py 1.md` | Preview a single post or special page (does not update index pages) |
 
 Use `--flush` after editing templates. Use `--resources` after editing CSS or JS.
 
@@ -92,6 +92,8 @@ All files live flat in `content/` — no subdirectories.
 
 - Markdown files: `{post-id}.md` (e.g. `42.md`)
 - Image files: `{post-id}-image-{nn}.jpg/jpeg/png` (e.g. `42-image-01.jpg`)
+- `about.md` — optional static about page (supports images as `about-image-{nn}.jpg/jpeg/png`)
+- `cookies.md` — optional static cookies/privacy page
 
 Posts are displayed in reverse order by post ID — a higher ID means a newer post.
 
