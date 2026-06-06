@@ -108,6 +108,15 @@ def _about_image_filenames(content_dir):
     return sorted(f.name for f in content_dir.iterdir() if pattern.match(f.name))
 
 
+def _build_cookies_page(content_dir, dist_dir, config, template):
+    md_text = (content_dir / "cookies.md").read_text()
+    post = parse_post(md_text, "cookies", [])
+    content_html = render_post_page_content(post, "index.html", back_url="index.html")
+    title = render_page_title(config["site_title"], post.title, page_num=None)
+    html = render_template(template, title=title, content=content_html)
+    (dist_dir / "cookies.html").write_text(html)
+
+
 def _build_about_page(content_dir, dist_dir, config, template):
     md_text = (content_dir / "about.md").read_text()
     images = _about_image_filenames(content_dir)
@@ -165,11 +174,17 @@ def build(cwd, filename=None, flush=False, resources=False):
     manifest = load_manifest(manifest_path)
 
     about_md = content_dir / "about.md"
+    cookies_md = content_dir / "cookies.md"
 
     if filename:
-        if Path(filename).stem == "about":
+        stem = Path(filename).stem
+        if stem == "about":
             if about_md.exists():
                 _build_about_page(content_dir, dist_dir, config, template)
+            return {"created": 0, "updated": 0, "deleted": 0}
+        if stem == "cookies":
+            if cookies_md.exists():
+                _build_cookies_page(content_dir, dist_dir, config, template)
             return {"created": 0, "updated": 0, "deleted": 0}
         post_id = int(Path(filename).stem)
         post_ids_to_build = {post_id}
@@ -203,6 +218,17 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     if about_md.exists():
         _build_about_page(content_dir, dist_dir, config, template)
+    elif not filename:
+        about_html = dist_dir / "about.html"
+        if about_html.exists():
+            about_html.unlink()
+
+    if cookies_md.exists():
+        _build_cookies_page(content_dir, dist_dir, config, template)
+    elif not filename:
+        cookies_html = dist_dir / "cookies.html"
+        if cookies_html.exists():
+            cookies_html.unlink()
 
     if not filename and post_ids_to_build:
         all_posts = [

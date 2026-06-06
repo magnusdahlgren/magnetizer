@@ -39,7 +39,7 @@ def validate_content(content_dir):
     has_about_images = any(_ABOUT_IMAGE_PATTERN.match(n) for n in files)
 
     for name in files:
-        if name == 'about.md':
+        if name in ('about.md', 'cookies.md'):
             continue
         if _ABOUT_IMAGE_PATTERN.match(name):
             if not has_about:

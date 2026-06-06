@@ -525,6 +525,115 @@ class TestAboutPage:
         build(p)
         assert (p / "dist" / "about-image-01-resized.jpg").exists()
 
+    def test_about_html_removed_when_about_md_deleted(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert (p / "dist" / "about.html").exists()
+        (p / "content" / "about.md").unlink()
+        build(p)
+        assert not (p / "dist" / "about.html").exists()
+
+    def test_single_file_build_does_not_remove_about_html(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        (p / "content" / "about.md").unlink()
+        build(p, filename="1.md")
+        assert (p / "dist" / "about.html").exists()
+
+
+# ---------------------------------------------------------------------------
+# Cookies page
+# ---------------------------------------------------------------------------
+
+COOKIES_MD = "---\ntitle: Cookie Policy\n---\n\nThis site uses cookies.\n"
+
+class TestCookiesPage:
+
+    def test_cookies_html_created_when_cookies_md_exists(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert (p / "dist" / "cookies.html").exists()
+
+    def test_cookies_html_not_created_when_cookies_md_absent(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert not (p / "dist" / "cookies.html").exists()
+
+    def test_cookies_html_contains_body_content(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert "uses cookies" in (p / "dist" / "cookies.html").read_text()
+
+    def test_cookies_html_uses_template(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert "<html>" in (p / "dist" / "cookies.html").read_text()
+
+    def test_cookies_html_title_includes_post_title_and_site_title(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert "Cookie Policy - Test Blog" in (p / "dist" / "cookies.html").read_text()
+
+    def test_cookies_not_in_index(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert "cookies.html" not in (p / "dist" / "index.html").read_text()
+
+    def test_cookies_not_in_post_navigation(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert "cookies.html" not in (p / "dist" / "1.html").read_text()
+        assert "cookies.html" not in (p / "dist" / "2.html").read_text()
+
+    def test_cookies_back_link_points_to_index(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert 'href="index.html"' in (p / "dist" / "cookies.html").read_text()
+
+    def test_cookies_back_link_has_no_anchor(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert 'href="index.html#' not in (p / "dist" / "cookies.html").read_text()
+
+    def test_single_file_build_cookies(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p, filename="cookies.md")
+        assert (p / "dist" / "cookies.html").exists()
+
+    def test_single_file_build_cookies_does_not_create_index(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p, filename="cookies.md")
+        assert not (p / "dist" / "index.html").exists()
+
+    def test_cookies_html_removed_when_cookies_md_deleted(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert (p / "dist" / "cookies.html").exists()
+        (p / "content" / "cookies.md").unlink()
+        build(p)
+        assert not (p / "dist" / "cookies.html").exists()
+
+    def test_single_file_build_does_not_remove_cookies_html(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        (p / "content" / "cookies.md").unlink()
+        build(p, filename="1.md")
+        assert (p / "dist" / "cookies.html").exists()
+
 
 # ---------------------------------------------------------------------------
 # Build ID placeholder
