@@ -62,12 +62,12 @@ class TestFeedStructure:
         assert root.find(el("id")).text == "https://example.github.io/"
 
     def test_feed_updated_is_most_recent_post_date(self):
-        posts = [make_post(id=3, date="2026-05-24"), make_post(id=1, date="2026-01-01")]
+        posts = [make_post(post_id=3, date="2026-05-24"), make_post(post_id=1, date="2026-01-01")]
         root = parse(posts)
         assert root.find(el("updated")).text == "2026-05-24T00:00:03Z"
 
     def test_feed_updated_with_single_post(self):
-        root = parse([make_post(id=1, date="2026-03-15")])
+        root = parse([make_post(post_id=1, date="2026-03-15")])
         assert root.find(el("updated")).text == "2026-03-15T00:00:01Z"
 
 
@@ -78,19 +78,19 @@ class TestFeedStructure:
 class TestFeedEntries:
 
     def test_one_entry_per_post(self):
-        posts = [make_post(id=1), make_post(id=2), make_post(id=3)]
+        posts = [make_post(post_id=1), make_post(post_id=2), make_post(post_id=3)]
         root = parse(posts)
         assert len(root.findall(el("entry"))) == 3
 
     def test_entries_in_reverse_chronological_order(self):
-        posts = [make_post(id=3, date="2026-05-24"), make_post(id=1, date="2026-01-01")]
+        posts = [make_post(post_id=3, date="2026-05-24"), make_post(post_id=1, date="2026-01-01")]
         root = parse(posts)
         entries = root.findall(el("entry"))
         dates = [e.find(el("updated")).text for e in entries]
         assert dates == ["2026-05-24T00:00:03Z", "2026-01-01T00:00:01Z"]
 
     def test_entries_on_same_date_have_unique_timestamps(self):
-        posts = [make_post(id=2, date="2026-05-24"), make_post(id=1, date="2026-05-24")]
+        posts = [make_post(post_id=2, date="2026-05-24"), make_post(post_id=1, date="2026-05-24")]
         root = parse(posts)
         entries = root.findall(el("entry"))
         timestamps = [e.find(el("updated")).text for e in entries]
@@ -116,17 +116,17 @@ class TestEntryStructure:
         assert entry.find(el("title")).text == "24 May 2026"
 
     def test_entry_link_href_is_absolute_url(self):
-        root = parse([make_post(id=5)])
+        root = parse([make_post(post_id=5)])
         entry = root.find(el("entry"))
         assert entry.find(el("link")).get("href") == "https://example.github.io/5.html"
 
     def test_entry_id_is_absolute_url(self):
-        root = parse([make_post(id=5)])
+        root = parse([make_post(post_id=5)])
         entry = root.find(el("entry"))
         assert entry.find(el("id")).text == "https://example.github.io/5.html"
 
     def test_entry_updated_is_rfc3339_date(self):
-        root = parse([make_post(id=1, date="2026-03-01")])
+        root = parse([make_post(post_id=1, date="2026-03-01")])
         entry = root.find(el("entry"))
         assert entry.find(el("updated")).text == "2026-03-01T00:00:01Z"
 
@@ -184,7 +184,7 @@ class TestFeedXmlSafety:
         assert entry.find(el("title")).text == "A & B"
 
     def test_undated_post_excluded_from_feed(self):
-        dated = make_post(id=2, date="2026-05-24")
+        dated = make_post(post_id=2, date="2026-05-24")
         undated = Post(id=1, date=None, date_uk=None, title="No date",
                        url="1.html", body_html="", images=[])
         root = parse([dated, undated])
@@ -197,7 +197,7 @@ class TestFeedXmlSafety:
         ET.fromstring(xml)  # must not raise
 
     def test_feed_updated_uses_most_recent_dated_post(self):
-        dated = make_post(id=2, date="2026-05-24")
+        dated = make_post(post_id=2, date="2026-05-24")
         undated = Post(id=3, date=None, date_uk=None, title=None,
                        url="3.html", body_html="", images=[])
         root = parse([undated, dated])

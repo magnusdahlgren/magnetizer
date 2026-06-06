@@ -23,7 +23,7 @@ def make_project(tmp_path, posts=None, config=_DEFAULT_CONFIG):
 
 
 def make_post(
-    id=1,
+    post_id=1,
     date="2026-05-24",
     date_uk="24 May 2026",
     title="My Post",
@@ -35,11 +35,11 @@ def make_post(
         for img in (images or [])
     ]
     return Post(
-        id=id,
+        id=post_id,
         date=date,
         date_uk=date_uk,
         title=title,
-        url=f"{id}.html",
+        url=f"{post_id}.html",
         body_html=body_html,
         images=image_objects,
     )
