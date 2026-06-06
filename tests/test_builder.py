@@ -725,15 +725,27 @@ class TestVerboseLog:
         (p / "content" / "1.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
         assert ("COPIED", "resources/") not in build(p)["log"]
 
-    def test_about_page_in_log(self, tmp_path):
+    def test_about_page_in_log_on_first_build(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "about.md").write_text(ABOUT_MD)
         assert ("UPDATED", "about.html") in build(p)["log"]
 
-    def test_cookies_page_in_log(self, tmp_path):
+    def test_about_page_not_in_log_when_unchanged(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert ("UPDATED", "about.html") not in build(p)["log"]
+
+    def test_cookies_page_in_log_on_first_build(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "cookies.md").write_text(COOKIES_MD)
         assert ("UPDATED", "cookies.html") in build(p)["log"]
+
+    def test_cookies_page_not_in_log_when_unchanged(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert ("UPDATED", "cookies.html") not in build(p)["log"]
 
     def test_removed_about_in_log(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})

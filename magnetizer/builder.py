@@ -153,6 +153,26 @@ def _build_about_page(content_dir, dist_dir, config, template):
     (dist_dir / "about.html").write_text(html)
 
 
+def _special_page_changed(content_dir, manifest, md_name, image_pattern=None):
+    relevant = {md_name}
+    if image_pattern:
+        pattern = re.compile(image_pattern)
+        for f in content_dir.iterdir():
+            if pattern.match(f.name):
+                relevant.add(f.name)
+        for name in manifest:
+            if pattern.match(name):
+                relevant.add(name)
+    for name in relevant:
+        f = content_dir / name
+        if f.exists():
+            if name not in manifest or manifest[name]["mtime"] != f.stat().st_mtime:
+                return True
+        elif name in manifest:
+            return True
+    return False
+
+
 def _copy_resources(resources_dir, dist_dir, replace=False):
     dest = dist_dir / "resources"
     if replace and dest.exists():
@@ -255,8 +275,9 @@ def build(cwd, filename=None, flush=False, resources=False):
         log.append((action, f"{post_id}.html"))
 
     if about_md.exists():
-        _build_about_page(content_dir, dist_dir, config, template)
-        log.append(("UPDATED", "about.html"))
+        if filename or _special_page_changed(content_dir, manifest, "about.md", r'^about-image-\d{2}\.(jpg|jpeg|png)$'):
+            _build_about_page(content_dir, dist_dir, config, template)
+            log.append(("UPDATED", "about.html"))
     elif not filename:
         about_html = dist_dir / "about.html"
         if about_html.exists():
@@ -264,8 +285,9 @@ def build(cwd, filename=None, flush=False, resources=False):
             log.append(("REMOVED", "about.html"))
 
     if cookies_md.exists():
-        _build_cookies_page(content_dir, dist_dir, config, template)
-        log.append(("UPDATED", "cookies.html"))
+        if filename or _special_page_changed(content_dir, manifest, "cookies.md"):
+            _build_cookies_page(content_dir, dist_dir, config, template)
+            log.append(("UPDATED", "cookies.html"))
     elif not filename:
         cookies_html = dist_dir / "cookies.html"
         if cookies_html.exists():
