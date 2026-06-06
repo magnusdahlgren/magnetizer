@@ -64,6 +64,22 @@ def _build_post(post, dist_dir, content_dir, config):
         )
 
 
+def _neighbor_post_ids(post_id, all_post_ids_sorted_desc):
+    if post_id in all_post_ids_sorted_desc:
+        pos = all_post_ids_sorted_desc.index(post_id)
+        neighbors = []
+        if pos > 0:
+            neighbors.append(all_post_ids_sorted_desc[pos - 1])
+        if pos + 1 < len(all_post_ids_sorted_desc):
+            neighbors.append(all_post_ids_sorted_desc[pos + 1])
+        return neighbors
+    else:
+        # Deleted post: find neighbors by value in the remaining list
+        newer = next((p for p in all_post_ids_sorted_desc if p > post_id), None)
+        older = next((p for p in reversed(all_post_ids_sorted_desc) if p < post_id), None)
+        return [p for p in [newer, older] if p is not None]
+
+
 def _post_index_page_url(post_id, all_post_ids_sorted_desc, posts_per_page):
     pos = all_post_ids_sorted_desc.index(post_id)
     page = pos // posts_per_page + 1
@@ -172,9 +188,17 @@ def build(cwd, filename=None, flush=False, resources=False):
                 _build_about_page(content_dir, dist_dir, config, template)
             return {"created": 0, "updated": 0, "deleted": 0}
         post_id = int(Path(filename).stem)
+        changed_post_ids = {post_id}
         post_ids_to_build = {post_id}
     else:
-        post_ids_to_build = get_changed_post_ids(content_dir, manifest)
+        changed_post_ids = get_changed_post_ids(content_dir, manifest)
+        all_post_ids_sorted_desc = sorted(_post_ids_in_content(content_dir), reverse=True)
+        neighbor_ids = {
+            n
+            for pid in changed_post_ids
+            for n in _neighbor_post_ids(pid, all_post_ids_sorted_desc)
+        }
+        post_ids_to_build = changed_post_ids | neighbor_ids
 
     all_post_ids_sorted_desc = sorted(_post_ids_in_content(content_dir), reverse=True)
 
@@ -184,14 +208,16 @@ def build(cwd, filename=None, flush=False, resources=False):
     for post_id in post_ids_to_build:
         md_path = content_dir / f"{post_id}.md"
         if not md_path.exists():
-            _delete_post_files(dist_dir, post_id)
-            deleted += 1
+            if post_id in changed_post_ids:
+                _delete_post_files(dist_dir, post_id)
+                deleted += 1
             continue
 
-        if f"{post_id}.md" in manifest:
-            updated += 1
-        else:
-            created += 1
+        if post_id in changed_post_ids:
+            if f"{post_id}.md" in manifest:
+                updated += 1
+            else:
+                created += 1
 
         post = _load_post(content_dir, post_id)
         posts_cache[post_id] = post

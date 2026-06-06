@@ -263,16 +263,17 @@ class TestFlush:
 class TestIncrementalBuild:
 
     def test_unchanged_post_html_not_regenerated(self, tmp_path):
-        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        # Posts 1 and 3 are neighbours of post 2 and will be rebuilt to update
+        # nav links; post 4 is not adjacent to post 2 and must stay untouched.
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD, 3: MINIMAL_MD, 4: MINIMAL_MD})
         build(p)
-        mtime_before = (p / "dist" / "1.html").stat().st_mtime
+        mtime_before = (p / "dist" / "4.html").stat().st_mtime
 
-        # Touch only post 2
         import time; time.sleep(0.01)
         (p / "content" / "2.md").write_text(MINIMAL_MD)
 
         build(p)
-        assert (p / "dist" / "1.html").stat().st_mtime == mtime_before
+        assert (p / "dist" / "4.html").stat().st_mtime == mtime_before
 
     def test_changed_post_html_is_regenerated(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
@@ -436,6 +437,34 @@ class TestPostNavigation:
         html = (p / "dist" / "1.html").read_text()
         assert "Newer post" not in html
         assert "Older post" not in html
+
+    def test_previous_newest_post_gets_newer_link_when_new_post_added(self, tmp_path):
+        import time
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        assert "Newer post" not in (p / "dist" / "2.html").read_text()
+        time.sleep(0.01)
+        (p / "content" / "3.md").write_text(MINIMAL_MD)
+        build(p)
+        assert "← Newer post" in (p / "dist" / "2.html").read_text()
+
+    def test_neighbors_get_nav_links_updated_when_post_deleted(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD, 3: MINIMAL_MD})
+        build(p)
+        (p / "content" / "2.md").unlink()
+        build(p)
+        assert "2.html" not in (p / "dist" / "1.html").read_text()
+        assert "2.html" not in (p / "dist" / "3.html").read_text()
+
+    def test_neighbor_rebuild_not_counted_in_outcome(self, tmp_path):
+        import time
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        time.sleep(0.01)
+        (p / "content" / "3.md").write_text(MINIMAL_MD)
+        result = build(p)
+        assert result["created"] == 1
+        assert result["updated"] == 0
 
 
 # ---------------------------------------------------------------------------
