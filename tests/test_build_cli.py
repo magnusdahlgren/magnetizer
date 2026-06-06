@@ -189,13 +189,17 @@ class TestCLIOutcome:
         assert "post(s) updated" in result.stdout
         assert "post(s) deleted" in result.stdout
 
-    def test_outcome_shows_zero_when_no_changes(self, tmp_path):
+    def test_no_changes_message_when_nothing_changed(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         run_build([], cwd=p)
         result = run_build([], cwd=p)
-        assert "0 post(s) created" in result.stdout
-        assert "0 post(s) updated" in result.stdout
-        assert "0 post(s) deleted" in result.stdout
+        assert "No changes detected." in result.stdout
+
+    def test_no_zero_counts_when_nothing_changed(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        run_build([], cwd=p)
+        result = run_build([], cwd=p)
+        assert "post(s)" not in result.stdout
 
 
 # ---------------------------------------------------------------------------
@@ -234,3 +238,43 @@ class TestCLIVerbose:
         p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
         result = run_build(["1.md", "--verbose"], cwd=p)
         assert result.returncode == 0
+
+
+# ---------------------------------------------------------------------------
+# Generating header and no-changes message
+# ---------------------------------------------------------------------------
+
+class TestCLIHeaderAndStatus:
+
+    def test_generating_line_includes_site_title(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build([], cwd=p)
+        assert "Generating Test" in result.stdout
+
+    def test_generating_line_includes_dist_path(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build([], cwd=p)
+        assert str(p / "dist") in result.stdout
+
+    def test_generating_line_appears_before_summary(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build([], cwd=p)
+        assert result.stdout.index("Generating") < result.stdout.index("post(s)")
+
+    def test_no_changes_message_shown_on_second_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        run_build([], cwd=p)
+        result = run_build([], cwd=p)
+        assert "No changes detected." in result.stdout
+
+    def test_summary_counts_not_shown_when_no_changes(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        run_build([], cwd=p)
+        result = run_build([], cwd=p)
+        assert "post(s)" not in result.stdout
+
+    def test_summary_counts_shown_when_changes_exist(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build([], cwd=p)
+        assert "post(s)" in result.stdout
+        assert "No changes detected." not in result.stdout

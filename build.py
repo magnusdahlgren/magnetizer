@@ -6,6 +6,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 from magnetizer.builder import build
+from magnetizer.config import load_config
 from magnetizer.publisher import publish
 
 
@@ -25,6 +26,10 @@ def main():
         print("Error: FILENAME cannot be used together with other options.", file=sys.stderr)
         sys.exit(1)
 
+    config = load_config(Path.cwd() / "config.yaml")
+    dist_path = (Path.cwd() / "dist").resolve()
+    print(f"Generating {config['site_title']} to {dist_path}")
+
     outcome = build(
         Path.cwd(),
         filename=args.filename,
@@ -36,11 +41,14 @@ def main():
         for action, name in outcome["log"]:
             print(f"{action}: {name}")
 
-    print(
-        f"{outcome['created']} post(s) created, "
-        f"{outcome['updated']} post(s) updated, "
-        f"{outcome['deleted']} post(s) deleted"
-    )
+    if outcome["log"]:
+        print(
+            f"{outcome['created']} post(s) created, "
+            f"{outcome['updated']} post(s) updated, "
+            f"{outcome['deleted']} post(s) deleted"
+        )
+    else:
+        print("No changes detected.")
 
     if args.push:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
