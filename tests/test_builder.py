@@ -668,6 +668,106 @@ class TestCookiesPage:
 
 
 # ---------------------------------------------------------------------------
+# Verbose log
+# ---------------------------------------------------------------------------
+
+class TestVerboseLog:
+
+    def test_created_post_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        assert ("CREATED", "1.html") in build(p)["log"]
+
+    def test_updated_post_in_log(self, tmp_path):
+        import time
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        time.sleep(0.01)
+        (p / "content" / "1.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
+        assert ("UPDATED", "1.html") in build(p)["log"]
+
+    def test_removed_post_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        build(p)
+        (p / "content" / "2.md").unlink()
+        assert ("REMOVED", "2.html") in build(p)["log"]
+
+    def test_resized_image_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        assert ("RESIZED", "1-image-01-resized.jpg") in build(p)["log"]
+
+    def test_index_page_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        assert ("UPDATED", "index.html") in build(p)["log"]
+
+    def test_second_index_page_in_log(self, tmp_path):
+        posts = {i: MINIMAL_MD for i in range(1, 4)}  # posts_per_page=2, so 2 pages
+        p = make_project(tmp_path, posts=posts)
+        assert ("UPDATED", "index-2.html") in build(p)["log"]
+
+    def test_feed_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        assert ("UPDATED", "feed.xml") in build(p)["log"]
+
+    def test_archive_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        assert ("UPDATED", "archive.html") in build(p)["log"]
+
+    def test_resources_copied_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        assert ("COPIED", "resources/") in build(p)["log"]
+
+    def test_resources_not_in_log_when_already_present(self, tmp_path):
+        import time
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        time.sleep(0.01)
+        (p / "content" / "1.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
+        assert ("COPIED", "resources/") not in build(p)["log"]
+
+    def test_about_page_in_log_on_first_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        assert ("UPDATED", "about.html") in build(p)["log"]
+
+    def test_about_page_not_in_log_when_unchanged(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert ("UPDATED", "about.html") not in build(p)["log"]
+
+    def test_cookies_page_in_log_on_first_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        assert ("UPDATED", "cookies.html") in build(p)["log"]
+
+    def test_cookies_page_not_in_log_when_unchanged(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert ("UPDATED", "cookies.html") not in build(p)["log"]
+
+    def test_removed_about_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        (p / "content" / "about.md").unlink()
+        assert ("REMOVED", "about.html") in build(p)["log"]
+
+    def test_removed_cookies_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        (p / "content" / "cookies.md").unlink()
+        assert ("REMOVED", "cookies.html") in build(p)["log"]
+
+    def test_log_empty_when_nothing_changed(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert build(p)["log"] == []
+
+
+# ---------------------------------------------------------------------------
 # Build ID placeholder
 # ---------------------------------------------------------------------------
 
