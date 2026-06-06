@@ -10,33 +10,7 @@ from magnetizer.render import (
     render_post_page_content,
     render_template,
 )
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-def make_post(
-    id=1,
-    date="2026-05-24",
-    date_uk="24 May 2026",
-    title="My Post",
-    body_html="<p>Hello</p>",
-    images=None,
-):
-    image_objects = [
-        img if isinstance(img, Image) else Image(filename=img, alt="")
-        for img in (images or [])
-    ]
-    return Post(
-        id=id,
-        date=date,
-        date_uk=date_uk,
-        title=title,
-        url=f"{id}.html",
-        body_html=body_html,
-        images=image_objects,
-    )
+from conftest import make_post
 
 
 # ---------------------------------------------------------------------------
@@ -51,7 +25,7 @@ class TestRenderArticleStructure:
         assert "</article>" in html
 
     def test_article_id_attribute(self):
-        html = render_article(make_post(id=7), on_index_page=False)
+        html = render_article(make_post(post_id=7), on_index_page=False)
         assert 'id="post-7"' in html
 
     def test_article_has_single_post_class_on_post_page(self):
@@ -67,11 +41,11 @@ class TestRenderArticleStructure:
         assert 'aria-label' not in html
 
     def test_article_has_aria_label_when_untitled(self):
-        html = render_article(make_post(title=None, id=12, date_uk="5 May 2026"), on_index_page=False)
+        html = render_article(make_post(title=None, post_id=12, date_uk="5 May 2026"), on_index_page=False)
         assert 'aria-label=' in html
 
     def test_article_aria_label_includes_post_id_and_date(self):
-        html = render_article(make_post(title=None, id=12, date_uk="5 May 2026"), on_index_page=False)
+        html = render_article(make_post(title=None, post_id=12, date_uk="5 May 2026"), on_index_page=False)
         assert 'aria-label="Post 12 (5 May 2026)"' in html
 
     def test_article_aria_label_without_date_when_no_date(self):
@@ -149,19 +123,19 @@ class TestRenderArticleTitle:
 class TestRenderArticleLinks:
 
     def test_h1_contains_link_on_index_page(self):
-        html = render_article(make_post(id=3, title="My Title"), on_index_page=True)
+        html = render_article(make_post(post_id=3, title="My Title"), on_index_page=True)
         assert '<h1><a href="3.html">My Title</a></h1>' in html
 
     def test_h1_has_no_link_on_post_page(self):
-        html = render_article(make_post(id=3, title="My Title"), on_index_page=False)
+        html = render_article(make_post(post_id=3, title="My Title"), on_index_page=False)
         assert '<h1>My Title</h1>' in html
 
     def test_time_contains_link_on_index_page(self):
-        html = render_article(make_post(id=3, date="2026-05-24", date_uk="24 May 2026"), on_index_page=True)
+        html = render_article(make_post(post_id=3, date="2026-05-24", date_uk="24 May 2026"), on_index_page=True)
         assert '<a href="3.html">24 May 2026</a>' in html
 
     def test_time_has_no_link_on_post_page(self):
-        html = render_article(make_post(id=3, date_uk="24 May 2026"), on_index_page=False)
+        html = render_article(make_post(post_id=3, date_uk="24 May 2026"), on_index_page=False)
         assert "24 May 2026" in html
         assert '<a href="3.html">24 May 2026</a>' not in html
 
@@ -211,35 +185,35 @@ class TestRenderArticleImages:
         assert images_pos < h1_pos < body_pos
 
     def test_images_wrapped_in_link_on_index_page(self):
-        html = render_article(make_post(id=1, images=["1-image-01.jpg"]), on_index_page=True)
+        html = render_article(make_post(post_id=1, images=["1-image-01.jpg"]), on_index_page=True)
         assert '<a href="1.html"><img src="1-image-01-resized.jpg" alt=""></a>' in html
 
     def test_images_not_wrapped_in_link_on_post_page(self):
-        html = render_article(make_post(id=1, images=["1-image-01.jpg"]), on_index_page=False)
+        html = render_article(make_post(post_id=1, images=["1-image-01.jpg"]), on_index_page=False)
         assert '<a href="1.html"><img' not in html
         assert 'src="1-image-01-resized.jpg"' in html
 
     def test_img_has_alt_attribute(self):
-        html = render_article(make_post(id=1, images=["1-image-01.jpg"]), on_index_page=False)
+        html = render_article(make_post(post_id=1, images=["1-image-01.jpg"]), on_index_page=False)
         assert 'alt=' in html
 
     def test_img_alt_text_from_image_object(self):
         img = Image(filename="1-image-01.jpg", alt="A sunny beach")
-        html = render_article(make_post(id=1, images=[img]), on_index_page=False)
+        html = render_article(make_post(post_id=1, images=[img]), on_index_page=False)
         assert 'alt="A sunny beach"' in html
 
     def test_img_empty_alt_when_no_alt_text(self):
-        html = render_article(make_post(id=1, images=["1-image-01.jpg"]), on_index_page=False)
+        html = render_article(make_post(post_id=1, images=["1-image-01.jpg"]), on_index_page=False)
         assert 'alt=""' in html
 
     def test_img_alt_double_quote_escaped(self):
         img = Image(filename="1-image-01.jpg", alt='Say "hello"')
-        html = render_article(make_post(id=1, images=[img]), on_index_page=False)
+        html = render_article(make_post(post_id=1, images=[img]), on_index_page=False)
         assert 'alt="Say &quot;hello&quot;"' in html
 
     def test_img_alt_ampersand_escaped(self):
         img = Image(filename="1-image-01.jpg", alt="A & B")
-        html = render_article(make_post(id=1, images=[img]), on_index_page=False)
+        html = render_article(make_post(post_id=1, images=[img]), on_index_page=False)
         assert 'alt="A &amp; B"' in html
 
 
@@ -275,7 +249,7 @@ class TestRenderPostPageContent:
         assert "</main>" in html
 
     def test_article_inside_main(self):
-        html = render_post_page_content(make_post(id=1), index_page_url="index.html")
+        html = render_post_page_content(make_post(post_id=1), index_page_url="index.html")
         main_start = html.index("<main>")
         article_start = html.index("<article")
         main_end = html.index("</main>")
@@ -286,7 +260,7 @@ class TestRenderPostPageContent:
         assert "<nav>" in html
 
     def test_back_link_url_includes_index_page_and_anchor(self):
-        html = render_post_page_content(make_post(id=5), index_page_url="index-2.html")
+        html = render_post_page_content(make_post(post_id=5), index_page_url="index-2.html")
         assert 'href="index-2.html#post-5"' in html
 
     def test_back_link_text(self):
@@ -298,7 +272,7 @@ class TestRenderPostPageContent:
         assert "⌂ Back to homepage" in html
 
     def test_article_rendered_without_links(self):
-        html = render_post_page_content(make_post(id=1, title="T"), index_page_url="index.html")
+        html = render_post_page_content(make_post(post_id=1, title="T"), index_page_url="index.html")
         assert '<h1>T</h1>' in html
 
     def test_back_link_in_separate_nav_from_post_navigation(self):
@@ -370,18 +344,18 @@ class TestRenderPostPageNavigation:
 class TestRenderIndexPageContent:
 
     def test_articles_wrapped_in_main(self):
-        posts = [make_post(id=1), make_post(id=2)]
+        posts = [make_post(post_id=1), make_post(post_id=2)]
         html = render_index_page_content(posts, page_num=1, total_pages=1)
         assert "<main>" in html
         assert html.count("<article") == 2
 
     def test_all_posts_rendered(self):
-        posts = [make_post(id=i) for i in range(1, 6)]
+        posts = [make_post(post_id=i) for i in range(1, 6)]
         html = render_index_page_content(posts, page_num=1, total_pages=1)
         assert html.count("<article") == 5
 
     def test_articles_rendered_with_links(self):
-        posts = [make_post(id=1, title="T")]
+        posts = [make_post(post_id=1, title="T")]
         html = render_index_page_content(posts, page_num=1, total_pages=1)
         assert '<h1><a href="1.html">T</a></h1>' in html
 

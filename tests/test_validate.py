@@ -2,6 +2,7 @@
 
 import pytest
 from magnetizer.validate import validate_config, validate_content, validate_project
+from conftest import make_content
 
 
 # ---------------------------------------------------------------------------
@@ -19,15 +20,6 @@ def make_project(tmp_path, missing=None):
     if missing != "templates/index.html" and "templates" not in (missing or ""):
         (tmp_path / "templates" / "index.html").write_text("<html>MAGNETIZER_TITLE MAGNETIZER_CONTENT</html>")
     return tmp_path
-
-
-def make_content(tmp_path, files):
-    """Write files into a content/ directory and return its path."""
-    content = tmp_path / "content"
-    content.mkdir(exist_ok=True)
-    for name, body in files.items():
-        (content / name).write_bytes(body if isinstance(body, bytes) else body.encode())
-    return content
 
 
 MINIMAL_MD = b"---\ndate: 2026-01-01\n---\n"
