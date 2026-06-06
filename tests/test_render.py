@@ -10,33 +10,7 @@ from magnetizer.render import (
     render_post_page_content,
     render_template,
 )
-
-
-# ---------------------------------------------------------------------------
-# Helpers
-# ---------------------------------------------------------------------------
-
-def make_post(
-    id=1,
-    date="2026-05-24",
-    date_uk="24 May 2026",
-    title="My Post",
-    body_html="<p>Hello</p>",
-    images=None,
-):
-    image_objects = [
-        img if isinstance(img, Image) else Image(filename=img, alt="")
-        for img in (images or [])
-    ]
-    return Post(
-        id=id,
-        date=date,
-        date_uk=date_uk,
-        title=title,
-        url=f"{id}.html",
-        body_html=body_html,
-        images=image_objects,
-    )
+from conftest import make_post
 
 
 # ---------------------------------------------------------------------------

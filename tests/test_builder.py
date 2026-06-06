@@ -8,41 +8,19 @@ import pytest
 from PIL import Image as PILImage
 
 from magnetizer.builder import build
+from conftest import MINIMAL_MD, make_project
 
 
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
 
-TEMPLATE = (
-    "<!DOCTYPE html><html><head><title>MAGNETIZER_TITLE</title></head>"
-    "<body>MAGNETIZER_CONTENT</body></html>"
-)
-CONFIG = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\n"
-MINIMAL_MD = "---\ndate: 2026-05-24\n---\n\nHello world\n"
 TITLED_MD = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n# My Post\n\nContent here.\n"
 
 
 def make_jpg(path, width=800, height=600):
     img = PILImage.new("RGB", (width, height), color=(100, 150, 200))
     img.save(path, "JPEG")
-
-
-def make_project(tmp_path, posts=None, config=CONFIG):
-    """Build a minimal valid project tree and return the project root."""
-    (tmp_path / "content").mkdir()
-    (tmp_path / "dist").mkdir()
-    (tmp_path / "templates").mkdir()
-    (tmp_path / "resources").mkdir()
-    (tmp_path / "resources" / "style.css").write_text("body {}")
-    (tmp_path / "templates" / "index.html").write_text(TEMPLATE)
-    (tmp_path / "config.yaml").write_text(config)
-
-    if posts:
-        for post_id, md_text in posts.items():
-            (tmp_path / "content" / f"{post_id}.md").write_text(md_text)
-
-    return tmp_path
 
 
 # ---------------------------------------------------------------------------

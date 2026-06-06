@@ -7,14 +7,9 @@ from pathlib import Path
 import pytest
 from PIL import Image as PILImage
 
-BUILD_SCRIPT = Path(__file__).parent.parent / "build.py"
+from conftest import MINIMAL_MD, make_project
 
-TEMPLATE = (
-    "<!DOCTYPE html><html><head><title>MAGNETIZER_TITLE</title></head>"
-    "<body>MAGNETIZER_CONTENT</body></html>"
-)
-CONFIG = "site_title: Test\nsite_url: https://example.github.io\nposts_per_page: 12\n"
-MINIMAL_MD = "---\ndate: 2026-05-24\n---\n\nHello world\n"
+BUILD_SCRIPT = Path(__file__).parent.parent / "build.py"
 
 
 def run_build(args, cwd):
@@ -24,19 +19,6 @@ def run_build(args, cwd):
         capture_output=True,
         text=True,
     )
-
-
-def make_project(tmp_path, posts=None):
-    (tmp_path / "content").mkdir()
-    (tmp_path / "dist").mkdir()
-    (tmp_path / "templates").mkdir()
-    (tmp_path / "resources").mkdir()
-    (tmp_path / "resources" / "style.css").write_text("body {}")
-    (tmp_path / "templates" / "index.html").write_text(TEMPLATE)
-    (tmp_path / "config.yaml").write_text(CONFIG)
-    for post_id, md in (posts or {}).items():
-        (tmp_path / "content" / f"{post_id}.md").write_text(md)
-    return tmp_path
 
 
 # ---------------------------------------------------------------------------
@@ -63,7 +45,7 @@ class TestCLIValidation:
         (tmp_path / "dist").mkdir()
         (tmp_path / "templates").mkdir()
         (tmp_path / "resources").mkdir()
-        (tmp_path / "config.yaml").write_text(CONFIG)
+        (tmp_path / "config.yaml").write_text("site_url: https://example.github.io\n")
         result = run_build([], cwd=tmp_path)
         assert result.returncode != 0
 
@@ -71,7 +53,7 @@ class TestCLIValidation:
         (tmp_path / "dist").mkdir()
         (tmp_path / "templates").mkdir()
         (tmp_path / "resources").mkdir()
-        (tmp_path / "config.yaml").write_text(CONFIG)
+        (tmp_path / "config.yaml").write_text("site_url: https://example.github.io\n")
         result = run_build([], cwd=tmp_path)
         assert "content" in result.stderr.lower()
 

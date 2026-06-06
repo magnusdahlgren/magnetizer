@@ -6,24 +6,13 @@ import pytest
 
 from magnetizer.content import Post
 from magnetizer.feed import render_feed
+from conftest import make_post
 
 ATOM_NS = "http://www.w3.org/2005/Atom"
 
 
 def el(tag):
     return f"{{{ATOM_NS}}}{tag}"
-
-
-def make_post(id=1, date="2026-05-24", title="My Post", body_html="<p>Hello</p>", images=None):
-    return Post(
-        id=id,
-        date=date,
-        date_uk=f"24 May 2026",
-        title=title,
-        url=f"{id}.html",
-        body_html=body_html,
-        images=images or [],
-    )
 
 
 CONFIG = {
