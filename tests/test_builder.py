@@ -534,6 +534,14 @@ class TestAboutPage:
         build(p)
         assert not (p / "dist" / "about.html").exists()
 
+    def test_single_file_build_does_not_remove_about_html(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        (p / "content" / "about.md").unlink()
+        build(p, filename="1.md")
+        assert (p / "dist" / "about.html").exists()
+
 
 # ---------------------------------------------------------------------------
 # Cookies page
@@ -617,6 +625,14 @@ class TestCookiesPage:
         (p / "content" / "cookies.md").unlink()
         build(p)
         assert not (p / "dist" / "cookies.html").exists()
+
+    def test_single_file_build_does_not_remove_cookies_html(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        (p / "content" / "cookies.md").unlink()
+        build(p, filename="1.md")
+        assert (p / "dist" / "cookies.html").exists()
 
 
 # ---------------------------------------------------------------------------

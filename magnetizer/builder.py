@@ -218,14 +218,14 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     if about_md.exists():
         _build_about_page(content_dir, dist_dir, config, template)
-    else:
+    elif not filename:
         about_html = dist_dir / "about.html"
         if about_html.exists():
             about_html.unlink()
 
     if cookies_md.exists():
         _build_cookies_page(content_dir, dist_dir, config, template)
-    else:
+    elif not filename:
         cookies_html = dist_dir / "cookies.html"
         if cookies_html.exists():
             cookies_html.unlink()
