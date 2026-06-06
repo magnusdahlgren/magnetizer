@@ -239,6 +239,26 @@ class TestCLIVerbose:
         result = run_build(["1.md", "--verbose"], cwd=p)
         assert result.returncode == 0
 
+    def test_verbose_resized_images_are_indented(self, tmp_path):
+        from PIL import Image as PILImage
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        img = PILImage.new("RGB", (800, 600))
+        img.save(p / "content" / "1-image-01.jpg", "JPEG")
+        result = run_build(["--verbose"], cwd=p)
+        assert "  RESIZED: 1-image-01-resized.jpg" in result.stdout
+
+    def test_verbose_blank_line_between_post_and_site_entries(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build(["--verbose"], cwd=p)
+        created_pos = result.stdout.index("CREATED: 1.html")
+        index_pos = result.stdout.index("UPDATED: index.html")
+        assert "\n\n" in result.stdout[created_pos:index_pos]
+
+    def test_generating_line_has_arrow_prefix(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build([], cwd=p)
+        assert "→ Generating" in result.stdout
+
 
 # ---------------------------------------------------------------------------
 # Generating header and no-changes message

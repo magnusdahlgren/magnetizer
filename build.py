@@ -28,7 +28,7 @@ def main():
 
     config = load_config(Path.cwd() / "config.yaml")
     dist_path = (Path.cwd() / "dist").resolve()
-    print(f"Generating {config['site_title']} to {dist_path}")
+    print(f"→ Generating {config['site_title']} to {dist_path}")
 
     outcome = build(
         Path.cwd(),
@@ -37,8 +37,18 @@ def main():
         resources=args.resources,
     )
 
-    if args.verbose:
-        for action, name in outcome["log"]:
+    if args.verbose and outcome["log"]:
+        def _is_post_entry(action, name):
+            return action == "RESIZED" or (name.endswith(".html") and name[:-5].isdigit())
+
+        post_log = [(a, n) for a, n in outcome["log"] if _is_post_entry(a, n)]
+        site_log = [(a, n) for a, n in outcome["log"] if not _is_post_entry(a, n)]
+
+        for action, name in post_log:
+            print(f"  {action}: {name}" if action == "RESIZED" else f"{action}: {name}")
+        if post_log and site_log:
+            print()
+        for action, name in site_log:
             print(f"{action}: {name}")
 
     if outcome["log"]:
