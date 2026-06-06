@@ -525,6 +525,15 @@ class TestAboutPage:
         build(p)
         assert (p / "dist" / "about-image-01-resized.jpg").exists()
 
+    def test_about_html_removed_when_about_md_deleted(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        build(p)
+        assert (p / "dist" / "about.html").exists()
+        (p / "content" / "about.md").unlink()
+        build(p)
+        assert not (p / "dist" / "about.html").exists()
+
 
 # ---------------------------------------------------------------------------
 # Cookies page
