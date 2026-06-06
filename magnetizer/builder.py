@@ -192,15 +192,16 @@ def build(cwd, filename=None, flush=False, resources=False):
         post_ids_to_build = {post_id}
     else:
         changed_post_ids = get_changed_post_ids(content_dir, manifest)
-        all_post_ids_sorted_desc = sorted(_post_ids_in_content(content_dir), reverse=True)
+
+    all_post_ids_sorted_desc = sorted(_post_ids_in_content(content_dir), reverse=True)
+
+    if not filename:
         neighbor_ids = {
             n
             for pid in changed_post_ids
             for n in _neighbor_post_ids(pid, all_post_ids_sorted_desc)
         }
         post_ids_to_build = changed_post_ids | neighbor_ids
-
-    all_post_ids_sorted_desc = sorted(_post_ids_in_content(content_dir), reverse=True)
 
     created = updated = deleted = 0
     posts_cache = {}
