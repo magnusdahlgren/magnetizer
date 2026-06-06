@@ -600,6 +600,15 @@ class TestCookiesPage:
         build(p, filename="cookies.md")
         assert not (p / "dist" / "index.html").exists()
 
+    def test_cookies_html_removed_when_cookies_md_deleted(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        build(p)
+        assert (p / "dist" / "cookies.html").exists()
+        (p / "content" / "cookies.md").unlink()
+        build(p)
+        assert not (p / "dist" / "cookies.html").exists()
+
 
 # ---------------------------------------------------------------------------
 # Build ID placeholder

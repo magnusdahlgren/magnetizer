@@ -221,6 +221,10 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     if cookies_md.exists():
         _build_cookies_page(content_dir, dist_dir, config, template)
+    else:
+        cookies_html = dist_dir / "cookies.html"
+        if cookies_html.exists():
+            cookies_html.unlink()
 
     if not filename and post_ids_to_build:
         all_posts = [
