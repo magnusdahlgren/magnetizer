@@ -11,6 +11,7 @@ DEFAULTS = {
     "image_max_dimension": 1600,
     "image_quality": 75,
     "posts_per_page": 12,
+    "micro_post_max_length": 180,
 }
 
 
@@ -37,6 +38,9 @@ class TestDefaults:
 
     def test_posts_per_page_default(self, tmp_path):
         assert load_config(tmp_path / "config.yaml")["posts_per_page"] == 12
+
+    def test_micro_post_max_length_default(self, tmp_path):
+        assert load_config(tmp_path / "config.yaml")["micro_post_max_length"] == 180
 
     def test_missing_file_returns_all_defaults(self, tmp_path):
         config = load_config(tmp_path / "config.yaml")
@@ -65,18 +69,24 @@ class TestCustomValues:
         p = write_config(tmp_path, "posts_per_page: 6\n")
         assert load_config(p)["posts_per_page"] == 6
 
+    def test_micro_post_max_length_overridden(self, tmp_path):
+        p = write_config(tmp_path, "micro_post_max_length: 200\n")
+        assert load_config(p)["micro_post_max_length"] == 200
+
     def test_all_values_overridden(self, tmp_path):
         p = write_config(tmp_path, (
             "site_title: Photos\n"
             "image_max_dimension: 1400\n"
             "image_quality: 68\n"
             "posts_per_page: 8\n"
+            "micro_post_max_length: 200\n"
         ))
         config = load_config(p)
         assert config["site_title"] == "Photos"
         assert config["image_max_dimension"] == 1400
         assert config["image_quality"] == 68
         assert config["posts_per_page"] == 8
+        assert config["micro_post_max_length"] == 200
 
     def test_partial_override_keeps_other_defaults(self, tmp_path):
         p = write_config(tmp_path, "site_title: My Photos\n")

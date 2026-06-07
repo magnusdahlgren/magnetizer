@@ -37,11 +37,11 @@ def _image_filenames_for_post(content_dir, post_id):
     )
 
 
-def _load_post(content_dir, post_id):
+def _load_post(content_dir, post_id, micro_post_max_length=180):
     md_path = content_dir / f"{post_id}.md"
     md_text = md_path.read_text()
     images = _image_filenames_for_post(content_dir, post_id)
-    return parse_post(md_text, post_id, images)
+    return parse_post(md_text, post_id, images, micro_post_max_length)
 
 
 def _delete_post_files(dist_dir, post_id):
@@ -262,7 +262,7 @@ def build(cwd, filename=None, flush=False, resources=False):
             else:
                 created += 1
 
-        post = _load_post(content_dir, post_id)
+        post = _load_post(content_dir, post_id, config["micro_post_max_length"])
         posts_cache[post_id] = post
         _warn_if_missing_alt_texts(post)
         src_sizes = {img.filename: (content_dir / img.filename).stat().st_size for img in post.images}
@@ -275,7 +275,7 @@ def build(cwd, filename=None, flush=False, resources=False):
         idx_url = _post_index_page_url(post_id, all_post_ids_sorted_desc, config["posts_per_page"])
         newer_url, older_url = _adjacent_post_urls(post_id, all_post_ids_sorted_desc)
         _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url)
-        log.append((action, f"{post_id}.html"))
+        log.append((action, f"{post_id}.html", post.char_count, post.is_micro))
 
     if about_md.exists():
         if filename or _special_page_changed(content_dir, manifest, "about.md", r'^about-image-\d{2}\.(jpg|jpeg|png)$'):

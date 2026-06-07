@@ -263,6 +263,22 @@ class TestCLIVerbose:
         index_pos = result.stdout.index("UPDATED: index.html")
         assert "\n\n" in result.stdout[created_pos:index_pos]
 
+    def test_verbose_shows_char_count_for_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build(["--verbose"], cwd=p)
+        assert "characters" in result.stdout
+
+    def test_verbose_shows_micro_label_for_micro_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})  # "Hello world" — micro
+        result = run_build(["--verbose"], cwd=p)
+        assert "(micro)" in result.stdout
+
+    def test_verbose_no_micro_label_for_regular_post(self, tmp_path):
+        regular_md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\nNot micro.\n"
+        p = make_project(tmp_path, posts={1: regular_md})
+        result = run_build(["--verbose"], cwd=p)
+        assert "(micro)" not in result.stdout
+
     def test_generating_line_has_arrow_prefix(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build([], cwd=p)

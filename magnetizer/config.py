@@ -8,6 +8,7 @@ DEFAULTS = {
     "image_max_dimension": 1600,
     "image_quality": 75,
     "posts_per_page": 12,
+    "micro_post_max_length": 180,
 }
 
 
