@@ -457,6 +457,14 @@ class TestSitemap:
         build(p)
         assert "about.html" not in (p / "dist" / "sitemap.xml").read_text()
 
+    def test_sitemap_regenerated_when_only_about_changes(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "about.html" not in (p / "dist" / "sitemap.xml").read_text()
+        (p / "content" / "about.md").write_text("---\ntitle: About\n---\n\nAbout me.\n")
+        build(p)
+        assert "about.html" in (p / "dist" / "sitemap.xml").read_text()
+
     def test_sitemap_excludes_cookies_url(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "cookies.md").write_text("---\ntitle: Cookies\n---\n\nCookies.\n")

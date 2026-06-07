@@ -327,6 +327,9 @@ def build(cwd, filename=None, flush=False, resources=False):
         log.append(("UPDATED", "archive.html"))
         save_manifest(content_dir, manifest_path)
 
+    if not filename and log:
+        per_page = config["posts_per_page"]
+        total_pages = max(1, (len(all_post_ids_sorted_desc) + per_page - 1) // per_page)
         index_lastmod = _lastmod([content_dir / f"{pid}.md" for pid in all_post_ids_sorted_desc])
         sitemap_pages = []
         for pid in all_post_ids_sorted_desc:
