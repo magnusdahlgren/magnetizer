@@ -68,14 +68,14 @@ class TestCustomValues:
     def test_all_values_overridden(self, tmp_path):
         p = write_config(tmp_path, (
             "site_title: Photos\n"
-            "image_max_dimension: 1600\n"
-            "image_quality: 75\n"
+            "image_max_dimension: 1400\n"
+            "image_quality: 68\n"
             "posts_per_page: 8\n"
         ))
         config = load_config(p)
         assert config["site_title"] == "Photos"
-        assert config["image_max_dimension"] == 1600
-        assert config["image_quality"] == 75
+        assert config["image_max_dimension"] == 1400
+        assert config["image_quality"] == 68
         assert config["posts_per_page"] == 8
 
     def test_partial_override_keeps_other_defaults(self, tmp_path):
