@@ -24,6 +24,12 @@ class Post:
     images: list
     excerpt_html: str | None = None
     is_micro: bool = False
+    char_count: int = 0
+
+
+def _plain_text(html):
+    text = re.sub(r'<[^>]+>', '', html)
+    return re.sub(r'\s+', ' ', text).strip()
 
 
 def _parse_frontmatter(text):
@@ -62,7 +68,7 @@ def _format_date_uk(date_str):
     return f"{d.day} {d.strftime('%B %Y')}"
 
 
-def parse_post(md_text, post_id, image_filenames):
+def parse_post(md_text, post_id, image_filenames, micro_post_max_length=180):
     fm, body = _parse_frontmatter(md_text)
 
     for key in fm:
@@ -91,8 +97,8 @@ def parse_post(md_text, post_id, image_filenames):
         for i, f in enumerate(sorted_filenames)
     ]
 
-    text = re.sub(r'\s+', ' ', body).strip()
-    is_micro = title is None and not image_filenames and 0 < len(text) <= 180
+    char_count = len(_plain_text(body_html))
+    is_micro = title is None and not image_filenames and 0 < char_count <= micro_post_max_length
 
     return Post(
         id=post_id,
@@ -104,4 +110,5 @@ def parse_post(md_text, post_id, image_filenames):
         images=images,
         excerpt_html=excerpt_html,
         is_micro=is_micro,
+        char_count=char_count,
     )

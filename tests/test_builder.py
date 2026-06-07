@@ -675,7 +675,8 @@ class TestVerboseLog:
 
     def test_created_post_in_log(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        assert ("CREATED", "1.html") in build(p)["log"]
+        log = build(p)["log"]
+        assert any(e[0] == "CREATED" and e[1] == "1.html" for e in log)
 
     def test_updated_post_in_log(self, tmp_path):
         import time
@@ -683,7 +684,27 @@ class TestVerboseLog:
         build(p)
         time.sleep(0.01)
         (p / "content" / "1.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
-        assert ("UPDATED", "1.html") in build(p)["log"]
+        log = build(p)["log"]
+        assert any(e[0] == "UPDATED" and e[1] == "1.html" for e in log)
+
+    def test_post_log_entry_includes_char_count(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        log = build(p)["log"]
+        entry = next(e for e in log if e[0] == "CREATED" and e[1] == "1.html")
+        assert isinstance(entry[2], int) and entry[2] > 0
+
+    def test_post_log_entry_is_micro_true_for_micro_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})  # "Hello world" — micro
+        log = build(p)["log"]
+        entry = next(e for e in log if e[0] == "CREATED" and e[1] == "1.html")
+        assert entry[3] is True
+
+    def test_post_log_entry_is_micro_false_for_regular_post(self, tmp_path):
+        regular_md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\nNot micro.\n"
+        p = make_project(tmp_path, posts={1: regular_md})
+        log = build(p)["log"]
+        entry = next(e for e in log if e[0] == "CREATED" and e[1] == "1.html")
+        assert entry[3] is False
 
     def test_removed_post_in_log(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})

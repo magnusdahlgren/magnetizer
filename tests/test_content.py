@@ -325,3 +325,21 @@ class TestMicroPost:
     def test_not_micro_when_body_is_empty(self):
         post = parse_post(make_md(), 1, [])
         assert post.is_micro is False
+
+    def test_char_count_stored_on_post(self):
+        post = parse_post(make_md(body="Hello world"), 1, [])
+        assert post.char_count == 11
+
+    def test_char_count_excludes_markdown_syntax(self):
+        post = parse_post(make_md(body="**bold**"), 1, [])
+        assert post.char_count == 4
+
+    def test_is_micro_based_on_plain_text_not_raw_markdown(self):
+        # Raw length is 182 but plain text is 178 — should still be micro
+        body = "**" + "x" * 178 + "**"
+        post = parse_post(make_md(body=body), 1, [])
+        assert post.is_micro is True
+
+    def test_is_micro_respects_custom_max_length(self):
+        post = parse_post(make_md(body="x" * 181), 1, [], micro_post_max_length=200)
+        assert post.is_micro is True

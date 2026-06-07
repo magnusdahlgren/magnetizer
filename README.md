@@ -25,16 +25,18 @@ manifest.json  Build state (created automatically)
 |---|---|---|
 | `site_title` | Used in page `<title>` tags | `My Blog` |
 | `posts_per_page` | Posts shown per index page | `12` |
-| `image_max_dimension` | Long-edge pixel limit when resizing images | `2000` |
-| `image_quality` | JPEG quality for resized images (0–95) | `85` |
+| `image_max_dimension` | Long-edge pixel limit when resizing images | `1600` |
+| `image_quality` | JPEG quality for resized images (0–95) | `75` |
+| `micro_post_max_length` | Max plain-text characters for a post to be treated as a microblog post | `180` |
 
 Example:
 
 ```yaml
 site_title: My Blog
 posts_per_page: 12
-image_max_dimension: 2000
-image_quality: 85
+image_max_dimension: 1600
+image_quality: 75
+micro_post_max_length: 180
 ```
 
 ## Creating a post
@@ -63,6 +65,8 @@ Post body goes here. Standard Markdown is supported.
 
 The `title` field is optional.
 
+A post with no title, no images, and a plain-text body of `micro_post_max_length` characters or fewer is treated as a microblog post and rendered with an additional `micro-post` CSS class.
+
 ## Building the site
 
 Run `build.py` from your project directory.
@@ -73,6 +77,7 @@ Run `build.py` from your project directory.
 | `build.py --flush` | Delete all output and rebuild everything from scratch |
 | `build.py --resources` | Replace `dist/resources/` with the current `resources/` |
 | `build.py --push` | Build, then push `dist/` to GitHub Pages |
+| `build.py --verbose` | Build and print a detailed log of every file changed |
 | `build.py 1.md` | Preview a single post or special page (does not update index pages) |
 
 Use `--flush` after editing templates. Use `--resources` after editing CSS or JS.

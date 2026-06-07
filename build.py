@@ -54,6 +54,12 @@ def main():
                 print(f"  RESIZED: {name} ({_fmt_size(entry[2])} → {_fmt_size(entry[3])})")
             elif action == "RESIZED":
                 print(f"  RESIZED: {name}")
+            elif len(entry) == 4:
+                char_count, is_micro = entry[2], entry[3]
+                suffix = f" - {char_count} characters"
+                if is_micro:
+                    suffix += " (micro)"
+                print(f"{action}: {name}{suffix}")
             else:
                 print(f"{action}: {name}")
         if post_log and site_log:
