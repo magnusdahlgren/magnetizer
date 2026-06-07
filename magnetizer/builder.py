@@ -1,6 +1,7 @@
 import re
 import shutil
 import time
+from datetime import datetime as _datetime
 from pathlib import Path
 
 from magnetizer.config import load_config
@@ -16,9 +17,17 @@ from magnetizer.render import (
     render_template,
 )
 from magnetizer.feed import render_feed
+from magnetizer.sitemap import render_sitemap, render_robots_txt
 from magnetizer.validate import validate_config, validate_content, validate_project
 
 _FLUSH_PRESERVE = {'.git', 'CNAME', '.nojekyll'}
+
+
+def _lastmod(paths):
+    mtimes = [p.stat().st_mtime for p in paths if p.exists()]
+    if not mtimes:
+        return None
+    return _datetime.fromtimestamp(max(mtimes)).strftime('%Y-%m-%d')
 
 
 def _post_ids_in_content(content_dir):
@@ -317,6 +326,29 @@ def build(cwd, filename=None, flush=False, resources=False):
         (dist_dir / "archive.html").write_text(archive_html)
         log.append(("UPDATED", "archive.html"))
         save_manifest(content_dir, manifest_path)
+
+    if not filename and log:
+        per_page = config["posts_per_page"]
+        total_pages = max(1, (len(all_post_ids_sorted_desc) + per_page - 1) // per_page)
+        index_lastmod = _lastmod([content_dir / f"{pid}.md" for pid in all_post_ids_sorted_desc])
+        sitemap_pages = []
+        for pid in all_post_ids_sorted_desc:
+            post_files = [content_dir / f"{pid}.md"] + [
+                f for f in content_dir.iterdir() if re.match(rf'^{pid}-image-', f.name)
+            ]
+            sitemap_pages.append((f"{pid}.html", _lastmod(post_files)))
+        for page_num in range(1, total_pages + 1):
+            sitemap_pages.append((index_page_url(page_num), index_lastmod))
+        if about_md.exists():
+            about_files = [content_dir / "about.md"] + [
+                f for f in content_dir.iterdir() if re.match(r'^about-image-', f.name)
+            ]
+            sitemap_pages.append(("about.html", _lastmod(about_files)))
+        sitemap_pages.append(("archive.html", index_lastmod))
+        (dist_dir / "sitemap.xml").write_text(render_sitemap(sitemap_pages, config))
+        log.append(("UPDATED", "sitemap.xml"))
+        (dist_dir / "robots.txt").write_text(render_robots_txt(config))
+        log.append(("UPDATED", "robots.txt"))
 
     if _copy_resources(cwd / "resources", dist_dir, replace=resources or flush):
         log.append(("COPIED", "resources/"))
