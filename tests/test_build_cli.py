@@ -253,7 +253,7 @@ class TestCLIVerbose:
         img = PILImage.new("RGB", (800, 600))
         img.save(p / "content" / "1-image-01.jpg", "JPEG")
         result = run_build(["--verbose"], cwd=p)
-        resized_line = next(l for l in result.stdout.splitlines() if "RESIZED: 1-image-01-resized.jpg" in l)
+        resized_line = next(line for line in result.stdout.splitlines() if "RESIZED: 1-image-01-resized.jpg" in line)
         assert "→" in resized_line
 
     def test_verbose_blank_line_between_post_and_site_entries(self, tmp_path):
