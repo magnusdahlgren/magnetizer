@@ -409,6 +409,90 @@ class TestFeed:
 
 
 # ---------------------------------------------------------------------------
+# Sitemap and robots.txt
+# ---------------------------------------------------------------------------
+
+class TestSitemap:
+
+    def test_sitemap_created_on_full_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert (p / "dist" / "sitemap.xml").exists()
+
+    def test_sitemap_not_created_on_single_file_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p, filename="1.md")
+        assert not (p / "dist" / "sitemap.xml").exists()
+
+    def test_sitemap_recreated_on_flush(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        (p / "dist" / "sitemap.xml").write_text("old content")
+        build(p, flush=True)
+        assert "old content" not in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_contains_post_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "1.html" in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_contains_index_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "index.html" in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_contains_archive_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "archive.html" in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_contains_about_url_when_about_exists(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text("---\ntitle: About\n---\n\nAbout me.\n")
+        build(p)
+        assert "about.html" in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_excludes_about_url_when_no_about(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "about.html" not in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_excludes_cookies_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text("---\ntitle: Cookies\n---\n\nCookies.\n")
+        build(p)
+        assert "cookies.html" not in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_contains_lastmod(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "<lastmod>" in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        assert ("UPDATED", "sitemap.xml") in build(p)["log"]
+
+    def test_robots_txt_created_on_full_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert (p / "dist" / "robots.txt").exists()
+
+    def test_robots_txt_not_created_on_single_file_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p, filename="1.md")
+        assert not (p / "dist" / "robots.txt").exists()
+
+    def test_robots_txt_contains_sitemap_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "sitemap.xml" in (p / "dist" / "robots.txt").read_text()
+
+    def test_robots_txt_in_log(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        assert ("UPDATED", "robots.txt") in build(p)["log"]
+
+
+# ---------------------------------------------------------------------------
 # Post navigation
 # ---------------------------------------------------------------------------
 
