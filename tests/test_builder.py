@@ -694,7 +694,25 @@ class TestVerboseLog:
     def test_resized_image_in_log(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         make_jpg(p / "content" / "1-image-01.jpg")
-        assert ("RESIZED", "1-image-01-resized.jpg") in build(p)["log"]
+        log = build(p)["log"]
+        assert any(e[0] == "RESIZED" and e[1] == "1-image-01-resized.jpg" for e in log)
+
+    def test_resized_log_entry_includes_src_and_dest_sizes(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        log = build(p)["log"]
+        entry = next(e for e in log if e[0] == "RESIZED")
+        action, name, src_size, dest_size = entry
+        assert isinstance(src_size, int) and src_size > 0
+        assert isinstance(dest_size, int) and dest_size > 0
+
+    def test_resized_log_src_larger_than_dest_for_large_image(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        make_jpg(p / "content" / "1-image-01.jpg", width=3000, height=2000)
+        log = build(p)["log"]
+        entry = next(e for e in log if e[0] == "RESIZED")
+        _, _, src_size, dest_size = entry
+        assert src_size > dest_size
 
     def test_index_page_in_log(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
