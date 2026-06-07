@@ -221,8 +221,8 @@ Examples:
 | --- | --- | --- |
 | `site_title` | The generated pages’ `<title>` | `My Blog` |
 | `site_url` | Absolute base URL of the published site, e.g. `https://example.github.io` | Required — build exits with an error if absent or empty |
-| `image_max_dimension` | Long-edge max size when resizing images | `2000` |
-| `image_quality` | Image quality, when resizing images | `85` |
+| `image_max_dimension` | Long-edge max size when resizing images | `1600` |
+| `image_quality` | Image quality, when resizing images | `75` |
 | `posts_per_page` | Number of posts per page when generating the index files | `12` |
 
 ### Image processing

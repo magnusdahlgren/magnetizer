@@ -38,18 +38,28 @@ def main():
     )
 
     if args.verbose and outcome["log"]:
-        def _is_post_entry(action, name):
+        def _fmt_size(n):
+            return f"{n / 1_000_000:.1f} MB" if n >= 1_000_000 else f"{round(n / 1_000)} KB"
+
+        def _is_post_entry(entry):
+            action, name = entry[0], entry[1]
             return action == "RESIZED" or (name.endswith(".html") and name[:-5].isdigit())
 
-        post_log = [(a, n) for a, n in outcome["log"] if _is_post_entry(a, n)]
-        site_log = [(a, n) for a, n in outcome["log"] if not _is_post_entry(a, n)]
+        post_log = [e for e in outcome["log"] if _is_post_entry(e)]
+        site_log = [e for e in outcome["log"] if not _is_post_entry(e)]
 
-        for action, name in post_log:
-            print(f"  {action}: {name}" if action == "RESIZED" else f"{action}: {name}")
+        for entry in post_log:
+            action, name = entry[0], entry[1]
+            if action == "RESIZED" and len(entry) == 4:
+                print(f"  RESIZED: {name} ({_fmt_size(entry[2])} → {_fmt_size(entry[3])})")
+            elif action == "RESIZED":
+                print(f"  RESIZED: {name}")
+            else:
+                print(f"{action}: {name}")
         if post_log and site_log:
             print()
-        for action, name in site_log:
-            print(f"{action}: {name}")
+        for entry in site_log:
+            print(f"{entry[0]}: {entry[1]}")
 
     if outcome["log"]:
         print(

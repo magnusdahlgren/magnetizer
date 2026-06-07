@@ -265,10 +265,13 @@ def build(cwd, filename=None, flush=False, resources=False):
         post = _load_post(content_dir, post_id)
         posts_cache[post_id] = post
         _warn_if_missing_alt_texts(post)
+        src_sizes = {img.filename: (content_dir / img.filename).stat().st_size for img in post.images}
         _build_post(post, dist_dir, content_dir, config)
         for image in post.images:
             stem, _, ext = image.filename.rpartition('.')
-            log.append(("RESIZED", f"{stem}-resized.{ext}"))
+            resized_name = f"{stem}-resized.{ext}"
+            dest_size = (dist_dir / resized_name).stat().st_size
+            log.append(("RESIZED", resized_name, src_sizes[image.filename], dest_size))
         idx_url = _post_index_page_url(post_id, all_post_ids_sorted_desc, config["posts_per_page"])
         newer_url, older_url = _adjacent_post_urls(post_id, all_post_ids_sorted_desc)
         _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url)
