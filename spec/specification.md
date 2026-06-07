@@ -157,6 +157,8 @@ Options:
                 whenever resources (e.g. CSS or JS) have been updated.  
   --push        Push the contents of ./dist to GitHub Pages after a successful 
                 build.
+  --verbose     Print a detailed log of every file created, updated, or removed
+                during the build.
 
 Examples:
   build.py             Build all content from ./content that has changed since 
@@ -211,7 +213,20 @@ Examples:
     - `--resources` (delete existing `dist/resources/` first)
     - `dist/resources/` does not exist
 9. If `--push` and no errors, push to GitHub Pages
-10. Exit and return to the command line, indicating the outcome, e.g. `0 post(s) created, 2 post(s) updated, 1 post(s) deleted` 
+10. Exit and return to the command line, indicating the outcome, e.g. `0 post(s) created, 2 post(s) updated, 1 post(s) deleted`
+11. If `--verbose`, print a detailed log before the summary line. Post entries include character count and a `(micro)` label if applicable:
+
+    ```
+    CREATED: 1.html - 11 characters (micro)
+    UPDATED: 2.html - 340 characters
+      RESIZED: 2-image-01-resized.jpg (120 KB → 45 KB)
+    REMOVED: 3.html
+
+    UPDATED: index.html
+    UPDATED: feed.xml
+    ```
+
+    Post entries are printed first, separated from site entries (index pages, feed, etc.) by a blank line.
 
 ### Configuration
 
@@ -224,6 +239,7 @@ Examples:
 | `image_max_dimension` | Long-edge max size when resizing images | `1600` |
 | `image_quality` | Image quality, when resizing images | `75` |
 | `posts_per_page` | Number of posts per page when generating the index files | `12` |
+| `micro_post_max_length` | Maximum plain-text character count for a post to be treated as a microblog post | `180` |
 
 ### Image processing
 
@@ -361,6 +377,22 @@ Note: The following differences apply to <articles> when they appear on idex pag
 
 - The <article> class is `multiple-posts`
 - Each <img> is wrapped in an <a> pointing to the individual post page.
+
+### Microblog posts
+
+A post is classified as a microblog post if it meets all of the following criteria:
+
+- No `title` in the frontmatter
+- No associated image files
+- Body plain-text length is between 1 and `micro_post_max_length` characters (inclusive)
+
+Character counting uses the rendered plain text — markdown syntax (e.g. `**bold**`) and HTML tags are excluded, so only visible characters count.
+
+Microblog posts have `micro-post` appended to the `<article>` class:
+
+```html
+<article id="post-1" class="single-post micro-post" ...>
+```
 
 ### Individual post pages
 
