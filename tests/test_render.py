@@ -536,9 +536,14 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content(posts)
         assert html.index("May 2026") < html.index("April 2026")
 
-    def test_titled_post_shows_day_dash_title(self):
+    def test_titled_post_shows_day_and_title(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Sunny day")])
-        assert "24 - Sunny day" in html
+        assert '<span class="day">24</span>' in html
+        assert "Sunny day" in html
+
+    def test_day_in_span_outside_link(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Sunny day")])
+        assert html.index('<span class="day">') < html.index('<a href=')
 
     def test_untitled_imageless_post_shows_photo(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
@@ -573,10 +578,10 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([])
         assert "<main>" in html
 
-    def test_day_has_no_leading_zero_in_description(self):
+    def test_day_has_no_leading_zero_in_span(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03", title="Post")])
-        assert "3 - Post" in html
-        assert "03 - Post" not in html
+        assert '<span class="day">3</span>' in html
+        assert '<span class="day">03</span>' not in html
 
     def test_titled_post_title_escaped_in_archive(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="A & B")])
@@ -727,7 +732,7 @@ class TestArchiveDescriptions:
                             images=[Image("1-image-01.jpg")])
         ])
         assert "Has text." in html
-        assert "24 - Photo" not in html
+        assert ">Photo<" not in html
 
     def test_uses_first_paragraph_only(self):
         html = render_archive_page_content([

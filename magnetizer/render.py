@@ -159,7 +159,7 @@ def render_archive_page_content(posts):
         for post in months[(year, month)]:
             day = str(_date.fromisoformat(post.date).day)
             item_class = _archive_item_class(post)
-            parts.append(f'<li class="{item_class}"><a href="{post.url}">{day} - {_archive_description(post)}</a></li>')
+            parts.append(f'<li class="{item_class}"><span class="day">{day}</span><a href="{post.url}">{_archive_description(post)}</a></li>')
         parts.append('</ul>')
         parts.append('</section>')
     parts.append('</main>')

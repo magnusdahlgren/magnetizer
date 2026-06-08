@@ -478,7 +478,7 @@ The `MAGNETIZER_CONTENT` has the following structure:
   <section>
     <h2>May 2026</h2>
     <ul>
-      <li class="POST_TYPE"><a href="POST_URL">DAY - POST_TITLE</a></li>
+      <li class="POST_TYPE"><span class="day">DAY</span><a href="POST_URL">POST_TITLE</a></li>
       ...
     </ul>
   </section>
