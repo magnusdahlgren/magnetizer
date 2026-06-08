@@ -467,6 +467,7 @@ The page title is `Archive - {site_title}`.
 The `MAGNETIZER_CONTENT` has the following structure:
 
 ```html
+<h1>Archive</h1>
 <dl class="archive-stats">
   <dt class="posts">Posts:</dt>
   <dd>45</dd>

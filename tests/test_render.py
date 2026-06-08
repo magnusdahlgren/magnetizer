@@ -507,6 +507,14 @@ def make_dated_post(id, date, title=None, body_html="", images=None):
 
 class TestRenderArchivePageContent:
 
+    def test_has_h1_heading(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert "<h1>Archive</h1>" in html
+
+    def test_h1_before_stats(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert html.index("<h1>Archive</h1>") < html.index('<dl class="archive-stats">')
+
     def test_has_main_element(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
         assert "<main>" in html and "</main>" in html

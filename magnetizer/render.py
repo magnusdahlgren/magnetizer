@@ -132,6 +132,7 @@ def render_archive_page_content(posts):
         months.setdefault(key, []).append(post)
 
     parts = [
+        '<h1>Archive</h1>',
         '<dl class="archive-stats">',
         '<dt class="posts">Posts:</dt>',
         f'<dd>{len(posts)}</dd>',
