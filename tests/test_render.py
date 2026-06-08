@@ -267,9 +267,9 @@ class TestRenderPostPageContent:
         html = render_post_page_content(make_post(), index_page_url="index.html")
         assert "Back to homepage" in html
 
-    def test_back_link_has_house_symbol(self):
+    def test_back_link_has_no_utf_symbol(self):
         html = render_post_page_content(make_post(), index_page_url="index.html")
-        assert "⌂ Back to homepage" in html
+        assert "⌂" not in html
 
     def test_article_rendered_without_links(self):
         html = render_post_page_content(make_post(post_id=1, title="T"), index_page_url="index.html")
@@ -294,12 +294,14 @@ class TestRenderPostPageNavigation:
     def test_newer_link_present_when_newer_exists(self):
         html = render_post_page_content(make_post(), index_page_url="index.html",
                                         newer_url="2.html")
-        assert "← Newer post" in html
+        assert "Newer post" in html
+        assert "←" not in html
 
     def test_older_link_present_when_older_exists(self):
         html = render_post_page_content(make_post(), index_page_url="index.html",
                                         older_url="1.html")
-        assert "Older post →" in html
+        assert "Older post" in html
+        assert "→" not in html
 
     def test_newer_link_href(self):
         html = render_post_page_content(make_post(), index_page_url="index.html",
@@ -402,13 +404,15 @@ class TestRenderIndexPageContent:
         html = render_index_page_content([make_post()], page_num=1, total_pages=2)
         assert '<li class="older">' in html
 
-    def test_newer_posts_link_has_left_arrow(self):
+    def test_newer_posts_link_has_no_left_arrow(self):
         html = render_index_page_content([make_post()], page_num=2, total_pages=3)
-        assert '← Newer posts' in html
+        assert 'Newer posts' in html
+        assert '←' not in html
 
-    def test_older_posts_link_has_right_arrow(self):
+    def test_older_posts_link_has_no_right_arrow(self):
         html = render_index_page_content([make_post()], page_num=1, total_pages=2)
-        assert 'Older posts →' in html
+        assert 'Older posts' in html
+        assert '→' not in html
 
 
 # ---------------------------------------------------------------------------
