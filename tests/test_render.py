@@ -637,6 +637,32 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
         assert '<dt class="photos">Photos:</dt>' in html
 
+    def test_archive_item_text_post_class(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Hello")])
+        assert '<li class="text-post">' in html
+
+    def test_archive_item_photo_post_class(self):
+        from magnetizer.content import Image
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg")])])
+        assert '<li class="photo-post">' in html
+
+    def test_archive_item_mixed_post_class(self):
+        from magnetizer.content import Image
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Hello", images=[Image("1-image-01.jpg")])])
+        assert '<li class="mixed-post">' in html
+
+    def test_archive_item_micro_post_class(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title=None,
+                    url="1.html", body_html="<p>Short text</p>", images=[], is_micro=True)
+        html = render_archive_page_content([post])
+        assert '<li class="micro-post">' in html
+
+    def test_archive_item_imageless_untitled_non_micro_is_text_post(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title=None,
+                    url="1.html", body_html="<p>Text</p>", images=[], is_micro=False)
+        html = render_archive_page_content([post])
+        assert '<li class="text-post">' in html
+
 
 # ---------------------------------------------------------------------------
 # render_archive_page_content — post descriptions

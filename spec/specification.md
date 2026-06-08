@@ -478,8 +478,8 @@ The `MAGNETIZER_CONTENT` has the following structure:
   <section>
     <h2>May 2026</h2>
     <ul>
-      <li><a href="POST_URL">DAY - POST_TITLE</a></li>
-      <li><a href="POST_URL">DAY</a></li>
+      <li class="POST_TYPE"><a href="POST_URL">DAY - POST_TITLE</a></li>
+      ...
     </ul>
   </section>
   ...
@@ -493,6 +493,7 @@ Where:
 - `DAY` is the day of the month with no leading zero, e.g. `16`
 - Titled posts use `DAY - POST_TITLE` as link text
 - Untitled posts use just `DAY` as link text
+- `POST_TYPE` is one of: `text-post` (title, no images), `photo-post` (images, no title), `mixed-post` (title and images), `micro-post` (microblog post)
 
 ### Index pages
 

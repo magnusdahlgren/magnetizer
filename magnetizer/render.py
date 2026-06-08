@@ -121,6 +121,16 @@ def _archive_description(post):
     return 'Photo'
 
 
+def _archive_item_class(post):
+    if post.is_micro:
+        return "micro-post"
+    if post.images and post.title:
+        return "mixed-post"
+    if post.images:
+        return "photo-post"
+    return "text-post"
+
+
 def render_archive_page_content(posts):
     dated_posts = [p for p in posts if p.date]
     photo_posts_count = sum(1 for p in posts if p.images)
@@ -148,7 +158,8 @@ def render_archive_page_content(posts):
         parts.append('<ul>')
         for post in months[(year, month)]:
             day = str(_date.fromisoformat(post.date).day)
-            parts.append(f'<li><a href="{post.url}">{day} - {_archive_description(post)}</a></li>')
+            item_class = _archive_item_class(post)
+            parts.append(f'<li class="{item_class}"><a href="{post.url}">{day} - {_archive_description(post)}</a></li>')
         parts.append('</ul>')
         parts.append('</section>')
     parts.append('</main>')
