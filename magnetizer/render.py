@@ -66,12 +66,12 @@ def render_post_page_content(post, index_page_url, newer_url=None, older_url=Non
     if newer_url or older_url:
         nav_items = []
         if newer_url:
-            nav_items.append(f'<li class="newer"><a href="{newer_url}">← Newer post</a></li>')
+            nav_items.append(f'<li class="newer"><a href="{newer_url}">Newer post</a></li>')
         if older_url:
-            nav_items.append(f'<li class="older"><a href="{older_url}">Older post →</a></li>')
+            nav_items.append(f'<li class="older"><a href="{older_url}">Older post</a></li>')
         parts.append(f'<nav><ul>{"".join(nav_items)}</ul></nav>')
 
-    parts.append(f'<nav><a href="{back_url}">⌂ Back to homepage</a></nav>')
+    parts.append(f'<nav><a href="{back_url}">Back to homepage</a></nav>')
     return '\n'.join(parts)
 
 
@@ -83,10 +83,10 @@ def render_index_page_content(posts, page_num, total_pages):
         nav_items = []
         if page_num > 1:
             prev_url = index_page_url(page_num - 1)
-            nav_items.append(f'<li class="newer"><a href="{prev_url}">← Newer posts</a></li>')
+            nav_items.append(f'<li class="newer"><a href="{prev_url}">Newer posts</a></li>')
         if page_num < total_pages:
             next_url = index_page_url(page_num + 1)
-            nav_items.append(f'<li class="older"><a href="{next_url}">Older posts →</a></li>')
+            nav_items.append(f'<li class="older"><a href="{next_url}">Older posts</a></li>')
         content += f'\n<nav><ul>{"".join(nav_items)}</ul></nav>'
 
     return content
@@ -121,9 +121,19 @@ def _archive_description(post):
     return 'Photo'
 
 
+def _archive_item_class(post):
+    if post.is_micro:
+        return "micro-post"
+    if post.images and post.title:
+        return "mixed-post"
+    if post.images:
+        return "photo-post"
+    return "text-post"
+
+
 def render_archive_page_content(posts):
     dated_posts = [p for p in posts if p.date]
-    photo_count = sum(len(p.images) for p in posts)
+    photo_posts_count = sum(1 for p in posts if p.images)
 
     months = {}
     for post in dated_posts:
@@ -135,10 +145,10 @@ def render_archive_page_content(posts):
         '<main>',
         '<h1>Archive</h1>',
         '<dl class="archive-stats">',
+        '<dt class="photos">Photos:</dt>',
+        f'<dd>{photo_posts_count}</dd>',
         '<dt class="posts">Posts:</dt>',
         f'<dd>{len(posts)}</dd>',
-        '<dt class="photos">Photos:</dt>',
-        f'<dd>{photo_count}</dd>',
         '</dl>',
     ]
     for year, month in sorted(months.keys(), reverse=True):
@@ -148,10 +158,11 @@ def render_archive_page_content(posts):
         parts.append('<ul>')
         for post in months[(year, month)]:
             day = str(_date.fromisoformat(post.date).day)
-            parts.append(f'<li><a href="{post.url}">{day} - {_archive_description(post)}</a></li>')
+            item_class = _archive_item_class(post)
+            parts.append(f'<li class="{item_class}"><span class="day">{day}</span><a href="{post.url}">{_archive_description(post)}</a></li>')
         parts.append('</ul>')
         parts.append('</section>')
     parts.append('</main>')
-    parts.append('<nav><a href="index.html">⌂ Back to homepage</a></nav>')
+    parts.append('<nav><a href="index.html">Back to homepage</a></nav>')
 
     return '\n'.join(parts)

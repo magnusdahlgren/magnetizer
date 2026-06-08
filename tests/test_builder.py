@@ -541,7 +541,7 @@ class TestPostNavigation:
         time.sleep(0.01)
         (p / "content" / "3.md").write_text(MINIMAL_MD)
         build(p)
-        assert "← Newer post" in (p / "dist" / "2.html").read_text()
+        assert "Newer post" in (p / "dist" / "2.html").read_text()
 
     def test_neighbors_get_nav_links_updated_when_post_deleted(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD, 3: MINIMAL_MD})

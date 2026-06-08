@@ -470,16 +470,16 @@ The `MAGNETIZER_CONTENT` has the following structure:
 <main>
 <h1>Archive</h1>
 <dl class="archive-stats">
-  <dt class="posts">Posts:</dt>
-  <dd>45</dd>
   <dt class="photos">Photos:</dt>
-  <dd>64</dd>
+  <dd>34</dd>
+  <dt class="posts">Posts:</dt>
+  <dd>56</dd>
 </dl>
   <section>
     <h2>May 2026</h2>
     <ul>
-      <li><a href="POST_URL">DAY - POST_TITLE</a></li>
-      <li><a href="POST_URL">DAY</a></li>
+      <li class="POST_TYPE"><span class="day">DAY</span><a href="POST_URL">POST_TITLE</a></li>
+      ...
     </ul>
   </section>
   ...
@@ -489,10 +489,11 @@ The `MAGNETIZER_CONTENT` has the following structure:
 
 Where:
 
-- The `<dl class="archive-stats">` shows the total count of all posts and the total number of individual images across all posts (including undated posts)
+- The `<dl class="archive-stats">` shows the number of posts that have at least one photo, then the total count of all posts (including undated posts), in that order
 - `DAY` is the day of the month with no leading zero, e.g. `16`
 - Titled posts use `DAY - POST_TITLE` as link text
 - Untitled posts use just `DAY` as link text
+- `POST_TYPE` is one of: `text-post` (title, no images), `photo-post` (images, no title), `mixed-post` (title and images), `micro-post` (microblog post)
 
 ### Index pages
 

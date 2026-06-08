@@ -267,9 +267,9 @@ class TestRenderPostPageContent:
         html = render_post_page_content(make_post(), index_page_url="index.html")
         assert "Back to homepage" in html
 
-    def test_back_link_has_house_symbol(self):
+    def test_back_link_has_no_utf_symbol(self):
         html = render_post_page_content(make_post(), index_page_url="index.html")
-        assert "⌂ Back to homepage" in html
+        assert "⌂" not in html
 
     def test_article_rendered_without_links(self):
         html = render_post_page_content(make_post(post_id=1, title="T"), index_page_url="index.html")
@@ -294,12 +294,14 @@ class TestRenderPostPageNavigation:
     def test_newer_link_present_when_newer_exists(self):
         html = render_post_page_content(make_post(), index_page_url="index.html",
                                         newer_url="2.html")
-        assert "← Newer post" in html
+        assert "Newer post" in html
+        assert "←" not in html
 
     def test_older_link_present_when_older_exists(self):
         html = render_post_page_content(make_post(), index_page_url="index.html",
                                         older_url="1.html")
-        assert "Older post →" in html
+        assert "Older post" in html
+        assert "→" not in html
 
     def test_newer_link_href(self):
         html = render_post_page_content(make_post(), index_page_url="index.html",
@@ -402,13 +404,15 @@ class TestRenderIndexPageContent:
         html = render_index_page_content([make_post()], page_num=1, total_pages=2)
         assert '<li class="older">' in html
 
-    def test_newer_posts_link_has_left_arrow(self):
+    def test_newer_posts_link_has_no_left_arrow(self):
         html = render_index_page_content([make_post()], page_num=2, total_pages=3)
-        assert '← Newer posts' in html
+        assert 'Newer posts' in html
+        assert '←' not in html
 
-    def test_older_posts_link_has_right_arrow(self):
+    def test_older_posts_link_has_no_right_arrow(self):
         html = render_index_page_content([make_post()], page_num=1, total_pages=2)
-        assert 'Older posts →' in html
+        assert 'Older posts' in html
+        assert '→' not in html
 
 
 # ---------------------------------------------------------------------------
@@ -536,9 +540,14 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content(posts)
         assert html.index("May 2026") < html.index("April 2026")
 
-    def test_titled_post_shows_day_dash_title(self):
+    def test_titled_post_shows_day_and_title(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Sunny day")])
-        assert "24 - Sunny day" in html
+        assert '<span class="day">24</span>' in html
+        assert "Sunny day" in html
+
+    def test_day_in_span_outside_link(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Sunny day")])
+        assert html.index('<span class="day">') < html.index('<a href=')
 
     def test_untitled_imageless_post_shows_photo(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
@@ -573,10 +582,10 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([])
         assert "<main>" in html
 
-    def test_day_has_no_leading_zero_in_description(self):
+    def test_day_has_no_leading_zero_in_span(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03", title="Post")])
-        assert "3 - Post" in html
-        assert "03 - Post" not in html
+        assert '<span class="day">3</span>' in html
+        assert '<span class="day">03</span>' not in html
 
     def test_titled_post_title_escaped_in_archive(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="A & B")])
@@ -592,14 +601,26 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content(posts)
         assert "<dd>2</dd>" in html
 
-    def test_stats_shows_photo_count(self):
+    def test_stats_shows_photo_post_count(self):
         from magnetizer.content import Image
         posts = [
             make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg"), Image("1-image-02.jpg")]),
             make_dated_post(2, "2026-05-25", images=[Image("2-image-01.jpg")]),
         ]
         html = render_archive_page_content(posts)
-        assert "<dd>3</dd>" in html
+        assert "<dd>2</dd>" in html
+
+    def test_stats_multiple_images_count_as_one_photo_post(self):
+        from magnetizer.content import Image
+        posts = [
+            make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg"), Image("1-image-02.jpg")]),
+        ]
+        html = render_archive_page_content(posts)
+        assert "<dd>1</dd>" in html
+
+    def test_stats_photos_before_posts(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert html.index('<dt class="photos">') < html.index('<dt class="posts">')
 
     def test_stats_counts_undated_posts(self):
         posts = [
@@ -624,6 +645,32 @@ class TestRenderArchivePageContent:
     def test_stats_photos_dt_has_class(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
         assert '<dt class="photos">Photos:</dt>' in html
+
+    def test_archive_item_text_post_class(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Hello")])
+        assert '<li class="text-post">' in html
+
+    def test_archive_item_photo_post_class(self):
+        from magnetizer.content import Image
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg")])])
+        assert '<li class="photo-post">' in html
+
+    def test_archive_item_mixed_post_class(self):
+        from magnetizer.content import Image
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Hello", images=[Image("1-image-01.jpg")])])
+        assert '<li class="mixed-post">' in html
+
+    def test_archive_item_micro_post_class(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title=None,
+                    url="1.html", body_html="<p>Short text</p>", images=[], is_micro=True)
+        html = render_archive_page_content([post])
+        assert '<li class="micro-post">' in html
+
+    def test_archive_item_imageless_untitled_non_micro_is_text_post(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title=None,
+                    url="1.html", body_html="<p>Text</p>", images=[], is_micro=False)
+        html = render_archive_page_content([post])
+        assert '<li class="text-post">' in html
 
 
 # ---------------------------------------------------------------------------
@@ -689,7 +736,7 @@ class TestArchiveDescriptions:
                             images=[Image("1-image-01.jpg")])
         ])
         assert "Has text." in html
-        assert "24 - Photo" not in html
+        assert ">Photo<" not in html
 
     def test_uses_first_paragraph_only(self):
         html = render_archive_page_content([
