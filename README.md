@@ -109,13 +109,16 @@ Posts are displayed in reverse order by post ID — a higher ID means a newer po
 The archive page (`dist/archive.html`) lists all dated posts grouped by month. It opens with an `<h1>Archive</h1>` heading, followed by a stats block with the total number of posts and photos (individual images) across the whole site:
 
 ```html
-<h1>Archive</h1>
-<dl class="archive-stats">
-  <dt class="posts">Posts:</dt>
-  <dd>45</dd>
-  <dt class="photos">Photos:</dt>
-  <dd>64</dd>
-</dl>
+<main>
+  <h1>Archive</h1>
+  <dl class="archive-stats">
+    <dt class="posts">Posts:</dt>
+    <dd>45</dd>
+    <dt class="photos">Photos:</dt>
+    <dd>64</dd>
+  </dl>
+  ...
+</main>
 ```
 
 The `class` attributes on `<dt>` allow CSS to replace the text labels with icons (e.g. Font Awesome).

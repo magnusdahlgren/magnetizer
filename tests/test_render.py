@@ -609,9 +609,13 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content(posts)
         assert "<dd>2</dd>" in html
 
-    def test_stats_block_before_main(self):
+    def test_h1_inside_main(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
-        assert html.index('<dl class="archive-stats">') < html.index("<main>")
+        assert html.index("<main>") < html.index("<h1>Archive</h1>")
+
+    def test_stats_inside_main(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert html.index("<main>") < html.index('<dl class="archive-stats">')
 
     def test_stats_posts_dt_has_class(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])

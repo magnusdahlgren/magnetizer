@@ -132,6 +132,7 @@ def render_archive_page_content(posts):
         months.setdefault(key, []).append(post)
 
     parts = [
+        '<main>',
         '<h1>Archive</h1>',
         '<dl class="archive-stats">',
         '<dt class="posts">Posts:</dt>',
@@ -139,7 +140,6 @@ def render_archive_page_content(posts):
         '<dt class="photos">Photos:</dt>',
         f'<dd>{photo_count}</dd>',
         '</dl>',
-        '<main>',
     ]
     for year, month in sorted(months.keys(), reverse=True):
         label = _date(year, month, 1).strftime('%B %Y')
