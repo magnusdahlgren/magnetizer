@@ -467,6 +467,12 @@ The page title is `Archive - {site_title}`.
 The `MAGNETIZER_CONTENT` has the following structure:
 
 ```html
+<dl class="archive-stats">
+  <dt class="posts">Posts:</dt>
+  <dd>45</dd>
+  <dt class="photos">Photos:</dt>
+  <dd>64</dd>
+</dl>
 <main>
   <section>
     <h2>May 2026</h2>
@@ -482,6 +488,7 @@ The `MAGNETIZER_CONTENT` has the following structure:
 
 Where:
 
+- The `<dl class="archive-stats">` shows the total count of all posts and the total number of individual images across all posts (including undated posts)
 - `DAY` is the day of the month with no leading zero, e.g. `16`
 - Titled posts use `DAY - POST_TITLE` as link text
 - Untitled posts use just `DAY` as link text
