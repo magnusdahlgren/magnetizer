@@ -592,14 +592,26 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content(posts)
         assert "<dd>2</dd>" in html
 
-    def test_stats_shows_photo_count(self):
+    def test_stats_shows_photo_post_count(self):
         from magnetizer.content import Image
         posts = [
             make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg"), Image("1-image-02.jpg")]),
             make_dated_post(2, "2026-05-25", images=[Image("2-image-01.jpg")]),
         ]
         html = render_archive_page_content(posts)
-        assert "<dd>3</dd>" in html
+        assert "<dd>2</dd>" in html
+
+    def test_stats_multiple_images_count_as_one_photo_post(self):
+        from magnetizer.content import Image
+        posts = [
+            make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg"), Image("1-image-02.jpg")]),
+        ]
+        html = render_archive_page_content(posts)
+        assert "<dd>1</dd>" in html
+
+    def test_stats_photos_before_posts(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert html.index('<dt class="photos">') < html.index('<dt class="posts">')
 
     def test_stats_counts_undated_posts(self):
         posts = [

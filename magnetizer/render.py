@@ -123,7 +123,7 @@ def _archive_description(post):
 
 def render_archive_page_content(posts):
     dated_posts = [p for p in posts if p.date]
-    photo_count = sum(len(p.images) for p in posts)
+    photo_posts_count = sum(1 for p in posts if p.images)
 
     months = {}
     for post in dated_posts:
@@ -135,10 +135,10 @@ def render_archive_page_content(posts):
         '<main>',
         '<h1>Archive</h1>',
         '<dl class="archive-stats">',
+        '<dt class="photos">Photos:</dt>',
+        f'<dd>{photo_posts_count}</dd>',
         '<dt class="posts">Posts:</dt>',
         f'<dd>{len(posts)}</dd>',
-        '<dt class="photos">Photos:</dt>',
-        f'<dd>{photo_count}</dd>',
         '</dl>',
     ]
     for year, month in sorted(months.keys(), reverse=True):
