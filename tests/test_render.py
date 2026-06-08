@@ -507,6 +507,14 @@ def make_dated_post(id, date, title=None, body_html="", images=None):
 
 class TestRenderArchivePageContent:
 
+    def test_has_h1_heading(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert "<h1>Archive</h1>" in html
+
+    def test_h1_before_stats(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert html.index("<h1>Archive</h1>") < html.index('<dl class="archive-stats">')
+
     def test_has_main_element(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
         assert "<main>" in html and "</main>" in html
@@ -575,6 +583,48 @@ class TestRenderArchivePageContent:
         assert "&amp;" in html
         assert ">A & B<" not in html
 
+    def test_stats_block_present(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert '<dl class="archive-stats">' in html
+
+    def test_stats_shows_post_count(self):
+        posts = [make_dated_post(1, "2026-05-24"), make_dated_post(2, "2026-05-25")]
+        html = render_archive_page_content(posts)
+        assert "<dd>2</dd>" in html
+
+    def test_stats_shows_photo_count(self):
+        from magnetizer.content import Image
+        posts = [
+            make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg"), Image("1-image-02.jpg")]),
+            make_dated_post(2, "2026-05-25", images=[Image("2-image-01.jpg")]),
+        ]
+        html = render_archive_page_content(posts)
+        assert "<dd>3</dd>" in html
+
+    def test_stats_counts_undated_posts(self):
+        posts = [
+            make_dated_post(2, "2026-05-24"),
+            Post(id=1, date=None, date_uk=None, title="No date", url="1.html", body_html="", images=[]),
+        ]
+        html = render_archive_page_content(posts)
+        assert "<dd>2</dd>" in html
+
+    def test_h1_inside_main(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert html.index("<main>") < html.index("<h1>Archive</h1>")
+
+    def test_stats_inside_main(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert html.index("<main>") < html.index('<dl class="archive-stats">')
+
+    def test_stats_posts_dt_has_class(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert '<dt class="posts">Posts:</dt>' in html
+
+    def test_stats_photos_dt_has_class(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert '<dt class="photos">Photos:</dt>' in html
+
 
 # ---------------------------------------------------------------------------
 # render_archive_page_content — post descriptions
@@ -639,7 +689,7 @@ class TestArchiveDescriptions:
                             images=[Image("1-image-01.jpg")])
         ])
         assert "Has text." in html
-        assert "Photo" not in html
+        assert "24 - Photo" not in html
 
     def test_uses_first_paragraph_only(self):
         html = render_archive_page_content([

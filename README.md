@@ -104,6 +104,25 @@ All files live flat in `content/` — no subdirectories.
 
 Posts are displayed in reverse order by post ID — a higher ID means a newer post.
 
+## Archive page
+
+The archive page (`dist/archive.html`) lists all dated posts grouped by month. It opens with an `<h1>Archive</h1>` heading, followed by a stats block with the total number of posts and photos (individual images) across the whole site:
+
+```html
+<main>
+  <h1>Archive</h1>
+  <dl class="archive-stats">
+    <dt class="posts">Posts:</dt>
+    <dd>45</dd>
+    <dt class="photos">Photos:</dt>
+    <dd>64</dd>
+  </dl>
+  ...
+</main>
+```
+
+The `class` attributes on `<dt>` allow CSS to replace the text labels with icons (e.g. Font Awesome).
+
 ## Publishing
 
 Set up `dist/` as a clone of your GitHub Pages repository before using `--push`. Magnetizer stages, commits, and pushes all changes automatically.
