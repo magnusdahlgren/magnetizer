@@ -86,12 +86,32 @@ Every full build also generates `dist/sitemap.xml` (all post, index, about, and 
 
 ## Templates
 
-Magnetizer uses a single template file: `templates/index.html`. It must contain two placeholders:
+Magnetizer uses a single template file: `templates/index.html`. It must contain two required placeholders, plus optional ones:
 
-| Placeholder | Replaced with |
-|---|---|
-| `MAGNETIZER_TITLE` | The page title |
-| `MAGNETIZER_CONTENT` | The generated page content |
+| Placeholder | Required | Replaced with |
+|---|---|---|
+| `MAGNETIZER_TITLE` | Yes | The page title |
+| `MAGNETIZER_CONTENT` | Yes | The generated page content |
+| `MAGNETIZER_BUILD_ID` | No | A Unix timestamp, useful for cache-busting: `style.css?v=MAGNETIZER_BUILD_ID` |
+| `MAGNETIZER_CANONICAL_URL` | No | The canonical URL of the page. For `index.html` this is the root URL (e.g. `https://example.github.io/`); for all other pages it is `{site_url}/{filename}`. Use in a `<link rel="canonical">` tag to prevent duplicate-page issues with search engines. |
+
+Example `templates/index.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>MAGNETIZER_TITLE</title>
+    <link rel="canonical" href="MAGNETIZER_CANONICAL_URL">
+    <link rel="stylesheet" href="resources/style.css?v=MAGNETIZER_BUILD_ID">
+  </head>
+  <body>
+    <header><a href="/">My site</a></header>
+    MAGNETIZER_CONTENT
+  </body>
+</html>
+```
 
 ## Content files
 

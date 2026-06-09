@@ -9,6 +9,7 @@ from magnetizer.content import parse_post
 from magnetizer.image import resize_image
 from magnetizer.manifest import get_changed_post_ids, load_manifest, save_manifest
 from magnetizer.render import (
+    canonical_url,
     index_page_url,
     render_archive_page_content,
     render_index_page_content,
@@ -110,7 +111,8 @@ def _adjacent_post_urls(post_id, all_post_ids_sorted_desc):
 def _write_post_html(post, index_page_url, dist_dir, config, template, newer_url=None, older_url=None):
     content_html = render_post_page_content(post, index_page_url, newer_url=newer_url, older_url=older_url)
     title = render_page_title(config["site_title"], post.title, page_num=None)
-    html = render_template(template, title=title, content=content_html)
+    html = render_template(template, title=title, content=content_html,
+                           canonical=canonical_url(config["site_url"], f"{post.id}.html"))
     (dist_dir / f"{post.id}.html").write_text(html)
 
 
@@ -123,8 +125,9 @@ def _write_index_pages(posts_sorted_desc, dist_dir, config, template):
         slice_ = posts_sorted_desc[(page_num - 1) * per_page: page_num * per_page]
         content_html = render_index_page_content(slice_, page_num, total_pages)
         title = render_page_title(config["site_title"], None, page_num=page_num)
-        html = render_template(template, title=title, content=content_html)
         filename = index_page_url(page_num)
+        html = render_template(template, title=title, content=content_html,
+                               canonical=canonical_url(config["site_url"], filename))
         (dist_dir / filename).write_text(html)
 
 
@@ -138,7 +141,8 @@ def _build_cookies_page(content_dir, dist_dir, config, template):
     post = parse_post(md_text, "cookies", [])
     content_html = render_post_page_content(post, "index.html", back_url="index.html")
     title = render_page_title(config["site_title"], post.title, page_num=None)
-    html = render_template(template, title=title, content=content_html)
+    html = render_template(template, title=title, content=content_html,
+                           canonical=canonical_url(config["site_url"], "cookies.html"))
     (dist_dir / "cookies.html").write_text(html)
 
 
@@ -158,7 +162,8 @@ def _build_about_page(content_dir, dist_dir, config, template):
 
     content_html = render_post_page_content(post, "index.html", back_url="index.html")
     title = render_page_title(config["site_title"], post.title, page_num=None)
-    html = render_template(template, title=title, content=content_html)
+    html = render_template(template, title=title, content=content_html,
+                           canonical=canonical_url(config["site_url"], "about.html"))
     (dist_dir / "about.html").write_text(html)
 
 
@@ -322,6 +327,7 @@ def build(cwd, filename=None, flush=False, resources=False):
             template,
             title=render_page_title(config["site_title"], "Archive", page_num=None),
             content=render_archive_page_content(all_posts),
+            canonical=canonical_url(config["site_url"], "archive.html"),
         )
         (dist_dir / "archive.html").write_text(archive_html)
         log.append(("UPDATED", "archive.html"))
