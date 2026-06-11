@@ -909,6 +909,13 @@ BUILD_ID_TEMPLATE = (
     "<body>MAGNETIZER_CONTENT</body></html>"
 )
 
+CANONICAL_TEMPLATE = (
+    "<!DOCTYPE html><html><head>"
+    "<link rel=\"canonical\" href=\"MAGNETIZER_CANONICAL_URL\">"
+    "<title>MAGNETIZER_TITLE</title></head>"
+    "<body>MAGNETIZER_CONTENT</body></html>"
+)
+
 
 class TestBuildId:
 
@@ -936,6 +943,52 @@ class TestBuildId:
             m = re.search(r'style\.css\?v=(\d+)', path.read_text())
             return m.group(1) if m else None
         assert get_build_id(p / "dist" / "1.html") == get_build_id(p / "dist" / "index.html")
+
+
+# ---------------------------------------------------------------------------
+# Canonical URLs
+# ---------------------------------------------------------------------------
+
+class TestCanonicalUrls:
+
+    def test_post_page_has_canonical_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "templates" / "index.html").write_text(CANONICAL_TEMPLATE)
+        build(p)
+        assert 'href="https://example.github.io/1.html"' in (p / "dist" / "1.html").read_text()
+
+    def test_index_page_canonical_is_root_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "templates" / "index.html").write_text(CANONICAL_TEMPLATE)
+        build(p)
+        assert 'href="https://example.github.io/"' in (p / "dist" / "index.html").read_text()
+
+    def test_second_index_page_canonical_includes_filename(self, tmp_path):
+        posts = {i: MINIMAL_MD for i in range(1, 4)}
+        p = make_project(tmp_path, posts=posts)
+        (p / "templates" / "index.html").write_text(CANONICAL_TEMPLATE)
+        build(p)
+        assert 'href="https://example.github.io/index-2.html"' in (p / "dist" / "index-2.html").read_text()
+
+    def test_about_page_has_canonical_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(ABOUT_MD)
+        (p / "templates" / "index.html").write_text(CANONICAL_TEMPLATE)
+        build(p)
+        assert 'href="https://example.github.io/about.html"' in (p / "dist" / "about.html").read_text()
+
+    def test_archive_page_has_canonical_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "templates" / "index.html").write_text(CANONICAL_TEMPLATE)
+        build(p)
+        assert 'href="https://example.github.io/archive.html"' in (p / "dist" / "archive.html").read_text()
+
+    def test_cookies_page_has_canonical_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(COOKIES_MD)
+        (p / "templates" / "index.html").write_text(CANONICAL_TEMPLATE)
+        build(p)
+        assert 'href="https://example.github.io/cookies.html"' in (p / "dist" / "cookies.html").read_text()
 
 
 # ---------------------------------------------------------------------------

@@ -261,6 +261,7 @@ The following placeholders are available:
   • `site_title` (for individual post without a title) |
 | `MAGNETIZER_CONTENT` | Yes | The generated page content — one post for an individual post page or multiple posts for an index page. |
 | `MAGNETIZER_BUILD_ID` | No | A Unix timestamp generated at build time, e.g. `1748123456`. Useful for cache-busting static assets: `<link rel="stylesheet" href="resources/style.css?v=MAGNETIZER_BUILD_ID">`. The same value is used across all pages in a single build. |
+| `MAGNETIZER_CANONICAL_URL` | No | The canonical URL of the page, derived from `site_url` in config. For `index.html` this is the root URL (e.g. `https://example.github.io/`); for all other pages it is `site_url` + `/` + filename (e.g. `https://example.github.io/1.html`). Use in a `<link rel="canonical">` tag to help search engines identify the preferred URL for each page. |
 
 The following template is required in `templates/`:
 
@@ -274,7 +275,8 @@ Example `index.html`:
   <head>
     <meta charset="UTF-8">
     <title>MAGNETIZER_TITLE</title>
-    <link rel="stylesheet" href="resources/style.css">
+    <link rel="canonical" href="MAGNETIZER_CANONICAL_URL">
+    <link rel="stylesheet" href="resources/style.css?v=MAGNETIZER_BUILD_ID">
   </head>
   <body>
     <header><a href='/'>My site</a></header>

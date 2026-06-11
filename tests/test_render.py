@@ -3,6 +3,7 @@
 import pytest
 from magnetizer.content import Image, Post
 from magnetizer.render import (
+    canonical_url,
     render_archive_page_content,
     render_article,
     render_index_page_content,
@@ -444,6 +445,10 @@ class TestRenderPageTitle:
 class TestRenderTemplate:
 
     TEMPLATE = "<title>MAGNETIZER_TITLE</title><body>MAGNETIZER_CONTENT</body>"
+    CANONICAL_TEMPLATE = (
+        '<link rel="canonical" href="MAGNETIZER_CANONICAL_URL">'
+        "<title>MAGNETIZER_TITLE</title><body>MAGNETIZER_CONTENT</body>"
+    )
 
     def test_title_placeholder_replaced(self):
         html = render_template(self.TEMPLATE, title="My Page", content="<p>hi</p>")
@@ -459,6 +464,47 @@ class TestRenderTemplate:
         html = render_template(self.TEMPLATE, title="T", content="C")
         assert "<title>" in html
         assert "<body>" in html
+
+    def test_canonical_placeholder_replaced_when_provided(self):
+        html = render_template(self.CANONICAL_TEMPLATE, title="T", content="C",
+                               canonical="https://example.com/1.html")
+        assert "MAGNETIZER_CANONICAL_URL" not in html
+        assert 'href="https://example.com/1.html"' in html
+
+    def test_canonical_placeholder_untouched_when_not_provided(self):
+        html = render_template(self.CANONICAL_TEMPLATE, title="T", content="C")
+        assert "MAGNETIZER_CANONICAL_URL" in html
+
+    def test_canonical_url_in_content_is_not_replaced(self):
+        template = '<link href="MAGNETIZER_CANONICAL_URL"><body>MAGNETIZER_CONTENT</body>'
+        content = "Visit MAGNETIZER_CANONICAL_URL for more"
+        html = render_template(template, title="T", content=content,
+                               canonical="https://example.com/")
+        assert "Visit MAGNETIZER_CANONICAL_URL for more" in html
+
+
+class TestCanonicalUrl:
+
+    def test_index_html_maps_to_root(self):
+        assert canonical_url("https://example.com", "index.html") == "https://example.com/"
+
+    def test_index_page_2_includes_filename(self):
+        assert canonical_url("https://example.com", "index-2.html") == "https://example.com/index-2.html"
+
+    def test_post_filename_included(self):
+        assert canonical_url("https://example.com", "5.html") == "https://example.com/5.html"
+
+    def test_about_filename_included(self):
+        assert canonical_url("https://example.com", "about.html") == "https://example.com/about.html"
+
+    def test_archive_filename_included(self):
+        assert canonical_url("https://example.com", "archive.html") == "https://example.com/archive.html"
+
+    def test_trailing_slash_in_site_url_is_stripped(self):
+        assert canonical_url("https://example.com/", "1.html") == "https://example.com/1.html"
+
+    def test_trailing_slash_in_site_url_stripped_for_index(self):
+        assert canonical_url("https://example.com/", "index.html") == "https://example.com/"
 
 
 # ---------------------------------------------------------------------------
