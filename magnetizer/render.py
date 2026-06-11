@@ -103,9 +103,10 @@ def render_page_title(site_title, post_title, page_num):
 
 
 def render_template(template_html, title, content, canonical=None):
-    html = template_html.replace('MAGNETIZER_TITLE', title).replace('MAGNETIZER_CONTENT', content)
-    if canonical:
+    html = template_html.replace('MAGNETIZER_TITLE', title)
+    if canonical is not None:
         html = html.replace('MAGNETIZER_CANONICAL_URL', canonical)
+    html = html.replace('MAGNETIZER_CONTENT', content)
     return html
 
 

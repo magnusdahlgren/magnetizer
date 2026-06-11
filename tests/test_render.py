@@ -475,6 +475,13 @@ class TestRenderTemplate:
         html = render_template(self.CANONICAL_TEMPLATE, title="T", content="C")
         assert "MAGNETIZER_CANONICAL_URL" in html
 
+    def test_canonical_url_in_content_is_not_replaced(self):
+        template = '<link href="MAGNETIZER_CANONICAL_URL"><body>MAGNETIZER_CONTENT</body>'
+        content = "Visit MAGNETIZER_CANONICAL_URL for more"
+        html = render_template(template, title="T", content=content,
+                               canonical="https://example.com/")
+        assert "Visit MAGNETIZER_CANONICAL_URL for more" in html
+
 
 class TestCanonicalUrl:
 
