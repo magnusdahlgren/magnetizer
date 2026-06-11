@@ -1019,7 +1019,7 @@ class TestMicroPostDetection:
         micro_md = f"---\ndate: 2026-06-01\n---\n\n{body}\n"
         normal_md = "---\ndate: 2026-06-06\ntitle: Normal Post\n---\n\nContent\n"
         config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 10\nmicro_post_max_length: 200\n"
-        # Posts 1–4; post 1 is the micro post.  Changing post 4 makes the
+        # Posts 1-4; post 1 is the micro post.  Changing post 4 makes the
         # builder rebuild posts 3 and 4 (changed + its neighbour) but NOT post 1,
         # so post 1 is loaded fresh for the archive without going through posts_cache.
         p = make_project(tmp_path, posts={1: micro_md, 2: normal_md, 3: normal_md, 4: normal_md}, config=config)
