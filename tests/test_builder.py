@@ -1038,7 +1038,7 @@ class TestAltTextWarnings:
         assert "Warning: Post 1 is missing one or more alt texts" in capsys.readouterr().out
 
     def test_no_warning_when_all_images_have_alt_texts(self, tmp_path, capsys):
-        md = "---\ndate: 2026-05-24\nimages:\n  - Alt text\n---\n\nHello\n"
+        md = "---\ndate: 2026-05-24\ntitle: My Post\nimages:\n  - Alt text\n---\n\nHello\n"
         p = make_project(tmp_path, posts={1: md})
         make_jpg(p / "content" / "1-image-01.jpg")
         build(p)
@@ -1083,3 +1083,42 @@ class TestMicroPostDetection:
         build(p)
 
         assert 'class="micro-post"' in (p / "dist" / "archive.html").read_text()
+
+
+# ---------------------------------------------------------------------------
+# Missing title warnings
+# ---------------------------------------------------------------------------
+
+class TestMissingTitleWarnings:
+
+    def test_warning_for_long_text_post_without_title(self, tmp_path, capsys):
+        long_body = "Word " * 50
+        md = f"---\ndate: 2026-05-24\n---\n\n{long_body}\n"
+        p = make_project(tmp_path, posts={1: md})
+        build(p)
+        assert "Warning: Post 1 is missing a title" in capsys.readouterr().out
+
+    def test_no_warning_for_micro_post(self, tmp_path, capsys):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "missing a title" not in capsys.readouterr().out
+
+    def test_no_warning_when_post_has_title(self, tmp_path, capsys):
+        p = make_project(tmp_path, posts={1: TITLED_MD})
+        build(p)
+        assert "missing a title" not in capsys.readouterr().out
+
+    def test_no_warning_for_photo_only_post(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\nimages:\n  - Alt\n---\n\n"
+        p = make_project(tmp_path, posts={1: md})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        build(p)
+        assert "missing a title" not in capsys.readouterr().out
+
+    def test_warning_for_mixed_post_without_title(self, tmp_path, capsys):
+        long_body = "Word " * 50
+        md = f"---\ndate: 2026-05-24\nimages:\n  - Alt\n---\n\n{long_body}\n"
+        p = make_project(tmp_path, posts={1: md})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        build(p)
+        assert "Warning: Post 1 is missing a title" in capsys.readouterr().out

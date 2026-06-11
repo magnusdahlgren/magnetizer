@@ -194,6 +194,72 @@ class TestRenderArticleImages:
         assert '<a href="1.html"><img' not in html
         assert 'src="1-image-01-resized.jpg"' in html
 
+
+# ---------------------------------------------------------------------------
+# render_article — index page photo limit
+# ---------------------------------------------------------------------------
+
+class TestRenderArticleIndexPagePhotoLimit:
+
+    def test_only_first_two_images_shown_on_index_page(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        assert html.count("<figure>") == 2
+
+    def test_third_image_not_shown_on_index_page(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        assert "1-image-03-resized.jpg" not in html
+
+    def test_all_images_shown_on_post_page(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=False)
+        assert html.count("<figure>") == 3
+
+    def test_more_photos_link_present_when_more_than_two_images(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        assert 'class="more-photos"' in html
+
+    def test_more_photos_link_points_to_post(self):
+        images = ["5-image-01.jpg", "5-image-02.jpg", "5-image-03.jpg"]
+        html = render_article(make_post(post_id=5, images=images), on_index_page=True)
+        assert 'href="5.html"' in html
+
+    def test_more_photos_singular_when_one_hidden(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        assert "1 more photo" in html
+        assert "1 more photos" not in html
+
+    def test_more_photos_plural_when_multiple_hidden(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg", "1-image-04.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        assert "2 more photos" in html
+
+    def test_no_more_photos_link_with_exactly_two_images(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        assert 'class="more-photos"' not in html
+
+    def test_no_more_photos_link_with_one_image(self):
+        images = ["1-image-01.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        assert 'class="more-photos"' not in html
+
+    def test_no_more_photos_link_on_post_page(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=False)
+        assert 'class="more-photos"' not in html
+
+    def test_more_photos_link_inside_post_images_div(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        div_start = html.index('<div class="post-images">')
+        link_pos = html.index('class="more-photos"')
+        div_end = html.index('</div>', div_start)
+        assert div_start < link_pos < div_end
+
     def test_img_has_alt_attribute(self):
         html = render_article(make_post(post_id=1, images=["1-image-01.jpg"]), on_index_page=False)
         assert 'alt=' in html
@@ -647,26 +713,9 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content(posts)
         assert "<dd>2</dd>" in html
 
-    def test_stats_shows_photo_post_count(self):
-        from magnetizer.content import Image
-        posts = [
-            make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg"), Image("1-image-02.jpg")]),
-            make_dated_post(2, "2026-05-25", images=[Image("2-image-01.jpg")]),
-        ]
-        html = render_archive_page_content(posts)
-        assert "<dd>2</dd>" in html
-
-    def test_stats_multiple_images_count_as_one_photo_post(self):
-        from magnetizer.content import Image
-        posts = [
-            make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg"), Image("1-image-02.jpg")]),
-        ]
-        html = render_archive_page_content(posts)
-        assert "<dd>1</dd>" in html
-
-    def test_stats_photos_before_posts(self):
+    def test_stats_no_photos_label(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
-        assert html.index('<dt class="photos">') < html.index('<dt class="posts">')
+        assert '<dt class="photos">' not in html
 
     def test_stats_counts_undated_posts(self):
         posts = [
@@ -687,10 +736,6 @@ class TestRenderArchivePageContent:
     def test_stats_posts_dt_has_class(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
         assert '<dt class="posts">Posts:</dt>' in html
-
-    def test_stats_photos_dt_has_class(self):
-        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
-        assert '<dt class="photos">Photos:</dt>' in html
 
     def test_archive_item_text_post_class(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Hello")])

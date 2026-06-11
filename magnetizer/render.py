@@ -24,13 +24,18 @@ def render_article(post, on_index_page):
 
     if post.images:
         parts.append('<div class="post-images">')
-        for image in post.images:
+        images_to_show = post.images[:2] if on_index_page else post.images
+        for image in images_to_show:
             resized = _resized_filename(image.filename)
             alt = f' alt="{_escape(image.alt, quote=True)}"'
             if on_index_page:
                 parts.append(f'<figure><a href="{post.url}"><img src="{resized}"{alt}></a></figure>')
             else:
                 parts.append(f'<figure><img src="{resized}"{alt}></figure>')
+        if on_index_page and len(post.images) > 2:
+            hidden = len(post.images) - 2
+            label = f'{hidden} more photo{"s" if hidden != 1 else ""}'
+            parts.append(f'<a href="{post.url}" class="more-photos">{label}</a>')
         parts.append('</div>')
 
     if post.title:
@@ -144,7 +149,6 @@ def _archive_item_class(post):
 
 def render_archive_page_content(posts):
     dated_posts = [p for p in posts if p.date]
-    photo_posts_count = sum(1 for p in posts if p.images)
 
     months = {}
     for post in dated_posts:
@@ -156,8 +160,6 @@ def render_archive_page_content(posts):
         '<main>',
         '<h1>Archive</h1>',
         '<dl class="archive-stats">',
-        '<dt class="photos">Photos:</dt>',
-        f'<dd>{photo_posts_count}</dd>',
         '<dt class="posts">Posts:</dt>',
         f'<dd>{len(posts)}</dd>',
         '</dl>',
