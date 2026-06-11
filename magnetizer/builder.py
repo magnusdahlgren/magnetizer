@@ -101,6 +101,13 @@ def _warn_if_missing_alt_texts(post):
         print(f"Warning: Post {post.id} is missing one or more alt texts")
 
 
+def _warn_if_missing_title(post):
+    has_text = bool(post.body_html and post.body_html.strip())
+    is_photo_only = bool(post.images) and not has_text
+    if not post.is_micro and not is_photo_only and (has_text or post.images) and not post.title:
+        print(f"Warning: Post {post.id} is missing a title")
+
+
 def _adjacent_post_urls(post_id, all_post_ids_sorted_desc):
     pos = all_post_ids_sorted_desc.index(post_id)
     newer_url = f"{all_post_ids_sorted_desc[pos - 1]}.html" if pos > 0 else None
@@ -279,6 +286,7 @@ def build(cwd, filename=None, flush=False, resources=False):
         post = _load_post(content_dir, post_id, config["micro_post_max_length"])
         posts_cache[post_id] = post
         _warn_if_missing_alt_texts(post)
+        _warn_if_missing_title(post)
         src_sizes = {img.filename: (content_dir / img.filename).stat().st_size for img in post.images}
         _build_post(post, dist_dir, content_dir, config)
         for image in post.images:
