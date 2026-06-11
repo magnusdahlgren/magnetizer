@@ -1004,3 +1004,29 @@ class TestAltTextWarnings:
         output = capsys.readouterr().out
         assert output.count("unknown frontmatter key") == 1
         assert output.count("missing one or more alt texts") == 1
+
+
+# ---------------------------------------------------------------------------
+# Micro post detection
+# ---------------------------------------------------------------------------
+
+class TestMicroPostDetection:
+
+    def test_micro_post_classification_uses_config_on_incremental_build(self, tmp_path):
+        import time
+        # Body is 190 chars: micro with max_length=200 but not with default 180
+        body = "x" * 190
+        micro_md = f"---\ndate: 2026-06-01\n---\n\n{body}\n"
+        normal_md = "---\ndate: 2026-06-06\ntitle: Normal Post\n---\n\nContent\n"
+        config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 10\nmicro_post_max_length: 200\n"
+        # Posts 1-4; post 1 is the micro post.  Changing post 4 makes the
+        # builder rebuild posts 3 and 4 (changed + its neighbour) but NOT post 1,
+        # so post 1 is loaded fresh for the archive without going through posts_cache.
+        p = make_project(tmp_path, posts={1: micro_md, 2: normal_md, 3: normal_md, 4: normal_md}, config=config)
+        build(p)
+
+        time.sleep(0.01)
+        (p / "content" / "4.md").write_text("---\ndate: 2026-06-06\ntitle: Normal Post\n---\n\nUpdated\n")
+        build(p)
+
+        assert 'class="micro-post"' in (p / "dist" / "archive.html").read_text()

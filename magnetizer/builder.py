@@ -308,7 +308,7 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     if not filename and post_ids_to_build:
         all_posts = [
-            posts_cache[pid] if pid in posts_cache else _load_post(content_dir, pid)
+            posts_cache[pid] if pid in posts_cache else _load_post(content_dir, pid, config["micro_post_max_length"])
             for pid in all_post_ids_sorted_desc
         ]
         _write_index_pages(all_posts, dist_dir, config, template)
