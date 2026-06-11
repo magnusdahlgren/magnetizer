@@ -120,6 +120,15 @@ class TestBodyHtml:
         assert "2026-05-24" not in post.body_html
         assert "My Title" not in post.body_html
 
+    def test_mark_syntax_converted_to_mark_element(self):
+        post = parse_post(make_md(body="This is ==highlighted== text"), 1, [])
+        assert "<mark>highlighted</mark>" in post.body_html
+
+    def test_mark_syntax_in_excerpt_converted_to_mark_element(self):
+        body = "Before ==marked==<!-- more -->After"
+        post = parse_post(make_md(body=body), 1, [])
+        assert "<mark>marked</mark>" in post.excerpt_html
+
 
 # ---------------------------------------------------------------------------
 # Images

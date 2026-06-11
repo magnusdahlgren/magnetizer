@@ -5,6 +5,7 @@ import markdown as _markdown
 
 
 _ALLOWED_FRONTMATTER_KEYS = frozenset({'date', 'title', 'images'})
+_MARKDOWN_EXTENSIONS = ['pymdownx.mark']
 
 
 @dataclass
@@ -81,10 +82,10 @@ def parse_post(md_text, post_id, image_filenames, micro_post_max_length=180):
 
     more_parts = body.split('<!-- more -->', 1)
     if len(more_parts) == 2:
-        body_html = _markdown.markdown(more_parts[0] + '\n\n' + more_parts[1])
-        excerpt_html = _markdown.markdown(more_parts[0].strip())
+        body_html = _markdown.markdown(more_parts[0] + '\n\n' + more_parts[1], extensions=_MARKDOWN_EXTENSIONS)
+        excerpt_html = _markdown.markdown(more_parts[0].strip(), extensions=_MARKDOWN_EXTENSIONS)
     else:
-        body_html = _markdown.markdown(body) if body else ''
+        body_html = _markdown.markdown(body, extensions=_MARKDOWN_EXTENSIONS) if body else ''
         excerpt_html = None
 
     sorted_filenames = sorted(
