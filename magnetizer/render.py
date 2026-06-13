@@ -136,7 +136,7 @@ def _archive_description(post):
                     return _escape(text)
                 truncated = text[:36].rsplit(' ', 1)[0]
                 return _escape(truncated) + '…'
-    return 'Photo'
+    return 'Untitled'
 
 
 def _archive_item_class(post):
