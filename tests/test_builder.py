@@ -1032,6 +1032,19 @@ class TestIndexMetaDescription:
         build(p)
         assert 'MAGNETIZER_META_DESCRIPTION' not in (p / "dist" / "index.html").read_text()
 
+    def test_meta_description_appears_on_rebuild_when_no_posts_changed(self, tmp_path):
+        import time as _time
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "templates" / "index.html").write_text(META_DESCRIPTION_TEMPLATE)
+        build(p)
+        assert '<meta name="description"' not in (p / "dist" / "index.html").read_text()
+
+        _time.sleep(0.01)
+        config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
+        (p / "config.yaml").write_text(config)
+        build(p)
+        assert '<meta name="description" content="A great blog.">' in (p / "dist" / "index.html").read_text()
+
 
 # ---------------------------------------------------------------------------
 # Archive page
