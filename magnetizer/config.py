@@ -9,6 +9,7 @@ DEFAULTS = {
     "image_quality": 75,
     "posts_per_page": 12,
     "micro_post_max_length": 180,
+    "index_meta_description": None,
 }
 
 

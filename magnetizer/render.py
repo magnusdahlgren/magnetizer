@@ -107,10 +107,12 @@ def render_page_title(site_title, post_title, page_num):
     return site_title
 
 
-def render_template(template_html, title, content, canonical=None):
+def render_template(template_html, title, content, canonical=None, meta_description=None):
     html = template_html.replace('MAGNETIZER_TITLE', title)
     if canonical is not None:
         html = html.replace('MAGNETIZER_CANONICAL_URL', canonical)
+    meta_tag = f'<meta name="description" content="{meta_description}">' if meta_description else ''
+    html = html.replace('MAGNETIZER_META_DESCRIPTION', meta_tag)
     html = html.replace('MAGNETIZER_CONTENT', content)
     return html
 

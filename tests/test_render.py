@@ -515,6 +515,7 @@ class TestRenderTemplate:
         '<link rel="canonical" href="MAGNETIZER_CANONICAL_URL">'
         "<title>MAGNETIZER_TITLE</title><body>MAGNETIZER_CONTENT</body>"
     )
+    META_TEMPLATE = "MAGNETIZER_META_DESCRIPTION<title>MAGNETIZER_TITLE</title><body>MAGNETIZER_CONTENT</body>"
 
     def test_title_placeholder_replaced(self):
         html = render_template(self.TEMPLATE, title="My Page", content="<p>hi</p>")
@@ -540,6 +541,17 @@ class TestRenderTemplate:
     def test_canonical_placeholder_untouched_when_not_provided(self):
         html = render_template(self.CANONICAL_TEMPLATE, title="T", content="C")
         assert "MAGNETIZER_CANONICAL_URL" in html
+
+    def test_meta_description_tag_injected_when_provided(self):
+        html = render_template(self.META_TEMPLATE, title="T", content="C",
+                               meta_description="A great blog about things.")
+        assert 'MAGNETIZER_META_DESCRIPTION' not in html
+        assert '<meta name="description" content="A great blog about things.">' in html
+
+    def test_meta_description_placeholder_removed_when_not_provided(self):
+        html = render_template(self.META_TEMPLATE, title="T", content="C")
+        assert 'MAGNETIZER_META_DESCRIPTION' not in html
+        assert '<meta name="description"' not in html
 
     def test_canonical_url_in_content_is_not_replaced(self):
         template = '<link href="MAGNETIZER_CANONICAL_URL"><body>MAGNETIZER_CONTENT</body>'

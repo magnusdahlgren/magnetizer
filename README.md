@@ -28,6 +28,7 @@ manifest.json  Build state (created automatically)
 | `image_max_dimension` | Long-edge pixel limit when resizing images | `1600` |
 | `image_quality` | JPEG quality for resized images (0–95) | `75` |
 | `micro_post_max_length` | Max plain-text characters for a post to be treated as a microblog post | `180` |
+| `index_meta_description` | `<meta name="description">` content on index pages (via `MAGNETIZER_META_DESCRIPTION` placeholder) | Not set |
 
 Example:
 

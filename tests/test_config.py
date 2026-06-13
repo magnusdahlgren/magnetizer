@@ -12,6 +12,7 @@ DEFAULTS = {
     "image_quality": 75,
     "posts_per_page": 12,
     "micro_post_max_length": 180,
+    "index_meta_description": None,
 }
 
 
@@ -41,6 +42,9 @@ class TestDefaults:
 
     def test_micro_post_max_length_default(self, tmp_path):
         assert load_config(tmp_path / "config.yaml")["micro_post_max_length"] == 180
+
+    def test_index_meta_description_default(self, tmp_path):
+        assert load_config(tmp_path / "config.yaml")["index_meta_description"] is None
 
     def test_missing_file_returns_all_defaults(self, tmp_path):
         config = load_config(tmp_path / "config.yaml")
@@ -72,6 +76,10 @@ class TestCustomValues:
     def test_micro_post_max_length_overridden(self, tmp_path):
         p = write_config(tmp_path, "micro_post_max_length: 200\n")
         assert load_config(p)["micro_post_max_length"] == 200
+
+    def test_index_meta_description_overridden(self, tmp_path):
+        p = write_config(tmp_path, "index_meta_description: A blog about things.\n")
+        assert load_config(p)["index_meta_description"] == "A blog about things."
 
     def test_all_values_overridden(self, tmp_path):
         p = write_config(tmp_path, (
