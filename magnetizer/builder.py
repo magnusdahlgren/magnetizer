@@ -320,28 +320,27 @@ def build(cwd, filename=None, flush=False, resources=False):
             cookies_html.unlink()
             log.append(("REMOVED", "cookies.html"))
 
-    if not filename:
+    if not filename and post_ids_to_build:
         all_posts = [
             posts_cache[pid] if pid in posts_cache else _load_post(content_dir, pid, config["micro_post_max_length"])
             for pid in all_post_ids_sorted_desc
         ]
         _write_index_pages(all_posts, dist_dir, config, template)
-        if post_ids_to_build:
-            per_page = config["posts_per_page"]
-            total_pages = max(1, (len(all_posts) + per_page - 1) // per_page)
-            for page_num in range(1, total_pages + 1):
-                log.append(("UPDATED", index_page_url(page_num)))
-            (dist_dir / "feed.xml").write_text(render_feed(all_posts, config))
-            log.append(("UPDATED", "feed.xml"))
-            archive_html = render_template(
-                template,
-                title=render_page_title(config["site_title"], "Archive", page_num=None),
-                content=render_archive_page_content(all_posts),
-                canonical=canonical_url(config["site_url"], "archive.html"),
-            )
-            (dist_dir / "archive.html").write_text(archive_html)
-            log.append(("UPDATED", "archive.html"))
-            save_manifest(content_dir, manifest_path)
+        per_page = config["posts_per_page"]
+        total_pages = max(1, (len(all_posts) + per_page - 1) // per_page)
+        for page_num in range(1, total_pages + 1):
+            log.append(("UPDATED", index_page_url(page_num)))
+        (dist_dir / "feed.xml").write_text(render_feed(all_posts, config))
+        log.append(("UPDATED", "feed.xml"))
+        archive_html = render_template(
+            template,
+            title=render_page_title(config["site_title"], "Archive", page_num=None),
+            content=render_archive_page_content(all_posts),
+            canonical=canonical_url(config["site_url"], "archive.html"),
+        )
+        (dist_dir / "archive.html").write_text(archive_html)
+        log.append(("UPDATED", "archive.html"))
+        save_manifest(content_dir, manifest_path)
 
     if not filename and log:
         per_page = config["posts_per_page"]
