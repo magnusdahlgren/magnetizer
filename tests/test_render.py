@@ -678,9 +678,9 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Sunny day")])
         assert html.index('<span class="day">') < html.index('<a href=')
 
-    def test_untitled_imageless_post_shows_photo(self):
+    def test_untitled_imageless_post_shows_untitled(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
-        assert "Photo" in html
+        assert "Untitled" in html
 
     def test_day_has_no_leading_zero(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
@@ -827,15 +827,17 @@ class TestArchiveDescriptions:
         ])
         assert "the l…" not in html
 
-    def test_untitled_post_with_only_images_shows_photo(self):
+    def test_untitled_post_with_only_images_shows_untitled(self):
         html = render_archive_page_content([
             make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg")])
         ])
-        assert "Photo" in html
+        assert "Untitled" in html
+        assert "Photo" not in html
 
-    def test_untitled_post_with_no_content_shows_photo(self):
+    def test_untitled_post_with_no_content_shows_untitled(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
-        assert "Photo" in html
+        assert "Untitled" in html
+        assert "Photo" not in html
 
     def test_untitled_post_with_text_and_images_shows_text_not_photo(self):
         html = render_archive_page_content([
