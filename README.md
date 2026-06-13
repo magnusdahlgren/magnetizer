@@ -95,6 +95,7 @@ Magnetizer uses a single template file: `templates/index.html`. It must contain 
 | `MAGNETIZER_CONTENT` | Yes | The generated page content |
 | `MAGNETIZER_BUILD_ID` | No | A Unix timestamp, useful for cache-busting: `style.css?v=MAGNETIZER_BUILD_ID` |
 | `MAGNETIZER_CANONICAL_URL` | No | The canonical URL of the page. For `index.html` this is the root URL (e.g. `https://example.github.io/`); for all other pages it is `{site_url}/{filename}`. Use in a `<link rel="canonical">` tag to prevent duplicate-page issues with search engines. |
+| `MAGNETIZER_META_DESCRIPTION` | No | On index pages: replaced with `<meta name="description" content="...">` using `index_meta_description` from config. Removed (empty string) when not configured or on non-index pages. |
 
 Example `templates/index.html`:
 

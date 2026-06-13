@@ -553,6 +553,11 @@ class TestRenderTemplate:
         assert 'MAGNETIZER_META_DESCRIPTION' not in html
         assert '<meta name="description"' not in html
 
+    def test_meta_description_special_chars_are_escaped(self):
+        html = render_template(self.META_TEMPLATE, title="T", content="C",
+                               meta_description='A "great" blog & <more>')
+        assert 'content="A &quot;great&quot; blog &amp; &lt;more&gt;"' in html
+
     def test_canonical_url_in_content_is_not_replaced(self):
         template = '<link href="MAGNETIZER_CANONICAL_URL"><body>MAGNETIZER_CONTENT</body>'
         content = "Visit MAGNETIZER_CANONICAL_URL for more"
