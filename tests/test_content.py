@@ -352,3 +352,46 @@ class TestMicroPost:
     def test_is_micro_respects_custom_max_length(self):
         post = parse_post(make_md(body="x" * 181), 1, [], micro_post_max_length=200)
         assert post.is_micro is True
+
+
+
+# ---------------------------------------------------------------------------
+# Smart / typographic quotes
+# ---------------------------------------------------------------------------
+
+class TestSmartQuotes:
+
+    def test_double_quotes_converted(self):
+        post = parse_post(make_md(body='"hello"'), 1, [])
+        assert '&ldquo;' in post.body_html
+        assert '&rdquo;' in post.body_html
+
+    def test_single_quotes_converted(self):
+        post = parse_post(make_md(body="'hello'"), 1, [])
+        assert '&lsquo;' in post.body_html
+        assert '&rsquo;' in post.body_html
+
+    def test_apostrophe_converted(self):
+        post = parse_post(make_md(body="it's a test"), 1, [])
+        assert '&rsquo;' in post.body_html
+        assert "it's" not in post.body_html
+
+    def test_quotes_in_inline_code_not_converted(self):
+        post = parse_post(make_md(body='Use `"value"` here'), 1, [])
+        assert '"value"' in post.body_html
+
+    def test_quotes_in_fenced_code_block_not_converted(self):
+        post = parse_post(make_md(body='```\n"not converted"\n```'), 1, [])
+        assert '"not converted"' in post.body_html
+
+    def test_dashes_not_converted(self):
+        post = parse_post(make_md(body='a--b'), 1, [])
+        assert '--' in post.body_html
+
+    def test_ellipsis_not_converted(self):
+        post = parse_post(make_md(body='hello...'), 1, [])
+        assert '...' in post.body_html
+
+    def test_smart_quotes_applied_to_excerpt(self):
+        post = parse_post(make_md(body='"intro"\n\n<!-- more -->\n\n"rest"'), 1, [])
+        assert '&ldquo;' in post.excerpt_html
