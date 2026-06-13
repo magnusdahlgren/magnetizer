@@ -916,6 +916,13 @@ CANONICAL_TEMPLATE = (
     "<body>MAGNETIZER_CONTENT</body></html>"
 )
 
+META_DESCRIPTION_TEMPLATE = (
+    "<!DOCTYPE html><html><head>"
+    "MAGNETIZER_META_DESCRIPTION"
+    "<title>MAGNETIZER_TITLE</title></head>"
+    "<body>MAGNETIZER_CONTENT</body></html>"
+)
+
 
 class TestBuildId:
 
@@ -989,6 +996,42 @@ class TestCanonicalUrls:
         (p / "templates" / "index.html").write_text(CANONICAL_TEMPLATE)
         build(p)
         assert 'href="https://example.github.io/cookies.html"' in (p / "dist" / "cookies.html").read_text()
+
+
+# ---------------------------------------------------------------------------
+# Index meta description
+# ---------------------------------------------------------------------------
+
+class TestIndexMetaDescription:
+
+    def test_index_page_includes_meta_description_when_configured(self, tmp_path):
+        config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD}, config=config)
+        (p / "templates" / "index.html").write_text(META_DESCRIPTION_TEMPLATE)
+        build(p)
+        assert '<meta name="description" content="A great blog.">' in (p / "dist" / "index.html").read_text()
+
+    def test_second_index_page_also_has_meta_description(self, tmp_path):
+        config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
+        posts = {i: MINIMAL_MD for i in range(1, 4)}
+        p = make_project(tmp_path, posts=posts, config=config)
+        (p / "templates" / "index.html").write_text(META_DESCRIPTION_TEMPLATE)
+        build(p)
+        assert '<meta name="description" content="A great blog.">' in (p / "dist" / "index-2.html").read_text()
+
+    def test_post_page_does_not_include_meta_description(self, tmp_path):
+        config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD}, config=config)
+        (p / "templates" / "index.html").write_text(META_DESCRIPTION_TEMPLATE)
+        build(p)
+        assert '<meta name="description"' not in (p / "dist" / "1.html").read_text()
+
+    def test_placeholder_removed_when_meta_description_not_configured(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "templates" / "index.html").write_text(META_DESCRIPTION_TEMPLATE)
+        build(p)
+        assert 'MAGNETIZER_META_DESCRIPTION' not in (p / "dist" / "index.html").read_text()
+
 
 
 # ---------------------------------------------------------------------------

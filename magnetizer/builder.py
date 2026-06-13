@@ -134,7 +134,8 @@ def _write_index_pages(posts_sorted_desc, dist_dir, config, template):
         title = render_page_title(config["site_title"], None, page_num=page_num)
         filename = index_page_url(page_num)
         html = render_template(template, title=title, content=content_html,
-                               canonical=canonical_url(config["site_url"], filename))
+                               canonical=canonical_url(config["site_url"], filename),
+                               meta_description=config["index_meta_description"])
         (dist_dir / filename).write_text(html)
 
 
