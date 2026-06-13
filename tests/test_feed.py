@@ -4,7 +4,7 @@ import xml.etree.ElementTree as ET
 
 import pytest
 
-from magnetizer.content import Post
+from magnetizer.content import Image, Post
 from magnetizer.feed import render_feed
 from conftest import make_post
 
@@ -152,6 +152,51 @@ class TestEntryStructure:
         root = parse([make_post()])
         entry = root.find(el("entry"))
         assert entry.find(el("author")) is None
+
+
+# ---------------------------------------------------------------------------
+# Entry images
+# ---------------------------------------------------------------------------
+
+class TestEntryImages:
+
+    def test_entry_content_includes_img_tag_for_image(self):
+        post = make_post(images=["1-image-01.jpg"])
+        xml = render_feed([post], CONFIG)
+        assert 'src="https://example.github.io/1-image-01-resized.jpg"' in xml
+
+    def test_entry_content_uses_resized_filename(self):
+        post = make_post(images=["1-image-01.jpg"])
+        xml = render_feed([post], CONFIG)
+        assert "1-image-01-resized.jpg" in xml
+        assert '"1-image-01.jpg"' not in xml
+
+    def test_entry_content_includes_alt_text(self):
+        post = make_post(images=[Image("1-image-01.jpg", alt="A sunny beach")])
+        xml = render_feed([post], CONFIG)
+        assert 'alt="A sunny beach"' in xml
+
+    def test_entry_content_images_appear_before_body_html(self):
+        post = make_post(images=["1-image-01.jpg"], body_html="<p>Text here</p>")
+        xml = render_feed([post], CONFIG)
+        assert xml.index("1-image-01-resized.jpg") < xml.index("Text here")
+
+    def test_entry_content_multiple_images_all_included(self):
+        post = make_post(images=["1-image-01.jpg", "1-image-02.jpg"])
+        xml = render_feed([post], CONFIG)
+        assert "1-image-01-resized.jpg" in xml
+        assert "1-image-02-resized.jpg" in xml
+
+    def test_entry_content_special_chars_in_alt_escaped(self):
+        post = make_post(images=[Image("1-image-01.jpg", alt='Say "cheese" & smile')])
+        xml = render_feed([post], CONFIG)
+        assert 'alt="Say &quot;cheese&quot; &amp; smile"' in xml
+        ET.fromstring(xml)  # must be valid XML
+
+    def test_entry_without_images_has_no_img_tag(self):
+        post = make_post(body_html="<p>No images here</p>")
+        xml = render_feed([post], CONFIG)
+        assert "<img" not in xml
 
 
 # ---------------------------------------------------------------------------
