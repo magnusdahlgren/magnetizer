@@ -162,12 +162,18 @@ def render_archive_page_content(posts):
         key = (d.year, d.month)
         months.setdefault(key, []).append(post)
 
+    image_count = sum(1 for p in posts if p.images)
+    micro_count = sum(1 for p in posts if p.is_micro)
+    favourite_count = sum(1 for p in posts if p.is_favourite)
+
     parts = [
         '<main>',
         '<h1>Archive</h1>',
         '<dl class="archive-stats">',
-        '<dt class="posts">Posts:</dt>',
-        f'<dd>{len(posts)}</dd>',
+        f'<dt class="all">All posts</dt><dd>({len(posts)})</dd>',
+        f'<dt class="photo-post">Image posts</dt><dd>({image_count})</dd>',
+        f'<dt class="micro-post">Microblogs</dt><dd>({micro_count})</dd>',
+        f'<dt class="favourite">Favourites</dt><dd>({favourite_count})</dd>',
         '</dl>',
     ]
     for year, month in sorted(months.keys(), reverse=True):
