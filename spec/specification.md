@@ -321,6 +321,25 @@ Notes:
 - The `<h1>` is only included if the post has a title.
 - If the post is displayed on an index page, the contents of the `<h1>` and the `<time>` contain a link to the post page. On the individual post page, no links are included.
 
+### Favourite posts
+
+A post can be marked as a favourite by setting `favourite: true` in its frontmatter:
+
+```
+---
+date: 2026-05-21
+favourite: true
+---
+```
+
+When a post is a favourite, its `<li>` element in the archive page gets an additional `favourite` class appended to the existing post-type class:
+
+```html
+<li class="text-post favourite">...</li>
+```
+
+The `favourite` class is appended after the post-type class (`text-post`, `photo-post`, `mixed-post`, or `micro-post`). If `favourite` is absent or `false`, no additional class is added.
+
 ### Alt texts
 
 Alt texts for images are specified in the post's frontmatter using an optional `images:` list, with one entry per image in file order:

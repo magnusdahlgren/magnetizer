@@ -141,12 +141,16 @@ def _archive_description(post):
 
 def _archive_item_class(post):
     if post.is_micro:
-        return "micro-post"
-    if post.images and post.title:
-        return "mixed-post"
-    if post.images:
-        return "photo-post"
-    return "text-post"
+        cls = "micro-post"
+    elif post.images and post.title:
+        cls = "mixed-post"
+    elif post.images:
+        cls = "photo-post"
+    else:
+        cls = "text-post"
+    if post.is_favourite:
+        cls += " favourite"
+    return cls
 
 
 def render_archive_page_content(posts):

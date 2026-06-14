@@ -780,6 +780,18 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([post])
         assert '<li class="text-post">' in html
 
+    def test_archive_item_favourite_adds_class(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title="Hello",
+                    url="1.html", body_html="", images=[], is_favourite=True)
+        html = render_archive_page_content([post])
+        assert '<li class="text-post favourite">' in html
+
+    def test_archive_item_non_favourite_has_no_favourite_class(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title="Hello",
+                    url="1.html", body_html="", images=[], is_favourite=False)
+        html = render_archive_page_content([post])
+        assert "favourite" not in html
+
 
 # ---------------------------------------------------------------------------
 # render_archive_page_content — post descriptions

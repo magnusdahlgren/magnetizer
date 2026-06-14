@@ -354,6 +354,31 @@ class TestMicroPost:
         assert post.is_micro is True
 
 
+# ---------------------------------------------------------------------------
+# Favourite posts
+# ---------------------------------------------------------------------------
+
+class TestFavourite:
+
+    def test_is_favourite_when_frontmatter_true(self):
+        md = "---\ndate: 2026-05-24\nfavourite: true\n---\n"
+        post = parse_post(md, 1, [])
+        assert post.is_favourite is True
+
+    def test_is_not_favourite_by_default(self):
+        post = parse_post(make_md(), 1, [])
+        assert post.is_favourite is False
+
+    def test_favourite_false_is_not_favourite(self):
+        md = "---\ndate: 2026-05-24\nfavourite: false\n---\n"
+        post = parse_post(md, 1, [])
+        assert post.is_favourite is False
+
+    def test_favourite_key_does_not_trigger_unknown_key_warning(self, capsys):
+        md = "---\ndate: 2026-05-24\nfavourite: true\n---\n"
+        parse_post(md, 1, [])
+        assert "Warning" not in capsys.readouterr().out
+
 
 # ---------------------------------------------------------------------------
 # Smart / typographic quotes
