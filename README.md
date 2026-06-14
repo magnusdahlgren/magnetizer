@@ -64,7 +64,7 @@ title: My post title
 Post body goes here. Standard Markdown is supported.
 ```
 
-The `title` field is optional.
+The `title` field is optional. Set `favourite: true` to mark a post as a favourite — it will receive an additional `favourite` CSS class in the archive.
 
 A post with no title, no images, and a plain-text body of `micro_post_max_length` characters or fewer is treated as a microblog post and rendered with an additional `micro-post` CSS class.
 

@@ -725,23 +725,6 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
         assert '<dl class="archive-stats">' in html
 
-    def test_stats_shows_post_count(self):
-        posts = [make_dated_post(1, "2026-05-24"), make_dated_post(2, "2026-05-25")]
-        html = render_archive_page_content(posts)
-        assert "<dd>2</dd>" in html
-
-    def test_stats_no_photos_label(self):
-        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
-        assert '<dt class="photos">' not in html
-
-    def test_stats_counts_undated_posts(self):
-        posts = [
-            make_dated_post(2, "2026-05-24"),
-            Post(id=1, date=None, date_uk=None, title="No date", url="1.html", body_html="", images=[]),
-        ]
-        html = render_archive_page_content(posts)
-        assert "<dd>2</dd>" in html
-
     def test_h1_inside_main(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
         assert html.index("<main>") < html.index("<h1>Archive</h1>")
@@ -750,9 +733,59 @@ class TestRenderArchivePageContent:
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
         assert html.index("<main>") < html.index('<dl class="archive-stats">')
 
-    def test_stats_posts_dt_has_class(self):
+    def test_stats_all_posts_dt(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
-        assert '<dt class="posts">Posts:</dt>' in html
+        assert '<dt class="all">All posts</dt>' in html
+
+    def test_stats_all_posts_count(self):
+        posts = [make_dated_post(1, "2026-05-24"), make_dated_post(2, "2026-05-25")]
+        html = render_archive_page_content(posts)
+        assert '<dt class="all">All posts</dt><dd>(2)</dd>' in html
+
+    def test_stats_all_posts_includes_undated(self):
+        posts = [
+            make_dated_post(2, "2026-05-24"),
+            Post(id=1, date=None, date_uk=None, title="No date", url="1.html", body_html="", images=[]),
+        ]
+        html = render_archive_page_content(posts)
+        assert '<dt class="all">All posts</dt><dd>(2)</dd>' in html
+
+    def test_stats_image_posts_dt(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert '<dt class="photo-post">Image posts</dt>' in html
+
+    def test_stats_image_posts_count(self):
+        from magnetizer.content import Image
+        posts = [
+            make_dated_post(1, "2026-05-24", images=[Image("1-image-01.jpg")]),
+            make_dated_post(2, "2026-05-25"),
+        ]
+        html = render_archive_page_content(posts)
+        assert '<dt class="photo-post">Image posts</dt><dd>(1)</dd>' in html
+
+    def test_stats_microblogs_dt(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert '<dt class="micro-post">Microblogs</dt>' in html
+
+    def test_stats_microblogs_count(self):
+        posts = [
+            Post(id=1, date="2026-05-24", date_uk="", title=None, url="1.html", body_html="", images=[], is_micro=True),
+            make_dated_post(2, "2026-05-25"),
+        ]
+        html = render_archive_page_content(posts)
+        assert '<dt class="micro-post">Microblogs</dt><dd>(1)</dd>' in html
+
+    def test_stats_favourites_dt(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert '<dt class="favourite">Favourites</dt>' in html
+
+    def test_stats_favourites_count(self):
+        posts = [
+            Post(id=1, date="2026-05-24", date_uk="", title="A", url="1.html", body_html="", images=[], is_favourite=True),
+            make_dated_post(2, "2026-05-25"),
+        ]
+        html = render_archive_page_content(posts)
+        assert '<dt class="favourite">Favourites</dt><dd>(1)</dd>' in html
 
     def test_archive_item_text_post_class(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-24", title="Hello")])
@@ -779,6 +812,18 @@ class TestRenderArchivePageContent:
                     url="1.html", body_html="<p>Text</p>", images=[], is_micro=False)
         html = render_archive_page_content([post])
         assert '<li class="text-post">' in html
+
+    def test_archive_item_favourite_adds_class(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title="Hello",
+                    url="1.html", body_html="", images=[], is_favourite=True)
+        html = render_archive_page_content([post])
+        assert '<li class="text-post favourite">' in html
+
+    def test_archive_item_non_favourite_has_no_favourite_class(self):
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title="Hello",
+                    url="1.html", body_html="", images=[], is_favourite=False)
+        html = render_archive_page_content([post])
+        assert '<li class="text-post favourite">' not in html
 
 
 # ---------------------------------------------------------------------------
