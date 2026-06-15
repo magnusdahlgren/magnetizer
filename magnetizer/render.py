@@ -32,10 +32,6 @@ def render_article(post, on_index_page):
                 parts.append(f'<figure><a href="{post.url}"><img src="{resized}"{alt}></a></figure>')
             else:
                 parts.append(f'<figure><img src="{resized}"{alt}></figure>')
-        if on_index_page and len(post.images) > 2:
-            hidden = len(post.images) - 2
-            label = f'{hidden} more photo{"s" if hidden != 1 else ""}'
-            parts.append(f'<a href="{post.url}" class="more-photos">{label}</a>')
         parts.append('</div>')
 
     if post.title:
@@ -48,6 +44,11 @@ def render_article(post, on_index_page):
         parts.append(f'<div class="post-body">{post.excerpt_html}<a href="{post.url}" class="read-more">Read more →</a></div>')
     else:
         parts.append(f'<div class="post-body">{post.body_html}</div>')
+
+    if on_index_page and post.excerpt_html is None and len(post.images) > 2:
+        hidden = len(post.images) - 2
+        label = f'{hidden} more photo{"s" if hidden != 1 else ""}'
+        parts.append(f'<a href="{post.url}" class="more-photos">{label}</a>')
 
     if post.date:
         if on_index_page:
