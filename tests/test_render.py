@@ -252,13 +252,36 @@ class TestRenderArticleIndexPagePhotoLimit:
         html = render_article(make_post(post_id=1, images=images), on_index_page=False)
         assert 'class="more-photos"' not in html
 
-    def test_more_photos_link_inside_post_images_div(self):
+    def test_more_photos_link_outside_post_images_div(self):
         images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
         html = render_article(make_post(post_id=1, images=images), on_index_page=True)
         div_start = html.index('<div class="post-images">')
+        div_end = html.index('</div>', div_start) + len('</div>')
         link_pos = html.index('class="more-photos"')
-        div_end = html.index('</div>', div_start)
-        assert div_start < link_pos < div_end
+        assert not (div_start < link_pos < div_end)
+
+    def test_more_photos_link_appears_after_post_body(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        body_end = html.index('</div>', html.index('class="post-body"')) + len('</div>')
+        link_pos = html.index('class="more-photos"')
+        assert link_pos > body_end
+
+    def test_more_photos_link_appears_before_footer(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        html = render_article(make_post(post_id=1, images=images), on_index_page=True)
+        link_pos = html.index('class="more-photos"')
+        footer_pos = html.index('<footer>')
+        assert link_pos < footer_pos
+
+    def test_no_more_photos_link_when_read_more_present(self):
+        images = ["1-image-01.jpg", "1-image-02.jpg", "1-image-03.jpg"]
+        post = Post(id=1, date="2026-05-24", date_uk="24 May 2026", title="My Post",
+                    url="1.html", body_html="<p>Full body</p>",
+                    images=[Image(f, "") for f in images],
+                    excerpt_html="<p>Intro</p>")
+        html = render_article(post, on_index_page=True)
+        assert 'class="more-photos"' not in html
 
     def test_img_has_alt_attribute(self):
         html = render_article(make_post(post_id=1, images=["1-image-01.jpg"]), on_index_page=False)

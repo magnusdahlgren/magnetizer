@@ -397,10 +397,18 @@ When there is one or more images for the post, each is included as a `<figure>` 
 </article>
 ```
 
-Note: The following differences apply to <articles> when they appear on idex pages:
+Note: The following differences apply to `<article>` elements when they appear on index pages:
 
-- The <article> class is `multiple-posts`
-- Each <img> is wrapped in an <a> pointing to the individual post page.
+- The `<article>` class is `multiple-posts`
+- Each `<img>` is wrapped in an `<a>` pointing to the individual post page
+- Only the first two images are shown
+- If a post has more than two images and no `<!-- more -->` marker, a "N more photo(s)" link is rendered between the post body and the date footer:
+
+```html
+<a href="POST_URL" class="more-photos">N more photo(s)</a>
+```
+
+Where `N` is the number of hidden images (total minus two). The text uses "photo" for one hidden image and "photos" for two or more. This link is omitted when a "Read more →" link is already present (i.e. the post uses `<!-- more -->`), since both links point to the same post page.
 
 ### Microblog posts
 
