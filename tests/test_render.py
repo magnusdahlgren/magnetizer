@@ -4,8 +4,10 @@ import pytest
 from magnetizer.content import Image, Post
 from magnetizer.render import (
     canonical_url,
+    category_page_url,
     render_archive_page_content,
     render_article,
+    render_category_page_content,
     render_index_page_content,
     render_page_title,
     render_post_page_content,
@@ -935,3 +937,136 @@ class TestArchiveDescriptions:
             make_dated_post(1, "2026-05-24", body_html="<p>A &amp; B</p>")
         ])
         assert "A &amp; B" in html
+
+
+# ---------------------------------------------------------------------------
+# render_article — category link
+# ---------------------------------------------------------------------------
+
+_CATEGORIES = {"photography": "Photography", "travel": "Travel"}
+
+
+class TestRenderArticleCategory:
+
+    def test_category_link_in_footer_when_category_set(self):
+        html = render_article(make_post(category="photography"), on_index_page=False, categories=_CATEGORIES)
+        assert 'class="category"' in html
+
+    def test_no_category_link_when_post_has_no_category(self):
+        html = render_article(make_post(), on_index_page=False, categories=_CATEGORIES)
+        assert 'class="category"' not in html
+
+    def test_no_category_link_when_categories_not_provided(self):
+        html = render_article(make_post(category="photography"), on_index_page=False)
+        assert 'class="category"' not in html
+
+    def test_no_category_link_when_categories_empty(self):
+        html = render_article(make_post(category="photography"), on_index_page=False, categories={})
+        assert 'class="category"' not in html
+
+    def test_category_link_href_points_to_category_page(self):
+        html = render_article(make_post(category="photography"), on_index_page=False, categories=_CATEGORIES)
+        assert 'href="photography.html"' in html
+
+    def test_category_link_text_is_display_name(self):
+        html = render_article(make_post(category="photography"), on_index_page=False, categories=_CATEGORIES)
+        assert ">Photography<" in html
+
+    def test_category_link_inside_footer(self):
+        html = render_article(make_post(category="photography"), on_index_page=False, categories=_CATEGORIES)
+        footer_start = html.index('<footer>')
+        footer_end = html.index('</footer>')
+        link_pos = html.index('class="category"')
+        assert footer_start < link_pos < footer_end
+
+    def test_category_link_appears_on_index_page_too(self):
+        html = render_article(make_post(category="photography"), on_index_page=True, categories=_CATEGORIES)
+        assert 'class="category"' in html
+
+    def test_no_category_link_for_unknown_category(self):
+        html = render_article(make_post(category="unknown"), on_index_page=False, categories=_CATEGORIES)
+        assert 'class="category"' not in html
+
+    def test_category_display_name_is_html_escaped(self):
+        cats = {"fun": "Fun & Games"}
+        html = render_article(make_post(category="fun"), on_index_page=False, categories=cats)
+        assert "Fun &amp; Games" in html
+        assert "Fun & Games<" not in html
+
+
+# ---------------------------------------------------------------------------
+# category_page_url
+# ---------------------------------------------------------------------------
+
+class TestCategoryPageUrl:
+
+    def test_first_page_is_slug_dot_html(self):
+        assert category_page_url("photography", 1) == "photography.html"
+
+    def test_second_page_has_number_suffix(self):
+        assert category_page_url("photography", 2) == "photography-2.html"
+
+    def test_third_page_has_number_suffix(self):
+        assert category_page_url("photography", 3) == "photography-3.html"
+
+
+# ---------------------------------------------------------------------------
+# render_category_page_content
+# ---------------------------------------------------------------------------
+
+class TestRenderCategoryPage:
+
+    def test_category_page_has_h1_with_category_name(self):
+        html = render_category_page_content([make_post()], "Photography", "photography", 1, 1)
+        assert "<h1>Photography</h1>" in html
+
+    def test_category_page_h1_inside_main(self):
+        html = render_category_page_content([make_post()], "Photography", "photography", 1, 1)
+        main_start = html.index('<main>')
+        h1_pos = html.index('<h1>Photography</h1>')
+        main_end = html.index('</main>')
+        assert main_start < h1_pos < main_end
+
+    def test_category_page_h1_before_articles(self):
+        html = render_category_page_content([make_post()], "Photography", "photography", 1, 1)
+        assert html.index('<h1>') < html.index('<article')
+
+    def test_category_page_includes_post_articles(self):
+        posts = [make_post(post_id=1), make_post(post_id=2)]
+        html = render_category_page_content(posts, "Photography", "photography", 1, 1)
+        assert html.count('<article') == 2
+
+    def test_category_page_has_back_to_homepage_link(self):
+        html = render_category_page_content([make_post()], "Photography", "photography", 1, 1)
+        assert 'href="index.html"' in html
+
+    def test_category_page_no_pagination_nav_when_single_page(self):
+        html = render_category_page_content([make_post()], "Photography", "photography", 1, 1)
+        assert 'photography-2.html' not in html
+
+    def test_category_page_older_link_present_on_page_1_of_2(self):
+        html = render_category_page_content([make_post()], "Photography", "photography", 1, 2)
+        assert 'href="photography-2.html"' in html
+
+    def test_category_page_newer_link_present_on_page_2_of_2(self):
+        html = render_category_page_content([make_post()], "Photography", "photography", 2, 2)
+        assert 'href="photography.html"' in html
+
+    def test_category_page_no_newer_link_on_page_1(self):
+        html = render_category_page_content([make_post()], "Photography", "photography", 1, 2)
+        assert 'class="newer"' not in html
+
+    def test_category_page_no_older_link_on_last_page(self):
+        html = render_category_page_content([make_post()], "Photography", "photography", 2, 2)
+        assert 'class="older"' not in html
+
+    def test_category_name_is_html_escaped(self):
+        html = render_category_page_content([make_post()], "Fun & Games", "fun", 1, 1)
+        assert "<h1>Fun &amp; Games</h1>" in html
+        assert "<h1>Fun & Games</h1>" not in html
+
+    def test_category_page_passes_categories_to_articles(self):
+        post = make_post(category="photography")
+        html = render_category_page_content([post], "Photography", "photography", 1, 1,
+                                            categories=_CATEGORIES)
+        assert 'class="category"' in html

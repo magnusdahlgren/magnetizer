@@ -10,8 +10,10 @@ from magnetizer.image import resize_image
 from magnetizer.manifest import get_changed_post_ids, load_manifest, save_manifest
 from magnetizer.render import (
     canonical_url,
+    category_page_url,
     index_page_url,
     render_archive_page_content,
+    render_category_page_content,
     render_index_page_content,
     render_page_title,
     render_post_page_content,
@@ -96,6 +98,16 @@ def _post_index_page_url(post_id, all_post_ids_sorted_desc, posts_per_page):
     return index_page_url(page)
 
 
+def _warn_if_missing_category(post, categories):
+    if categories and not post.category:
+        print(f"Warning: Post {post.id} is missing a category")
+
+
+def _warn_if_invalid_category(post, categories):
+    if categories and post.category and post.category not in categories:
+        print(f"Warning: Post {post.id} has unknown category: '{post.category}'")
+
+
 def _warn_if_missing_alt_texts(post):
     if post.images and any(not img.alt for img in post.images):
         print(f"Warning: Post {post.id} is missing one or more alt texts")
@@ -115,28 +127,51 @@ def _adjacent_post_urls(post_id, all_post_ids_sorted_desc):
     return newer_url, older_url
 
 
-def _write_post_html(post, index_page_url, dist_dir, config, template, newer_url=None, older_url=None):
-    content_html = render_post_page_content(post, index_page_url, newer_url=newer_url, older_url=older_url)
+def _write_post_html(post, index_page_url, dist_dir, config, template, newer_url=None, older_url=None, categories=None):
+    content_html = render_post_page_content(post, index_page_url, newer_url=newer_url, older_url=older_url, categories=categories)
     title = render_page_title(config["site_title"], post.title, page_num=None)
     html = render_template(template, title=title, content=content_html,
                            canonical=canonical_url(config["site_url"], f"{post.id}.html"))
     (dist_dir / f"{post.id}.html").write_text(html)
 
 
-def _write_index_pages(posts_sorted_desc, dist_dir, config, template):
+def _write_index_pages(posts_sorted_desc, dist_dir, config, template, categories=None):
     per_page = config["posts_per_page"]
     total = len(posts_sorted_desc)
     total_pages = max(1, (total + per_page - 1) // per_page)
 
     for page_num in range(1, total_pages + 1):
         slice_ = posts_sorted_desc[(page_num - 1) * per_page: page_num * per_page]
-        content_html = render_index_page_content(slice_, page_num, total_pages)
+        content_html = render_index_page_content(slice_, page_num, total_pages, categories=categories)
         title = render_page_title(config["site_title"], None, page_num=page_num)
         filename = index_page_url(page_num)
         html = render_template(template, title=title, content=content_html,
                                canonical=canonical_url(config["site_url"], filename),
                                meta_description=config["index_meta_description"])
         (dist_dir / filename).write_text(html)
+
+
+def _write_category_pages(posts_sorted_desc, dist_dir, config, template):
+    categories = config["categories"]
+    if not categories:
+        return
+    per_page = config["posts_per_page"]
+    for slug, display_name in categories.items():
+        category_posts = [p for p in posts_sorted_desc if p.category == slug]
+        if not category_posts:
+            continue
+        total = len(category_posts)
+        total_pages = max(1, (total + per_page - 1) // per_page)
+        for page_num in range(1, total_pages + 1):
+            slice_ = category_posts[(page_num - 1) * per_page: page_num * per_page]
+            content_html = render_category_page_content(
+                slice_, display_name, slug, page_num, total_pages, categories=categories
+            )
+            title = render_page_title(config["site_title"], display_name, page_num=None)
+            filename = category_page_url(slug, page_num)
+            html = render_template(template, title=title, content=content_html,
+                                   canonical=canonical_url(config["site_url"], filename))
+            (dist_dir / filename).write_text(html)
 
 
 def _about_image_filenames(content_dir):
@@ -290,6 +325,8 @@ def build(cwd, filename=None, flush=False, resources=False):
         posts_cache[post_id] = post
         _warn_if_missing_alt_texts(post)
         _warn_if_missing_title(post)
+        _warn_if_missing_category(post, config["categories"])
+        _warn_if_invalid_category(post, config["categories"])
         src_sizes = {img.filename: (content_dir / img.filename).stat().st_size for img in post.images}
         _build_post(post, dist_dir, content_dir, config)
         for image in post.images:
@@ -299,7 +336,7 @@ def build(cwd, filename=None, flush=False, resources=False):
             log.append(("RESIZED", resized_name, src_sizes[image.filename], dest_size))
         idx_url = _post_index_page_url(post_id, all_post_ids_sorted_desc, config["posts_per_page"])
         newer_url, older_url = _adjacent_post_urls(post_id, all_post_ids_sorted_desc)
-        _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url)
+        _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url, categories=config["categories"])
         log.append((action, f"{post_id}.html", post.char_count, post.is_micro))
 
     if about_md.exists():
@@ -327,11 +364,12 @@ def build(cwd, filename=None, flush=False, resources=False):
             posts_cache[pid] if pid in posts_cache else _load_post(content_dir, pid, config["micro_post_max_length"])
             for pid in all_post_ids_sorted_desc
         ]
-        _write_index_pages(all_posts, dist_dir, config, template)
+        _write_index_pages(all_posts, dist_dir, config, template, categories=config["categories"])
         per_page = config["posts_per_page"]
         total_pages = max(1, (len(all_posts) + per_page - 1) // per_page)
         for page_num in range(1, total_pages + 1):
             log.append(("UPDATED", index_page_url(page_num)))
+        _write_category_pages(all_posts, dist_dir, config, template)
         (dist_dir / "feed.xml").write_text(render_feed(all_posts, config))
         log.append(("UPDATED", "feed.xml"))
         archive_html = render_template(

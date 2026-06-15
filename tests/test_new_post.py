@@ -157,18 +157,23 @@ class TestMarkdownFileCreation:
         content = (project_dir / "content" / "1.md").read_text()
         assert "# " not in content
 
+    def test_md_has_category_field_in_frontmatter(self, project_dir):
+        run_new_post([], cwd=project_dir)
+        content = (project_dir / "content" / "1.md").read_text()
+        assert "category:" in content
+
     def test_md_exact_format_without_title(self, project_dir):
         today = date.today().isoformat()
         run_new_post([], cwd=project_dir)
         content = (project_dir / "content" / "1.md").read_text()
-        expected = f"---\ndate: {today}\n---\n"
+        expected = f"---\ndate: {today}\ncategory: \n---\n"
         assert content == expected
 
     def test_md_exact_format_with_title(self, project_dir):
         today = date.today().isoformat()
         run_new_post(["This is my title"], cwd=project_dir)
         content = (project_dir / "content" / "1.md").read_text()
-        expected = f"---\ndate: {today}\ntitle: This is my title\n---\n"
+        expected = f"---\ndate: {today}\ntitle: This is my title\ncategory: \n---\n"
         assert content == expected
 
     def test_md_images_list_included_when_images_provided(self, project_dir, sample_jpg):
@@ -195,7 +200,7 @@ class TestMarkdownFileCreation:
         today = date.today().isoformat()
         run_new_post([str(sample_jpg)], cwd=project_dir)
         content = (project_dir / "content" / "1.md").read_text()
-        expected = f"---\ndate: {today}\nimages:\n  - Image 1\n---\n"
+        expected = f"---\ndate: {today}\nimages:\n  - Image 1\ncategory: \n---\n"
         assert content == expected
 
     def test_md_no_images_key_when_no_images(self, project_dir):

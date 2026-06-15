@@ -20,6 +20,7 @@ def build_markdown(date_str: str, title: str | None, image_count: int = 0) -> st
         lines.append("images:")
         for i in range(1, image_count + 1):
             lines.append(f"  - Image {i}")
+    lines.append("category: ")
     lines.append("---")
     lines.append("")
     return "\n".join(lines)
