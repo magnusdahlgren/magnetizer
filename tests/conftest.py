@@ -26,7 +26,7 @@ def make_post(
     post_id=1,
     date="2026-05-24",
     date_uk="24 May 2026",
-    title="My Post",
+    title: str | None = "My Post",
     body_html="<p>Hello</p>",
     images=None,
 ):

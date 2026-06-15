@@ -127,6 +127,7 @@ class TestBodyHtml:
     def test_mark_syntax_in_excerpt_converted_to_mark_element(self):
         body = "Before ==marked==<!-- more -->After"
         post = parse_post(make_md(body=body), 1, [])
+        assert post.excerpt_html is not None
         assert "<mark>marked</mark>" in post.excerpt_html
 
 
@@ -170,10 +171,12 @@ class TestReadMore:
 
     def test_excerpt_html_contains_content_before_more_tag(self):
         post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
+        assert post.excerpt_html is not None
         assert "<p>Intro.</p>" in post.excerpt_html
 
     def test_excerpt_html_excludes_content_after_more_tag(self):
         post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
+        assert post.excerpt_html is not None
         assert "Rest" not in post.excerpt_html
 
     def test_body_html_contains_full_content_when_more_tag_present(self):
@@ -183,6 +186,7 @@ class TestReadMore:
 
     def test_more_tag_not_present_in_excerpt_html(self):
         post = parse_post(make_md(body="Intro.\n\n<!-- more -->\n\nRest."), 1, [])
+        assert post.excerpt_html is not None
         assert "<!-- more -->" not in post.excerpt_html
 
     def test_more_tag_not_present_in_body_html(self):
@@ -419,4 +423,5 @@ class TestSmartQuotes:
 
     def test_smart_quotes_applied_to_excerpt(self):
         post = parse_post(make_md(body='"intro"\n\n<!-- more -->\n\n"rest"'), 1, [])
+        assert post.excerpt_html is not None
         assert '&ldquo;' in post.excerpt_html

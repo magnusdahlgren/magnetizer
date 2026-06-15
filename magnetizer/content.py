@@ -95,7 +95,7 @@ def parse_post(md_text, post_id, image_filenames, micro_post_max_length=180):
 
     sorted_filenames = sorted(
         image_filenames,
-        key=lambda f: int(re.search(r'-image-(\d+)', f).group(1)),
+        key=lambda f: int(re.search(r'-image-(\d+)', f).group(1)),  # type: ignore[union-attr]
     )
 
     images = [

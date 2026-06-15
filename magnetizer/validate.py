@@ -1,6 +1,7 @@
 import re
 import sys
 from pathlib import Path
+from typing import NoReturn
 
 
 _MD_PATTERN = re.compile(r'^([1-9]\d*)\.md$')
@@ -8,7 +9,7 @@ _IMAGE_PATTERN = re.compile(r'^([1-9]\d*)-image-(\d{2})\.(jpg|jpeg|png)$')
 _ABOUT_IMAGE_PATTERN = re.compile(r'^about-image-(\d{2})\.(jpg|jpeg|png)$')
 
 
-def _error(msg):
+def _error(msg) -> NoReturn:
     print(f"Error: {msg}", file=sys.stderr)
     sys.exit(1)
 

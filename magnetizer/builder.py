@@ -237,6 +237,8 @@ def build(cwd, filename=None, flush=False, resources=False):
     about_md = content_dir / "about.md"
     cookies_md = content_dir / "cookies.md"
 
+    post_ids_to_build: set[int] = set()
+
     if filename:
         stem = Path(filename).stem
         if stem == "about":
