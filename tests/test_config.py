@@ -13,6 +13,7 @@ DEFAULTS = {
     "posts_per_page": 12,
     "micro_post_max_length": 180,
     "index_meta_description": None,
+    "categories": {},
 }
 
 
@@ -108,3 +109,32 @@ class TestCustomValues:
         p = write_config(tmp_path, "unknown_key: whatever\n")
         config = load_config(p)
         assert set(config.keys()) == set(DEFAULTS.keys())
+
+
+# ---------------------------------------------------------------------------
+# Categories
+# ---------------------------------------------------------------------------
+
+class TestCategories:
+
+    def test_categories_default_is_empty_dict(self, tmp_path):
+        assert load_config(tmp_path / "config.yaml")["categories"] == {}
+
+    def test_categories_loaded_from_config(self, tmp_path):
+        p = write_config(tmp_path, "categories:\n  photography: Photography\n  travel: Travel\n")
+        assert load_config(p)["categories"] == {"photography": "Photography", "travel": "Travel"}
+
+    def test_single_category_loaded(self, tmp_path):
+        p = write_config(tmp_path, "categories:\n  thoughts: Thoughts\n")
+        assert load_config(p)["categories"] == {"thoughts": "Thoughts"}
+
+    def test_categories_not_included_in_known_keys_check(self, tmp_path):
+        p = write_config(tmp_path, "categories:\n  photography: Photography\n")
+        config = load_config(p)
+        assert "categories" in config
+
+    def test_mutating_returned_categories_does_not_leak_into_next_load(self, tmp_path):
+        config = load_config(tmp_path / "config.yaml")
+        config["categories"]["photography"] = "Photography"
+        fresh = load_config(tmp_path / "config.yaml")
+        assert fresh["categories"] == {}

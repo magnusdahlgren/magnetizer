@@ -29,6 +29,7 @@ def make_post(
     title: str | None = "My Post",
     body_html="<p>Hello</p>",
     images=None,
+    category: str | None = None,
 ):
     image_objects = [
         img if isinstance(img, Image) else Image(filename=img, alt="")
@@ -42,6 +43,7 @@ def make_post(
         url=f"{post_id}.html",
         body_html=body_html,
         images=image_objects,
+        category=category,
     )
 
 

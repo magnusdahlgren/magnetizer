@@ -12,7 +12,11 @@ def index_page_url(page_num):
     return "index.html" if page_num == 1 else f"index-{page_num}.html"
 
 
-def render_article(post, on_index_page):
+def category_page_url(slug, page_num):
+    return f"{slug}.html" if page_num == 1 else f"{slug}-{page_num}.html"
+
+
+def render_article(post, on_index_page, categories=None):
     article_class = "multiple-posts" if on_index_page else "single-post"
     if post.is_micro:
         article_class += " micro-post"
@@ -55,16 +59,18 @@ def render_article(post, on_index_page):
             date_content = f'<a href="{post.url}">{post.date_uk}</a>'
         else:
             date_content = post.date_uk
-        parts.append(
-            f'<footer><time datetime="{post.date}">{date_content}</time></footer>'
-        )
+        footer_parts = [f'<time datetime="{post.date}">{date_content}</time>']
+        if post.category and categories and post.category in categories:
+            display_name = _escape(categories[post.category])
+            footer_parts.append(f'<a href="{post.category}.html" class="category">{display_name}</a>')
+        parts.append(f'<footer>{"".join(footer_parts)}</footer>')
 
     parts.append('</article>')
     return '\n'.join(parts)
 
 
-def render_post_page_content(post, index_page_url, newer_url=None, older_url=None, back_url=None):
-    article = render_article(post, on_index_page=False)
+def render_post_page_content(post, index_page_url, newer_url=None, older_url=None, back_url=None, categories=None):
+    article = render_article(post, on_index_page=False, categories=categories)
     back_url = back_url or f"{index_page_url}#post-{post.id}"
 
     parts = [f'<main>\n{article}\n</main>']
@@ -81,8 +87,8 @@ def render_post_page_content(post, index_page_url, newer_url=None, older_url=Non
     return '\n'.join(parts)
 
 
-def render_index_page_content(posts, page_num, total_pages):
-    articles = '\n'.join(render_article(p, on_index_page=True) for p in posts)
+def render_index_page_content(posts, page_num, total_pages, categories=None):
+    articles = '\n'.join(render_article(p, on_index_page=True, categories=categories) for p in posts)
     content = f'<main>\n{articles}\n</main>'
 
     if total_pages > 1:
@@ -95,6 +101,24 @@ def render_index_page_content(posts, page_num, total_pages):
             nav_items.append(f'<li class="older"><a href="{next_url}">Older posts</a></li>')
         content += f'\n<nav><ul>{"".join(nav_items)}</ul></nav>'
 
+    return content
+
+
+def render_category_page_content(posts, category_name, category_slug, page_num, total_pages, categories=None):
+    articles = '\n'.join(render_article(p, on_index_page=True, categories=categories) for p in posts)
+    content = f'<main>\n<h1>{_escape(category_name)}</h1>\n{articles}\n</main>'
+
+    if total_pages > 1:
+        nav_items = []
+        if page_num > 1:
+            prev_url = category_page_url(category_slug, page_num - 1)
+            nav_items.append(f'<li class="newer"><a href="{prev_url}">Newer posts</a></li>')
+        if page_num < total_pages:
+            next_url = category_page_url(category_slug, page_num + 1)
+            nav_items.append(f'<li class="older"><a href="{next_url}">Older posts</a></li>')
+        content += f'\n<nav><ul>{"".join(nav_items)}</ul></nav>'
+
+    content += '\n<nav><a href="index.html">Back to homepage</a></nav>'
     return content
 
 
@@ -154,7 +178,7 @@ def _archive_item_class(post):
     return cls
 
 
-def render_archive_page_content(posts):
+def render_archive_page_content(posts, categories=None):
     dated_posts = [p for p in posts if p.date]
 
     months = {}
@@ -167,9 +191,20 @@ def render_archive_page_content(posts):
     micro_count = sum(1 for p in posts if p.is_micro)
     favourite_count = sum(1 for p in posts if p.is_favourite)
 
-    parts = [
-        '<main>',
-        '<h1>Archive</h1>',
+    parts = ['<main>', '<h1>Archive</h1>']
+
+    if categories:
+        used_slugs = {p.category for p in posts if p.category}
+        category_items = [(slug, name) for slug, name in categories.items() if slug in used_slugs]
+        if category_items:
+            parts.append('<h2>Categories</h2>')
+            parts.append('<ul>')
+            for slug, name in category_items:
+                parts.append(f'<li><a href="{slug}.html">{_escape(name)}</a></li>')
+            parts.append('</ul>')
+            parts.append('<h2>Posts</h2>')
+
+    parts += [
         '<dl class="archive-stats">',
         f'<dt class="all">All posts</dt><dd>({len(posts)})</dd>',
         f'<dt class="photo-post">Image posts</dt><dd>({image_count})</dd>',

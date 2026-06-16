@@ -8,11 +8,13 @@ from magnetizer.content import Post, parse_post
 # Helpers
 # ---------------------------------------------------------------------------
 
-def make_md(date="2026-05-24", title=None, body=""):
+def make_md(date="2026-05-24", title=None, body="", category=None):
     """Build a minimal markdown string with frontmatter."""
     lines = ["---", f"date: {date}"]
     if title:
         lines.append(f"title: {title}")
+    if category is not None:
+        lines.append(f"category: {category}")
     lines.append("---")
     if body:
         lines.append("")
@@ -425,3 +427,34 @@ class TestSmartQuotes:
         post = parse_post(make_md(body='"intro"\n\n<!-- more -->\n\n"rest"'), 1, [])
         assert post.excerpt_html is not None
         assert '&ldquo;' in post.excerpt_html
+
+
+# ---------------------------------------------------------------------------
+# Category
+# ---------------------------------------------------------------------------
+
+class TestCategory:
+
+    def test_category_is_none_by_default(self):
+        post = parse_post(make_md(), 1, [])
+        assert post.category is None
+
+    def test_category_extracted_from_frontmatter(self):
+        post = parse_post(make_md(category="photography"), 1, [])
+        assert post.category == "photography"
+
+    def test_category_normalised_to_lowercase(self):
+        post = parse_post(make_md(category="Photography"), 1, [])
+        assert post.category == "photography"
+
+    def test_category_mixed_case_normalised(self):
+        post = parse_post(make_md(category="Travel & Leisure"), 1, [])
+        assert post.category == "travel & leisure"
+
+    def test_empty_category_is_none(self):
+        post = parse_post(make_md(category=""), 1, [])
+        assert post.category is None
+
+    def test_category_key_does_not_trigger_unknown_key_warning(self, capsys):
+        parse_post(make_md(category="photography"), 1, [])
+        assert "unknown frontmatter key" not in capsys.readouterr().out

@@ -1165,3 +1165,124 @@ class TestMissingTitleWarnings:
         make_jpg(p / "content" / "1-image-01.jpg")
         build(p)
         assert "Warning: Post 1 is missing a title" in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
+# Category warnings
+# ---------------------------------------------------------------------------
+
+_CATEGORIES_CONFIG = (
+    "site_title: Test Blog\nsite_url: https://example.github.io\n"
+    "posts_per_page: 2\ncategories:\n  photography: Photography\n  travel: Travel\n"
+)
+_CATEGORY_MD = "---\ndate: 2026-05-24\ntitle: My Post\ncategory: photography\n---\n\nHello world\n"
+_NO_CATEGORY_MD = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\nHello world\n"
+
+
+class TestCategoryWarnings:
+
+    def test_warning_when_post_missing_category_and_categories_configured(self, tmp_path, capsys):
+        p = make_project(tmp_path, posts={1: _NO_CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "Warning: Post 1 is missing a category" in capsys.readouterr().out
+
+    def test_no_warning_when_categories_not_configured(self, tmp_path, capsys):
+        p = make_project(tmp_path, posts={1: _NO_CATEGORY_MD})
+        build(p)
+        assert "missing a category" not in capsys.readouterr().out
+
+    def test_no_warning_when_post_has_valid_category(self, tmp_path, capsys):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "missing a category" not in capsys.readouterr().out
+
+    def test_warning_when_post_has_unknown_category(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\ntitle: My Post\ncategory: unknown-cat\n---\n\nHello\n"
+        p = make_project(tmp_path, posts={1: md}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "Warning: Post 1 has unknown category: 'unknown-cat'" in capsys.readouterr().out
+
+    def test_no_warning_for_unknown_category_when_no_categories_configured(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\ntitle: My Post\ncategory: unknown-cat\n---\n\nHello\n"
+        p = make_project(tmp_path, posts={1: md})
+        build(p)
+        assert "unknown category" not in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
+# Category pages
+# ---------------------------------------------------------------------------
+
+class TestCategoryPages:
+
+    def test_category_page_created_for_configured_category(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert (p / "dist" / "photography.html").exists()
+
+    def test_all_category_pages_created(self, tmp_path):
+        travel_md = "---\ndate: 2026-05-24\ntitle: Travel Post\ncategory: travel\n---\n\nContent\n"
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD, 2: travel_md}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert (p / "dist" / "photography.html").exists()
+        assert (p / "dist" / "travel.html").exists()
+
+    def test_category_page_not_created_on_single_file_build(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p, filename="1.md")
+        assert not (p / "dist" / "photography.html").exists()
+
+    def test_category_page_not_created_when_no_categories_configured(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD})
+        build(p)
+        assert not (p / "dist" / "photography.html").exists()
+
+    def test_category_page_contains_posts_of_that_category(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "Hello world" in (p / "dist" / "photography.html").read_text()
+
+    def test_category_page_excludes_posts_of_other_categories(self, tmp_path):
+        travel_md = "---\ndate: 2026-05-24\ntitle: Travel Post\ncategory: travel\n---\n\nTravel content\n"
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD, 2: travel_md}, config=_CATEGORIES_CONFIG)
+        build(p)
+        photography_html = (p / "dist" / "photography.html").read_text()
+        assert "Travel content" not in photography_html
+
+    def test_category_page_has_h1_with_category_name(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "<h1>Photography</h1>" in (p / "dist" / "photography.html").read_text()
+
+    def test_category_page_paginated_when_exceeds_posts_per_page(self, tmp_path):
+        posts = {i: _CATEGORY_MD for i in range(1, 4)}  # 3 posts, per_page=2
+        p = make_project(tmp_path, posts=posts, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert (p / "dist" / "photography-2.html").exists()
+
+    def test_category_page_includes_category_link_in_posts(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert 'class="category"' in (p / "dist" / "photography.html").read_text()
+
+
+# ---------------------------------------------------------------------------
+# Archive categories list
+# ---------------------------------------------------------------------------
+
+class TestArchiveCategoriesList:
+
+    def test_archive_contains_categories_heading(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "<h2>Categories</h2>" in (p / "dist" / "archive.html").read_text()
+
+    def test_archive_contains_category_link(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert '<a href="photography.html">Photography</a>' in (p / "dist" / "archive.html").read_text()
+
+    def test_archive_has_no_categories_heading_without_config(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _NO_CATEGORY_MD})
+        build(p)
+        assert "<h2>Categories</h2>" not in (p / "dist" / "archive.html").read_text()

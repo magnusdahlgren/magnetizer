@@ -7,6 +7,8 @@ from typing import NoReturn
 _MD_PATTERN = re.compile(r'^([1-9]\d*)\.md$')
 _IMAGE_PATTERN = re.compile(r'^([1-9]\d*)-image-(\d{2})\.(jpg|jpeg|png)$')
 _ABOUT_IMAGE_PATTERN = re.compile(r'^about-image-(\d{2})\.(jpg|jpeg|png)$')
+_RESERVED_CATEGORY_SLUGS = {"index", "archive", "about", "cookies"}
+_INDEX_PAGE_SLUG_PATTERN = re.compile(r'^index-\d+$')
 
 
 def _error(msg) -> NoReturn:
@@ -17,6 +19,9 @@ def _error(msg) -> NoReturn:
 def validate_config(config):
     if not config.get("site_url"):
         _error("'site_url' is required in config.yaml — set it to the absolute base URL of your site, e.g. https://example.github.io")
+    for slug in config.get("categories", {}):
+        if slug in _RESERVED_CATEGORY_SLUGS or _INDEX_PAGE_SLUG_PATTERN.match(slug) or slug.isdigit():
+            _error(f"category slug '{slug}' in config.yaml is reserved and would overwrite a generated page — choose a different slug")
 
 
 def validate_project(cwd):

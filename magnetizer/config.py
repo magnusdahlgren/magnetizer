@@ -1,3 +1,4 @@
+from copy import deepcopy
 from pathlib import Path
 
 import yaml
@@ -10,11 +11,12 @@ DEFAULTS = {
     "posts_per_page": 12,
     "micro_post_max_length": 180,
     "index_meta_description": None,
+    "categories": {},
 }
 
 
 def load_config(path):
-    config = dict(DEFAULTS)
+    config = deepcopy(DEFAULTS)
     p = Path(path)
     if p.is_file():
         data = yaml.safe_load(p.read_text()) or {}

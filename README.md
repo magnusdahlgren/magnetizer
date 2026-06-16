@@ -29,6 +29,7 @@ manifest.json  Build state (created automatically)
 | `image_quality` | JPEG quality for resized images (0–95) | `75` |
 | `micro_post_max_length` | Max plain-text characters for a post to be treated as a microblog post | `180` |
 | `index_meta_description` | `<meta name="description">` content on index pages (via `MAGNETIZER_META_DESCRIPTION` placeholder) | Not set |
+| `categories` | Map of category slug to display name, e.g. `{photography: Photography}` | `{}` (no categories) |
 
 Example:
 
@@ -38,6 +39,9 @@ posts_per_page: 12
 image_max_dimension: 1600
 image_quality: 75
 micro_post_max_length: 180
+categories:
+  photography: Photography
+  travel: Travel
 ```
 
 ## Creating a post
@@ -65,6 +69,8 @@ Post body goes here. Standard Markdown is supported.
 ```
 
 The `title` field is optional. Set `favourite: true` to mark a post as a favourite — it will receive an additional `favourite` CSS class in the archive.
+
+Set `category` to a slug from the `categories` map in `config.yaml` to assign the post to a category — matching is case-insensitive. This adds a link to the category's page in the post's footer, and includes the post on that category's page (`{slug}.html`). If `categories` is configured, the build prints a warning for posts with no category or with a category not found in `categories`.
 
 A post with no title, no images, and a plain-text body of `micro_post_max_length` characters or fewer is treated as a microblog post and rendered with an additional `micro-post` CSS class.
 
@@ -144,6 +150,24 @@ The archive page (`dist/archive.html`) lists all dated posts grouped by month. I
 ```
 
 The `class` attributes on `<dt>` allow CSS to replace the text labels with icons (e.g. Font Awesome).
+
+If `categories` is configured and at least one category has a matching post, a categories list is inserted between the `<h1>` and the stats block, followed by a `<h2>Posts</h2>` heading:
+
+```html
+<main>
+  <h1>Archive</h1>
+  <h2>Categories</h2>
+  <ul>
+    <li><a href="photography.html">Photography</a></li>
+    <li><a href="travel.html">Travel</a></li>
+  </ul>
+  <h2>Posts</h2>
+  <dl class="archive-stats">...</dl>
+  ...
+</main>
+```
+
+Categories appear in the order defined in `config.yaml`, and only if they have at least one matching post.
 
 ## Publishing
 
