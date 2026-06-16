@@ -45,7 +45,7 @@ def render_article(post, on_index_page, categories=None):
             parts.append(f'<h1>{_escape(post.title)}</h1>')
 
     if on_index_page and post.excerpt_html is not None:
-        parts.append(f'<div class="post-body">{post.excerpt_html}<a href="{post.url}" class="read-more">Read more →</a></div>')
+        parts.append(f'<div class="post-body">{post.excerpt_html}<a href="{post.url}" class="read-more">Read more</a></div>')
     else:
         parts.append(f'<div class="post-body">{post.body_html}</div>')
 
