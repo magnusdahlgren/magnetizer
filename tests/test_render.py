@@ -658,9 +658,9 @@ class TestRenderArticleReadMore:
 # render_archive_page_content
 # ---------------------------------------------------------------------------
 
-def make_dated_post(id, date, title=None, body_html="", images=None):
+def make_dated_post(id, date, title=None, body_html="", images=None, category=None):
     return Post(id=id, date=date, date_uk="", title=title,
-                url=f"{id}.html", body_html=body_html, images=images or [])
+                url=f"{id}.html", body_html=body_html, images=images or [], category=category)
 
 
 class TestRenderArchivePageContent:
@@ -849,6 +849,88 @@ class TestRenderArchivePageContent:
                     url="1.html", body_html="", images=[], is_favourite=False)
         html = render_archive_page_content([post])
         assert '<li class="text-post favourite">' not in html
+
+
+# ---------------------------------------------------------------------------
+# render_archive_page_content — categories list
+# ---------------------------------------------------------------------------
+
+class TestArchiveCategoriesList:
+
+    def test_categories_heading_present_when_a_category_has_posts(self):
+        post = make_dated_post(1, "2026-05-24", category="photography")
+        html = render_archive_page_content([post], categories=_CATEGORIES)
+        assert "<h2>Categories</h2>" in html
+
+    def test_no_categories_heading_when_categories_param_is_none(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert "<h2>Categories</h2>" not in html
+
+    def test_no_categories_heading_when_categories_param_is_empty(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")], categories={})
+        assert "<h2>Categories</h2>" not in html
+
+    def test_no_categories_heading_when_no_post_uses_a_category(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")], categories=_CATEGORIES)
+        assert "<h2>Categories</h2>" not in html
+
+    def test_category_link_href(self):
+        post = make_dated_post(1, "2026-05-24", category="photography")
+        html = render_archive_page_content([post], categories=_CATEGORIES)
+        assert '<a href="photography.html">' in html
+
+    def test_category_link_text(self):
+        post = make_dated_post(1, "2026-05-24", category="photography")
+        html = render_archive_page_content([post], categories=_CATEGORIES)
+        assert '<a href="photography.html">Photography</a>' in html
+
+    def test_category_with_no_posts_excluded_from_list(self):
+        post = make_dated_post(1, "2026-05-24", category="photography")
+        html = render_archive_page_content([post], categories=_CATEGORIES)
+        assert '<a href="travel.html">' not in html
+
+    def test_category_list_in_config_order(self):
+        posts = [
+            make_dated_post(1, "2026-05-24", category="travel"),
+            make_dated_post(2, "2026-05-25", category="photography"),
+        ]
+        html = render_archive_page_content(posts, categories=_CATEGORIES)
+        assert html.index("Photography") < html.index("Travel")
+
+    def test_category_item_is_li(self):
+        post = make_dated_post(1, "2026-05-24", category="photography")
+        html = render_archive_page_content([post], categories=_CATEGORIES)
+        assert '<li><a href="photography.html">Photography</a></li>' in html
+
+    def test_h1_before_categories_heading(self):
+        post = make_dated_post(1, "2026-05-24", category="photography")
+        html = render_archive_page_content([post], categories=_CATEGORIES)
+        assert html.index("<h1>Archive</h1>") < html.index("<h2>Categories</h2>")
+
+    def test_posts_heading_present_when_categories_shown(self):
+        post = make_dated_post(1, "2026-05-24", category="photography")
+        html = render_archive_page_content([post], categories=_CATEGORIES)
+        assert "<h2>Posts</h2>" in html
+
+    def test_posts_heading_after_categories_list(self):
+        post = make_dated_post(1, "2026-05-24", category="photography")
+        html = render_archive_page_content([post], categories=_CATEGORIES)
+        assert html.index('<a href="photography.html">') < html.index("<h2>Posts</h2>")
+
+    def test_posts_heading_before_stats(self):
+        post = make_dated_post(1, "2026-05-24", category="photography")
+        html = render_archive_page_content([post], categories=_CATEGORIES)
+        assert html.index("<h2>Posts</h2>") < html.index('<dl class="archive-stats">')
+
+    def test_no_posts_heading_when_no_categories_shown(self):
+        html = render_archive_page_content([make_dated_post(1, "2026-05-24")])
+        assert "<h2>Posts</h2>" not in html
+
+    def test_category_display_name_escaped(self):
+        post = make_dated_post(1, "2026-05-24", category="a-and-b")
+        html = render_archive_page_content([post], categories={"a-and-b": "A & B"})
+        assert "&amp;" in html
+        assert ">A & B<" not in html
 
 
 # ---------------------------------------------------------------------------

@@ -178,7 +178,7 @@ def _archive_item_class(post):
     return cls
 
 
-def render_archive_page_content(posts):
+def render_archive_page_content(posts, categories=None):
     dated_posts = [p for p in posts if p.date]
 
     months = {}
@@ -191,9 +191,20 @@ def render_archive_page_content(posts):
     micro_count = sum(1 for p in posts if p.is_micro)
     favourite_count = sum(1 for p in posts if p.is_favourite)
 
-    parts = [
-        '<main>',
-        '<h1>Archive</h1>',
+    parts = ['<main>', '<h1>Archive</h1>']
+
+    if categories:
+        used_slugs = {p.category for p in posts if p.category}
+        category_items = [(slug, name) for slug, name in categories.items() if slug in used_slugs]
+        if category_items:
+            parts.append('<h2>Categories</h2>')
+            parts.append('<ul>')
+            for slug, name in category_items:
+                parts.append(f'<li><a href="{slug}.html">{_escape(name)}</a></li>')
+            parts.append('</ul>')
+            parts.append('<h2>Posts</h2>')
+
+    parts += [
         '<dl class="archive-stats">',
         f'<dt class="all">All posts</dt><dd>({len(posts)})</dd>',
         f'<dt class="photo-post">Image posts</dt><dd>({image_count})</dd>',

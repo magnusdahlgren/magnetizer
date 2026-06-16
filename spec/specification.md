@@ -105,6 +105,7 @@ This will:
     1. The post date (i.e. the date when running the script) in ISO 8601 format (`YYYY-MM-DD`) in the .md frontmatter
     2. If a title was provided, include this in the .md frontmatter.
     3. If any images were provided, include an `images:` list in the frontmatter with a numbered placeholder alt text for each image, e.g. `Image 1`, `Image 2`, etc.
+    4. An empty `category:` field, for the user to fill in.
 
     Example with two images and a title:
 
@@ -115,6 +116,7 @@ This will:
     images:
       - Image 1
       - Image 2
+    category: 
     ---
 
     ```
@@ -242,6 +244,7 @@ Examples:
 | `posts_per_page` | Number of posts per page when generating the index files | `12` |
 | `micro_post_max_length` | Maximum plain-text character count for a post to be treated as a microblog post | `180` |
 | `index_meta_description` | Content for the `<meta name="description">` tag on index pages, via the `MAGNETIZER_META_DESCRIPTION` template placeholder | Not set — placeholder is removed |
+| `categories` | A map of category slug to display name, e.g. `{photography: Photography}`. See [Categories](#categories). | `{}` (no categories) |
 
 ### Image processing
 
@@ -303,6 +306,7 @@ Posts are generated using a simple html structure.
 	  <time datetime="POST_DATE">
 		  <a href="POST_URL">POST_DATE_UK</a>
 		</time>
+		<a href="CATEGORY_URL" class="category">CATEGORY_NAME</a>
 	</footer>
 </article>
 ```
@@ -315,6 +319,7 @@ Where:
 - `POST_DATE` is the `date` from the Markdown frontmatter
 - `POST_DATE_UK` is the human-readable version of the `date`, e.g. “24 May 2026”
 - `POST_BODY` is the HTML generated from the Markdown
+- `CATEGORY_URL` / `CATEGORY_NAME` — see [Categories](#categories). The `<a class="category">` link is omitted if the post has no category, or its category isn't configured.
 
 Notes:
 
@@ -339,6 +344,64 @@ When a post is a favourite, its `<li>` element in the archive page gets an addit
 ```
 
 The `favourite` class is appended after the post-type class (`text-post`, `photo-post`, `mixed-post`, or `micro-post`). If `favourite` is absent or `false`, no additional class is added.
+
+### Categories
+
+Categories are configured in `config.yaml` as a map of slug to display name:
+
+```yaml
+categories:
+  photography: Photography
+  travel: Travel
+```
+
+A post is assigned to a category by setting `category` in its frontmatter to the category's slug. Matching is case-insensitive and the value is normalised to lowercase:
+
+```
+---
+date: 2026-05-21
+category: photography
+---
+```
+
+If `categories` is configured and a post has no `category` set, a warning is printed during the build:
+
+```
+Warning: Post {post-id} is missing a category
+```
+
+If a post's `category` does not match any slug in `categories`, a warning is printed during the build:
+
+```
+Warning: Post {post-id} has unknown category: '{category}'
+```
+
+Both warnings are skipped when `categories` is not configured. The build continues normally in both cases — these are warnings, not errors.
+
+When a post has a category that matches a configured slug, a link to that category's page is included in the post's `<footer>`, after the date:
+
+```html
+<a href="{slug}.html" class="category">{display name}</a>
+```
+
+For each configured category with at least one matching post, Magnetizer generates a paginated category page (`{slug}.html`, `{slug}-2.html`, etc.), using the same pagination and `posts_per_page` rules as index pages. Category pages are generated under the same conditions as index pages — full builds where post changes are detected, not single-file preview builds. The `MAGNETIZER_CONTENT` has the following structure:
+
+```html
+<main>
+<h1>{display name}</h1>
+ARTICLE
+...
+</main>
+<nav>
+  <ul>
+    <li class="newer"><a href="{slug}.html">Newer posts</a></li>
+    <li class="older"><a href="{slug}-3.html">Older posts</a></li>
+  </ul>
+</nav>
+<nav><a href="index.html">⌂ Back to homepage</a></nav>
+```
+
+The pagination `<nav>` follows the same rules as index pages (see [Index pages](#index-pages)) — omitted entirely on a single-page category, and each `<li>` omitted at the corresponding boundary.
 
 ### Alt texts
 
@@ -500,6 +563,12 @@ The `MAGNETIZER_CONTENT` has the following structure:
 ```html
 <main>
 <h1>Archive</h1>
+<h2>Categories</h2>
+<ul>
+  <li><a href="CATEGORY_SLUG.html">CATEGORY_NAME</a></li>
+  ...
+</ul>
+<h2>Posts</h2>
 <dl class="archive-stats">
   <dt class="all">All posts</dt><dd>(56)</dd>
   <dt class="photo-post">Image posts</dt><dd>(34)</dd>
@@ -520,6 +589,8 @@ The `MAGNETIZER_CONTENT` has the following structure:
 
 Where:
 
+- The `<h2>Categories</h2>` heading and its `<ul>` are only included if `categories` is configured and at least one configured category has a matching post. Each `<li>` links to the corresponding category page (see [Categories](#categories)), listed in the order categories are defined in `config.yaml`. Categories with no matching posts are omitted.
+- The `<h2>Posts</h2>` heading is only included when the categories list above it is shown.
 - The `<dl class="archive-stats">` has four filter items — total post count (including undated), posts with at least one image, microblog posts, and favourite posts — each as a `<dt>`/`<dd>` pair. The `<dt>` class matches the post-type class used on archive `<li>` elements, for use as a JS filter hook.
 - `DAY` is the day of the month with no leading zero, e.g. `16`
 - Titled posts use `DAY - POST_TITLE` as link text

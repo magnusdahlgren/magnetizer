@@ -1264,3 +1264,25 @@ class TestCategoryPages:
         p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
         build(p)
         assert 'class="category"' in (p / "dist" / "photography.html").read_text()
+
+
+# ---------------------------------------------------------------------------
+# Archive categories list
+# ---------------------------------------------------------------------------
+
+class TestArchiveCategoriesList:
+
+    def test_archive_contains_categories_heading(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "<h2>Categories</h2>" in (p / "dist" / "archive.html").read_text()
+
+    def test_archive_contains_category_link(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert '<a href="photography.html">Photography</a>' in (p / "dist" / "archive.html").read_text()
+
+    def test_archive_has_no_categories_heading_without_config(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _NO_CATEGORY_MD})
+        build(p)
+        assert "<h2>Categories</h2>" not in (p / "dist" / "archive.html").read_text()

@@ -375,7 +375,7 @@ def build(cwd, filename=None, flush=False, resources=False):
         archive_html = render_template(
             template,
             title=render_page_title(config["site_title"], "Archive", page_num=None),
-            content=render_archive_page_content(all_posts),
+            content=render_archive_page_content(all_posts, categories=config["categories"]),
             canonical=canonical_url(config["site_url"], "archive.html"),
         )
         (dist_dir / "archive.html").write_text(archive_html)
