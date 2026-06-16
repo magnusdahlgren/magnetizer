@@ -40,7 +40,7 @@ def render_article(post, on_index_page, categories=None):
 
     if post.title:
         if on_index_page:
-            parts.append(f'<h1><a href="{post.url}">{_escape(post.title)}</a></h1>')
+            parts.append(f'<h2><a href="{post.url}">{_escape(post.title)}</a></h2>')
         else:
             parts.append(f'<h1>{_escape(post.title)}</h1>')
 

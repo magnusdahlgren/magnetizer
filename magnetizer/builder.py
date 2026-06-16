@@ -120,6 +120,16 @@ def _warn_if_missing_title(post):
         print(f"Warning: Post {post.id} is missing a title")
 
 
+_HIGH_HEADING_PATTERN = re.compile(r'<h([12])[ >]')
+
+
+def _warn_if_heading_too_high(post):
+    levels = sorted({int(m.group(1)) for m in _HIGH_HEADING_PATTERN.finditer(post.body_html)})
+    if levels:
+        tags = ", ".join(f"<h{level}>" for level in levels)
+        print(f"Warning: Post {post.id} has heading(s) more prominent than <h3> in its body: {tags}")
+
+
 def _adjacent_post_urls(post_id, all_post_ids_sorted_desc):
     pos = all_post_ids_sorted_desc.index(post_id)
     newer_url = f"{all_post_ids_sorted_desc[pos - 1]}.html" if pos > 0 else None
@@ -182,6 +192,7 @@ def _about_image_filenames(content_dir):
 def _build_cookies_page(content_dir, dist_dir, config, template):
     md_text = (content_dir / "cookies.md").read_text()
     post = parse_post(md_text, "cookies", [])
+    _warn_if_heading_too_high(post)
     content_html = render_post_page_content(post, "index.html", back_url="index.html")
     title = render_page_title(config["site_title"], post.title, page_num=None)
     html = render_template(template, title=title, content=content_html,
@@ -193,6 +204,7 @@ def _build_about_page(content_dir, dist_dir, config, template):
     md_text = (content_dir / "about.md").read_text()
     images = _about_image_filenames(content_dir)
     post = parse_post(md_text, "about", images)
+    _warn_if_heading_too_high(post)
 
     for image in post.images:
         stem, _, ext = image.filename.rpartition('.')
@@ -327,6 +339,7 @@ def build(cwd, filename=None, flush=False, resources=False):
         _warn_if_missing_title(post)
         _warn_if_missing_category(post, config["categories"])
         _warn_if_invalid_category(post, config["categories"])
+        _warn_if_heading_too_high(post)
         src_sizes = {img.filename: (content_dir / img.filename).stat().st_size for img in post.images}
         _build_post(post, dist_dir, content_dir, config)
         for image in post.images:
