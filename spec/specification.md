@@ -398,7 +398,7 @@ ARTICLE
     <li class="older"><a href="{slug}-3.html">Older posts</a></li>
   </ul>
 </nav>
-<nav><a href="index.html">⌂ Back to homepage</a></nav>
+<nav><a href="index.html">Back to homepage</a></nav>
 ```
 
 The pagination `<nav>` follows the same rules as index pages (see [Index pages](#index-pages)) — omitted entirely on a single-page category, and each `<li>` omitted at the corresponding boundary.

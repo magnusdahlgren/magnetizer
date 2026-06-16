@@ -132,3 +132,9 @@ class TestCategories:
         p = write_config(tmp_path, "categories:\n  photography: Photography\n")
         config = load_config(p)
         assert "categories" in config
+
+    def test_mutating_returned_categories_does_not_leak_into_next_load(self, tmp_path):
+        config = load_config(tmp_path / "config.yaml")
+        config["categories"]["photography"] = "Photography"
+        fresh = load_config(tmp_path / "config.yaml")
+        assert fresh["categories"] == {}

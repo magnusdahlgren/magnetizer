@@ -338,3 +338,24 @@ class TestValidateConfig:
         with pytest.raises(SystemExit):
             validate_config({})
         assert "site_url" in capsys.readouterr().err
+
+    def test_passes_with_non_reserved_category_slugs(self):
+        validate_config({"site_url": "https://example.github.io", "categories": {"photography": "Photography"}})  # should not raise
+
+    @pytest.mark.parametrize("slug", ["index", "archive", "about", "cookies"])
+    def test_fails_when_category_slug_is_reserved(self, slug):
+        with pytest.raises(SystemExit):
+            validate_config({"site_url": "https://example.github.io", "categories": {slug: "Whatever"}})
+
+    def test_fails_when_category_slug_matches_index_pagination_pattern(self):
+        with pytest.raises(SystemExit):
+            validate_config({"site_url": "https://example.github.io", "categories": {"index-2": "Whatever"}})
+
+    def test_fails_when_category_slug_is_purely_numeric(self):
+        with pytest.raises(SystemExit):
+            validate_config({"site_url": "https://example.github.io", "categories": {"42": "Whatever"}})
+
+    def test_error_message_mentions_reserved_slug(self, capsys):
+        with pytest.raises(SystemExit):
+            validate_config({"site_url": "https://example.github.io", "categories": {"archive": "Whatever"}})
+        assert "archive" in capsys.readouterr().err
