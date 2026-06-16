@@ -633,7 +633,7 @@ class TestRenderArticleReadMore:
 
     def test_index_page_shows_read_more_link(self):
         html = render_article(self._post_with_excerpt(), on_index_page=True)
-        assert "Read more →" in html
+        assert "Read more</a>" in html
 
     def test_index_page_read_more_link_points_to_post(self):
         html = render_article(self._post_with_excerpt(), on_index_page=True)

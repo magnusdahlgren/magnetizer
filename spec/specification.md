@@ -430,14 +430,16 @@ The build continues normally — this is a warning, not an error.
 
 If a post's Markdown body contains `<!-- more -->`, the content is split at that marker:
 
-- On **index pages**, only the content before `<!-- more -->` is shown, followed by a "Read more →" link:
+- On **index pages**, only the content before `<!-- more -->` is shown, followed by a "Read more" link:
 
 ```html
 <div class="post-body">
   EXCERPT_HTML
-  <a href="POST_URL" class="read-more">Read more →</a>
+  <a href="POST_URL" class="read-more">Read more</a>
 </div>
 ```
+
+The arrow shown after "Read more" is added via CSS (`.read-more::after`), not part of the generated text — this lets it share styling with the "N more photo(s)" link's arrow.
 
 - On **individual post pages**, the full content is shown as normal and `<!-- more -->` has no effect.
 
@@ -471,7 +473,7 @@ Note: The following differences apply to `<article>` elements when they appear o
 <a href="POST_URL" class="more-photos">N more photo(s)</a>
 ```
 
-Where `N` is the number of hidden images (total minus two). The text uses "photo" for one hidden image and "photos" for two or more. This link is omitted when a "Read more →" link is already present (i.e. the post uses `<!-- more -->`), since both links point to the same post page.
+Where `N` is the number of hidden images (total minus two). The text uses "photo" for one hidden image and "photos" for two or more. This link is omitted when a "Read more" link is already present (i.e. the post uses `<!-- more -->`), since both links point to the same post page.
 
 ### Microblog posts
 
