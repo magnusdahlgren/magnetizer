@@ -760,6 +760,41 @@ class TestCookiesPage:
 
 
 # ---------------------------------------------------------------------------
+# Heading level warnings — about and cookies pages
+# ---------------------------------------------------------------------------
+
+class TestAboutAndCookiesHeadingWarnings:
+
+    def test_warning_for_h2_heading_in_about_body(self, tmp_path, capsys):
+        md = "---\ntitle: About\n---\n\n## A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(md)
+        build(p)
+        assert "Warning: Post about has heading(s) more prominent than <h3> in its body: <h2>" in capsys.readouterr().out
+
+    def test_no_warning_for_h3_heading_in_about_body(self, tmp_path, capsys):
+        md = "---\ntitle: About\n---\n\n### A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(md)
+        build(p)
+        assert "more prominent than <h3>" not in capsys.readouterr().out
+
+    def test_warning_for_h1_heading_in_cookies_body(self, tmp_path, capsys):
+        md = "---\ntitle: Cookie Policy\n---\n\n# A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(md)
+        build(p)
+        assert "Warning: Post cookies has heading(s) more prominent than <h3> in its body: <h1>" in capsys.readouterr().out
+
+    def test_no_warning_for_h3_heading_in_cookies_body(self, tmp_path, capsys):
+        md = "---\ntitle: Cookie Policy\n---\n\n### A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(md)
+        build(p)
+        assert "more prominent than <h3>" not in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
 # Verbose log
 # ---------------------------------------------------------------------------
 
@@ -1207,6 +1242,42 @@ class TestCategoryWarnings:
         p = make_project(tmp_path, posts={1: md})
         build(p)
         assert "unknown category" not in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
+# Heading level warnings
+# ---------------------------------------------------------------------------
+
+class TestHeadingLevelWarnings:
+
+    def test_warning_for_h1_heading_in_post_body(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n# A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: md})
+        build(p)
+        assert "Warning: Post 1 has heading(s) more prominent than <h3> in its body: <h1>" in capsys.readouterr().out
+
+    def test_warning_for_h2_heading_in_post_body(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n## A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: md})
+        build(p)
+        assert "Warning: Post 1 has heading(s) more prominent than <h3> in its body: <h2>" in capsys.readouterr().out
+
+    def test_warning_lists_both_h1_and_h2_when_both_present(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n# One\n\n## Two\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: md})
+        build(p)
+        assert "Warning: Post 1 has heading(s) more prominent than <h3> in its body: <h1>, <h2>" in capsys.readouterr().out
+
+    def test_no_warning_for_h3_heading_in_post_body(self, tmp_path, capsys):
+        md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n### A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: md})
+        build(p)
+        assert "more prominent than <h3>" not in capsys.readouterr().out
+
+    def test_no_warning_when_no_headings_in_post_body(self, tmp_path, capsys):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "more prominent than <h3>" not in capsys.readouterr().out
 
 
 # ---------------------------------------------------------------------------

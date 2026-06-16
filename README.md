@@ -74,6 +74,8 @@ Set `category` to a slug from the `categories` map in `config.yaml` to assign th
 
 A post with no title, no images, and a plain-text body of `micro_post_max_length` characters or fewer is treated as a microblog post and rendered with an additional `micro-post` CSS class.
 
+The post `title` is rendered as the page's `<h1>` on an individual post page, or `<h2>` when shown alongside other posts (index and category pages). Use `###` (`<h3>`) or lower for any headings inside the post body — the build prints a warning if a post contains a `#` or `##` heading, since those levels are already used by the title.
+
 ## Building the site
 
 Run `build.py` from your project directory.

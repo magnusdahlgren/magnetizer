@@ -298,7 +298,7 @@ Posts are generated using a simple html structure.
 
 ```html
 <article id="POST_HTML_ID">
-  <h1><a href="POST_URL">POST_TITLE</a></h1>
+  <POST_TITLE_TAG><a href="POST_URL">POST_TITLE</a></POST_TITLE_TAG>
 	<div class="post-body">
     POST_BODY
   </div>
@@ -315,6 +315,7 @@ Where:
 
 - `POST_HTML_ID` is the unique id of the `<article>` element, as `post-{post-id}` , used for anchor links
 - `POST_URL` is the URL of the individual post page, e.g. `1.html`
+- `POST_TITLE_TAG` is `h2` when the post is displayed on a multi-post page (index or category page), or `h1` on the individual post page
 - `POST_TITLE` is the `title` from the Markdown frontmatter
 - `POST_DATE` is the `date` from the Markdown frontmatter
 - `POST_DATE_UK` is the human-readable version of the `date`, e.g. “24 May 2026”
@@ -323,8 +324,16 @@ Where:
 
 Notes:
 
-- The `<h1>` is only included if the post has a title.
-- If the post is displayed on an index page, the contents of the `<h1>` and the `<time>` contain a link to the post page. On the individual post page, no links are included.
+- The title element is only included if the post has a title.
+- On multi-post pages (index and category pages), the title is an `<h2>` rather than `<h1>`, so that a page listing several posts has only one `<h1>` (used elsewhere on the page, e.g. for a category name). On the individual post page, the title is an `<h1>`.
+- If the post is displayed on a multi-post page, the title and `<time>` contain a link to the post page. On the individual post page, no links are included.
+- Magnetizer prints a warning during the build if a post's Markdown body contains a heading more prominent than `<h3>` (i.e. an `<h1>` or `<h2>`, from `#` or `##`), since the post title already occupies that level of the document outline:
+
+```
+Warning: Post {post-id} has heading(s) more prominent than <h3> in its body: <h1>, <h2>
+```
+
+The same warning is printed for the [about page](#about-page) and [cookies page](#cookies-page), using `about` and `cookies` in place of `{post-id}`. The build continues normally — this is a warning, not an error.
 
 ### Favourite posts
 
@@ -445,7 +454,7 @@ The arrow shown after "Read more" is added via CSS (`.read-more::after`), not pa
 
 If a post contains no `<!-- more -->`, the full body is shown on both index and post pages.
 
-When there is one or more images for the post, each is included as a `<figure>` before `<h1>`, ordered by the image number in the filename (e.g. `2-image-01-resized.jpg`, `2-image-02-resized.jpg`, etc)
+When there is one or more images for the post, each is included as a `<figure>` before the title, ordered by the image number in the filename (e.g. `2-image-01-resized.jpg`, `2-image-02-resized.jpg`, etc)
 
 ```html
 ...
@@ -465,6 +474,7 @@ When there is one or more images for the post, each is included as a `<figure>` 
 Note: The following differences apply to `<article>` elements when they appear on index pages:
 
 - The `<article>` class is `multiple-posts`
+- The title is an `<h2>` instead of `<h1>` — see [Posts](#posts)
 - Each `<img>` is wrapped in an `<a>` pointing to the individual post page
 - Only the first two images are shown
 - If a post has more than two images and no `<!-- more -->` marker, a "N more photo(s)" link is rendered between the post body and the date footer:

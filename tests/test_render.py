@@ -118,6 +118,18 @@ class TestRenderArticleTitle:
         html = render_article(make_post(title=None), on_index_page=False)
         assert "<h1>" not in html and "<h1 " not in html
 
+    def test_h2_present_when_post_has_title_on_index_page(self):
+        html = render_article(make_post(title="My Title"), on_index_page=True)
+        assert "<h2>" in html or '<h2 ' in html
+
+    def test_no_h1_for_title_on_index_page(self):
+        html = render_article(make_post(title="My Title"), on_index_page=True)
+        assert "<h1>" not in html and "<h1 " not in html
+
+    def test_no_h2_for_title_on_post_page(self):
+        html = render_article(make_post(title="My Title"), on_index_page=False)
+        assert "<h2>" not in html and "<h2 " not in html
+
 
 # ---------------------------------------------------------------------------
 # render_article — links on index vs post page
@@ -125,9 +137,9 @@ class TestRenderArticleTitle:
 
 class TestRenderArticleLinks:
 
-    def test_h1_contains_link_on_index_page(self):
+    def test_h2_contains_link_on_index_page(self):
         html = render_article(make_post(post_id=3, title="My Title"), on_index_page=True)
-        assert '<h1><a href="3.html">My Title</a></h1>' in html
+        assert '<h2><a href="3.html">My Title</a></h2>' in html
 
     def test_h1_has_no_link_on_post_page(self):
         html = render_article(make_post(post_id=3, title="My Title"), on_index_page=False)
@@ -451,7 +463,7 @@ class TestRenderIndexPageContent:
     def test_articles_rendered_with_links(self):
         posts = [make_post(post_id=1, title="T")]
         html = render_index_page_content(posts, page_num=1, total_pages=1)
-        assert '<h1><a href="1.html">T</a></h1>' in html
+        assert '<h2><a href="1.html">T</a></h2>' in html
 
     def test_nav_present_when_multiple_pages(self):
         posts = [make_post()]
