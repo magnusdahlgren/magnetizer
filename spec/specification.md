@@ -237,13 +237,14 @@ Examples:
 
 | Variable | Use | Default, if not specified |
 | --- | --- | --- |
-| `site_title` | The generated pages’ `<title>` | `My Blog` |
+| `site_name` | The generated pages’ `<title>` | `My Blog` |
 | `site_url` | Absolute base URL of the published site, e.g. `https://example.github.io` | Required — build exits with an error if absent or empty |
 | `image_max_dimension` | Long-edge max size when resizing images | `1600` |
 | `image_quality` | Image quality, when resizing images | `75` |
 | `posts_per_page` | Number of posts per page when generating the index files | `12` |
 | `micro_post_max_length` | Maximum plain-text character count for a post to be treated as a microblog post | `180` |
 | `index_meta_description` | Content for the `<meta name="description">` tag on index pages, via the `MAGNETIZER_META_DESCRIPTION` template placeholder | Not set — placeholder is removed |
+| `index_title` | When set, the title of `index.html` becomes `site_name - index_title` instead of just `site_name` | Not set — `index.html` title is just `site_name` |
 | `categories` | A map of category slug to display name, e.g. `{photography: Photography}`. See [Categories](#categories). | `{}` (no categories) |
 
 ### Image processing
@@ -258,11 +259,12 @@ The following placeholders are available:
 
 | Placeholder | Required | Replaced with |
 | --- | --- | --- |
-| `MAGNETIZER_TITLE`  | Yes | The title of the page, made up from the `site_title` (from config) plus contextual information, e.g:
-  • `site_title` (for index.html)
-  • `site_title - Page 2` (for index-2.html)
-  • `post_title - site_title` (for individual post page)
-  • `site_title` (for individual post without a title) |
+| `MAGNETIZER_TITLE`  | Yes | The title of the page, made up from the `site_name` (from config) plus contextual information, e.g:
+  • `site_name` (for index.html, when `index_title` is not set)
+  • `site_name - index_title` (for index.html, when `index_title` is set)
+  • `site_name - Page 2` (for index-2.html and beyond)
+  • `post_title - site_name` (for individual post page)
+  • `site_name` (for individual post without a title) |
 | `MAGNETIZER_CONTENT` | Yes | The generated page content — one post for an individual post page or multiple posts for an index page. |
 | `MAGNETIZER_BUILD_ID` | No | A Unix timestamp generated at build time, e.g. `1748123456`. Useful for cache-busting static assets: `<link rel="stylesheet" href="resources/style.css?v=MAGNETIZER_BUILD_ID">`. The same value is used across all pages in a single build. |
 | `MAGNETIZER_CANONICAL_URL` | No | The canonical URL of the page, derived from `site_url` in config. For `index.html` this is the root URL (e.g. `https://example.github.io/`); for all other pages it is `site_url` + `/` + filename (e.g. `https://example.github.io/1.html`). Use in a `<link rel="canonical">` tag to help search engines identify the preferred URL for each page. |
@@ -583,7 +585,7 @@ Magnetizer generates `dist/archive.html` under the same conditions as index page
 
 The archive lists all posts grouped by month, newest month first. Within each month, posts appear in reverse chronological order (highest post ID first). Posts without a `date` are excluded. The archive is not included in index pages, the feed, or the newer/older post navigation.
 
-The page title is `Archive - {site_title}`.
+The page title is `Archive - {site_name}`.
 
 The `MAGNETIZER_CONTENT` has the following structure:
 
@@ -721,7 +723,7 @@ A new configuration variable is required:
 
 Where:
 
-- `SITE_TITLE` is `site_title` from config
+- `SITE_TITLE` is `site_name` from config
 - `SITE_URL` is `site_url` from config
 - `FEED_URL` is `site_url + "/feed.xml"`
 - `MOST_RECENT_DATE` is the date of the most recent post in RFC 3339 format, e.g. `2026-05-24T00:00:00Z`
@@ -730,7 +732,7 @@ Where:
 - `POST_DATE` is the post date in RFC 3339 format, e.g. `2026-05-24T00:00:00Z`
 - `POST_BODY_HTML` is the HTML generated from the post's Markdown body
 
-Posts are listed in reverse chronological order (highest post ID first). All posts are included.
+Posts are listed in reverse chronological order (highest post ID first). Only published posts are included (draft posts are excluded).
 
 ## Sitemap
 

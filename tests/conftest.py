@@ -5,7 +5,7 @@ TEMPLATE = (
     "<body>MAGNETIZER_CONTENT</body></html>"
 )
 MINIMAL_MD = "---\ndate: 2026-05-24\n---\n\nHello world\n"
-_DEFAULT_CONFIG = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\n"
+_DEFAULT_CONFIG = "site_name: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\n"
 
 
 def make_project(tmp_path, posts=None, config=_DEFAULT_CONFIG):

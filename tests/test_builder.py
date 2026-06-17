@@ -47,12 +47,12 @@ class TestBasicBuild:
         assert "MAGNETIZER_CONTENT" not in html
         assert "MAGNETIZER_TITLE" not in html
 
-    def test_post_html_title_is_site_title_when_no_post_title(self, tmp_path):
+    def test_post_html_title_is_site_name_when_no_post_title(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         build(p)
         assert "Test Blog" in (p / "dist" / "1.html").read_text()
 
-    def test_post_html_title_is_post_title_dash_site_title(self, tmp_path):
+    def test_post_html_title_is_post_title_dash_site_name(self, tmp_path):
         p = make_project(tmp_path, posts={1: TITLED_MD})
         build(p)
         assert "My Post - Test Blog" in (p / "dist" / "1.html").read_text()
@@ -126,11 +126,23 @@ class TestIndexPages:
         build(p)
         assert "Hello world" in (p / "dist" / "index.html").read_text()
 
-    def test_index_page_title_is_site_title(self, tmp_path):
+    def test_index_page_title_is_site_name(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         build(p)
         html = (p / "dist" / "index.html").read_text()
         assert "<title>Test Blog</title>" in html
+
+    def test_index_page_title_includes_index_title_when_configured(self, tmp_path):
+        config = "site_name: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_title: My Photos\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD}, config=config)
+        build(p)
+        assert "<title>Test Blog - My Photos</title>" in (p / "dist" / "index.html").read_text()
+
+    def test_index_page_2_title_not_affected_by_index_title(self, tmp_path):
+        config = "site_name: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 1\nindex_title: My Photos\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD}, config=config)
+        build(p)
+        assert "<title>Test Blog - Page 2</title>" in (p / "dist" / "index-2.html").read_text()
 
     def test_multiple_pages_created_when_posts_exceed_per_page(self, tmp_path):
         # posts_per_page=2 in CONFIG, so 3 posts → 2 index pages
@@ -631,7 +643,7 @@ class TestAboutPage:
         build(p)
         assert "<html>" in (p / "dist" / "about.html").read_text()
 
-    def test_about_html_title_includes_post_title_and_site_title(self, tmp_path):
+    def test_about_html_title_includes_post_title_and_site_name(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "about.md").write_text(ABOUT_MD)
         build(p)
@@ -736,7 +748,7 @@ class TestCookiesPage:
         build(p)
         assert "<html>" in (p / "dist" / "cookies.html").read_text()
 
-    def test_cookies_html_title_includes_post_title_and_site_title(self, tmp_path):
+    def test_cookies_html_title_includes_post_title_and_site_name(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "cookies.md").write_text(COOKIES_MD)
         build(p)
@@ -1078,14 +1090,14 @@ class TestCanonicalUrls:
 class TestIndexMetaDescription:
 
     def test_index_page_includes_meta_description_when_configured(self, tmp_path):
-        config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
+        config = "site_name: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
         p = make_project(tmp_path, posts={1: MINIMAL_MD}, config=config)
         (p / "templates" / "index.html").write_text(META_DESCRIPTION_TEMPLATE)
         build(p)
         assert '<meta name="description" content="A great blog.">' in (p / "dist" / "index.html").read_text()
 
     def test_second_index_page_also_has_meta_description(self, tmp_path):
-        config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
+        config = "site_name: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
         posts = {i: MINIMAL_MD for i in range(1, 4)}
         p = make_project(tmp_path, posts=posts, config=config)
         (p / "templates" / "index.html").write_text(META_DESCRIPTION_TEMPLATE)
@@ -1093,7 +1105,7 @@ class TestIndexMetaDescription:
         assert '<meta name="description" content="A great blog.">' in (p / "dist" / "index-2.html").read_text()
 
     def test_post_page_does_not_include_meta_description(self, tmp_path):
-        config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
+        config = "site_name: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_meta_description: A great blog.\n"
         p = make_project(tmp_path, posts={1: MINIMAL_MD}, config=config)
         (p / "templates" / "index.html").write_text(META_DESCRIPTION_TEMPLATE)
         build(p)
@@ -1135,10 +1147,10 @@ class TestArchivePage:
         build(p)
         assert "1.html" in (p / "dist" / "archive.html").read_text()
 
-    def test_archive_title_includes_site_title(self, tmp_path):
+    def test_archive_title_includes_site_name(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         build(p)
-        assert "Archive" in (p / "dist" / "archive.html").read_text()
+        assert "<title>Archive - Test Blog</title>" in (p / "dist" / "archive.html").read_text()
 
 
 # ---------------------------------------------------------------------------
@@ -1187,7 +1199,7 @@ class TestMicroPostDetection:
         body = "x" * 190
         micro_md = f"---\ndate: 2026-06-01\n---\n\n{body}\n"
         normal_md = "---\ndate: 2026-06-06\ntitle: Normal Post\n---\n\nContent\n"
-        config = "site_title: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 10\nmicro_post_max_length: 200\n"
+        config = "site_name: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 10\nmicro_post_max_length: 200\n"
         # Posts 1-4; post 1 is the micro post.  Changing post 4 makes the
         # builder rebuild posts 3 and 4 (changed + its neighbour) but NOT post 1,
         # so post 1 is loaded fresh for the archive without going through posts_cache.
@@ -1245,7 +1257,7 @@ class TestMissingTitleWarnings:
 # ---------------------------------------------------------------------------
 
 _CATEGORIES_CONFIG = (
-    "site_title: Test Blog\nsite_url: https://example.github.io\n"
+    "site_name: Test Blog\nsite_url: https://example.github.io\n"
     "posts_per_page: 2\ncategories:\n  photography: Photography\n  travel: Travel\n"
 )
 _CATEGORY_MD = "---\ndate: 2026-05-24\ntitle: My Post\ncategory: photography\n---\n\nHello world\n"

@@ -119,14 +119,14 @@ def render_category_page_content(posts, category_name, category_slug, page_num, 
     return content
 
 
-def render_page_title(site_title, post_title, page_num):
+def render_page_title(site_name, post_title, page_num, index_title=None):
     if page_num is not None:
         if page_num == 1:
-            return site_title
-        return f"{site_title} - Page {page_num}"
+            return f"{site_name} - {index_title}" if index_title else site_name
+        return f"{site_name} - Page {page_num}"
     if post_title:
-        return f"{post_title} - {site_title}"
-    return site_title
+        return f"{post_title} - {site_name}"
+    return site_name
 
 
 def render_template(template_html, title, content, canonical=None, meta_description=None):

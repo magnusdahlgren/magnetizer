@@ -139,7 +139,7 @@ def _adjacent_post_urls(post_id, post_ids_sorted_desc):
 
 def _write_post_html(post, index_page_url, dist_dir, config, template, newer_url=None, older_url=None, back_url=None, categories=None):
     content_html = render_post_page_content(post, index_page_url, newer_url=newer_url, older_url=older_url, back_url=back_url, categories=categories)
-    title = render_page_title(config["site_title"], post.title, page_num=None)
+    title = render_page_title(config["site_name"], post.title, page_num=None)
     html = render_template(template, title=title, content=content_html,
                            canonical=canonical_url(config["site_url"], f"{post.id}.html"))
     (dist_dir / f"{post.id}.html").write_text(html)
@@ -153,7 +153,7 @@ def _write_index_pages(posts_sorted_desc, dist_dir, config, template, categories
     for page_num in range(1, total_pages + 1):
         slice_ = posts_sorted_desc[(page_num - 1) * per_page: page_num * per_page]
         content_html = render_index_page_content(slice_, page_num, total_pages, categories=categories)
-        title = render_page_title(config["site_title"], None, page_num=page_num)
+        title = render_page_title(config["site_name"], None, page_num=page_num, index_title=config["index_title"])
         filename = index_page_url(page_num)
         html = render_template(template, title=title, content=content_html,
                                canonical=canonical_url(config["site_url"], filename),
@@ -177,7 +177,7 @@ def _write_category_pages(posts_sorted_desc, dist_dir, config, template):
             content_html = render_category_page_content(
                 slice_, display_name, slug, page_num, total_pages, categories=categories
             )
-            title = render_page_title(config["site_title"], display_name, page_num=None)
+            title = render_page_title(config["site_name"], display_name, page_num=None)
             filename = category_page_url(slug, page_num)
             html = render_template(template, title=title, content=content_html,
                                    canonical=canonical_url(config["site_url"], filename))
@@ -194,7 +194,7 @@ def _build_cookies_page(content_dir, dist_dir, config, template):
     post = parse_post(md_text, "cookies", [])
     _warn_if_heading_too_high(post)
     content_html = render_post_page_content(post, "index.html", back_url="index.html")
-    title = render_page_title(config["site_title"], post.title, page_num=None)
+    title = render_page_title(config["site_name"], post.title, page_num=None)
     html = render_template(template, title=title, content=content_html,
                            canonical=canonical_url(config["site_url"], "cookies.html"))
     (dist_dir / "cookies.html").write_text(html)
@@ -216,7 +216,7 @@ def _build_about_page(content_dir, dist_dir, config, template):
         )
 
     content_html = render_post_page_content(post, "index.html", back_url="index.html")
-    title = render_page_title(config["site_title"], post.title, page_num=None)
+    title = render_page_title(config["site_name"], post.title, page_num=None)
     html = render_template(template, title=title, content=content_html,
                            canonical=canonical_url(config["site_url"], "about.html"))
     (dist_dir / "about.html").write_text(html)
@@ -397,7 +397,7 @@ def build(cwd, filename=None, flush=False, resources=False):
         log.append(("UPDATED", "feed.xml"))
         archive_html = render_template(
             template,
-            title=render_page_title(config["site_title"], "Archive", page_num=None),
+            title=render_page_title(config["site_name"], "Archive", page_num=None),
             content=render_archive_page_content(published_posts_sorted_desc, categories=config["categories"]),
             canonical=canonical_url(config["site_url"], "archive.html"),
         )

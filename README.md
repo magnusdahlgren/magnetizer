@@ -23,18 +23,19 @@ manifest.json  Build state (created automatically)
 
 | Option | Description | Default |
 |---|---|---|
-| `site_title` | Used in page `<title>` tags | `My Blog` |
+| `site_name` | Used in page `<title>` tags | `My Blog` |
 | `posts_per_page` | Posts shown per index page | `12` |
 | `image_max_dimension` | Long-edge pixel limit when resizing images | `1600` |
 | `image_quality` | JPEG quality for resized images (0–95) | `75` |
 | `micro_post_max_length` | Max plain-text characters for a post to be treated as a microblog post | `180` |
 | `index_meta_description` | `<meta name="description">` content on index pages (via `MAGNETIZER_META_DESCRIPTION` placeholder) | Not set |
+| `index_title` | When set, the title of `index.html` becomes `site_name - index_title` | Not set |
 | `categories` | Map of category slug to display name, e.g. `{photography: Photography}` | `{}` (no categories) |
 
 Example:
 
 ```yaml
-site_title: My Blog
+site_name: My Blog
 posts_per_page: 12
 image_max_dimension: 1600
 image_quality: 75

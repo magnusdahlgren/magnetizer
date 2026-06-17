@@ -12,7 +12,7 @@ def _rfc3339(date_str, post_id):
 
 def render_feed(posts, config):
     site_url = config["site_url"].rstrip('/')
-    site_title = _html.escape(config["site_title"])
+    site_name = _html.escape(config["site_name"])
     feed_url = f"{site_url}/feed.xml"
     dated_posts = [p for p in posts if p.date]
     most_recent_date = _rfc3339(dated_posts[0].date, dated_posts[0].id) if dated_posts else ""
@@ -20,12 +20,12 @@ def render_feed(posts, config):
     lines = [
         '<?xml version="1.0" encoding="UTF-8"?>',
         '<feed xmlns="http://www.w3.org/2005/Atom">',
-        f'  <title>{site_title}</title>',
+        f'  <title>{site_name}</title>',
         f'  <link href="{site_url}" />',
         f'  <link rel="self" href="{feed_url}" />',
         f'  <id>{site_url}/</id>',
         f'  <updated>{most_recent_date}</updated>',
-        f'  <author><name>{site_title}</name></author>',
+        f'  <author><name>{site_name}</name></author>',
     ]
 
     for post in dated_posts:

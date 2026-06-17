@@ -291,7 +291,7 @@ class TestCLIVerbose:
 
 class TestCLIHeaderAndStatus:
 
-    def test_generating_line_includes_site_title(self, tmp_path):
+    def test_generating_line_includes_site_name(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build([], cwd=p)
         assert "Generating Test" in result.stdout
