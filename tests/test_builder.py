@@ -1395,3 +1395,57 @@ class TestArchiveCategoriesList:
         p = make_project(tmp_path, posts={1: _NO_CATEGORY_MD})
         build(p)
         assert "<h2>Categories</h2>" not in (p / "dist" / "archive.html").read_text()
+
+
+# ---------------------------------------------------------------------------
+# Draft posts
+# ---------------------------------------------------------------------------
+
+_DRAFT_MD = "---\ndate: 2026-05-24\ntitle: Draft Post\ndraft: true\n---\n\nDraft content\n"
+
+
+class TestDraftPosts:
+
+    def test_draft_post_html_is_still_built(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _DRAFT_MD})
+        build(p)
+        assert (p / "dist" / "1.html").exists()
+
+    def test_draft_post_excluded_from_index_page(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _DRAFT_MD})
+        build(p)
+        assert "Draft content" not in (p / "dist" / "index.html").read_text()
+
+    def test_draft_post_excluded_from_category_page(self, tmp_path):
+        md = "---\ndate: 2026-05-24\ntitle: Draft Post\ndraft: true\ncategory: photography\n---\n\nDraft content\n"
+        p = make_project(tmp_path, posts={1: md}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert not (p / "dist" / "photography.html").exists()
+
+    def test_draft_post_excluded_from_feed(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _DRAFT_MD})
+        build(p)
+        assert "Draft content" not in (p / "dist" / "feed.xml").read_text()
+
+    def test_draft_post_excluded_from_sitemap(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _DRAFT_MD})
+        build(p)
+        assert "1.html" not in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_draft_post_excluded_from_archive(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _DRAFT_MD})
+        build(p)
+        assert "Draft Post" not in (p / "dist" / "archive.html").read_text()
+
+    def test_draft_post_skipped_in_post_navigation(self, tmp_path):
+        # Posts 1, 3 are published; post 2 is draft — post 3's older link must point to 1
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: _DRAFT_MD, 3: MINIMAL_MD})
+        build(p)
+        assert "1.html" in (p / "dist" / "3.html").read_text()
+        assert "3.html" in (p / "dist" / "1.html").read_text()
+
+    def test_non_draft_post_not_excluded(self, tmp_path):
+        md = "---\ndate: 2026-05-24\ntitle: Published\ndraft: false\n---\n\nPublished content\n"
+        p = make_project(tmp_path, posts={1: md})
+        build(p)
+        assert "Published content" in (p / "dist" / "index.html").read_text()

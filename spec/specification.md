@@ -335,6 +335,21 @@ Warning: Post {post-id} has heading(s) more prominent than <h3> in its body: <h1
 
 The same warning is printed for the [about page](#about-page) and [cookies page](#cookies-page), using `about` and `cookies` in place of `{post-id}`. The build continues normally — this is a warning, not an error.
 
+### Draft posts
+
+A post can be marked as a draft by setting `draft: true` in its frontmatter:
+
+```
+---
+date: 2026-05-21
+draft: true
+---
+```
+
+Draft posts are excluded from index pages, category pages, the Atom feed, the sitemap, the archive, and next/previous post navigation. They can only be reached by navigating directly to their individual post URL (e.g. `5.html`). The HTML page for a draft post is still generated on every build.
+
+If `draft` is absent or set to `false`, the post is treated as published.
+
 ### Favourite posts
 
 A post can be marked as a favourite by setting `favourite: true` in its frontmatter:
@@ -726,7 +741,7 @@ Magnetizer generates an XML sitemap at `dist/sitemap.xml` and a `dist/robots.txt
 
 | Page | Condition |
 | --- | --- |
-| `{post-id}.html` | All posts, in reverse chronological order |
+| `{post-id}.html` | All published (non-draft) posts, in reverse chronological order |
 | `index.html`, `index-2.html`, … | All index pages |
 | `{slug}.html`, `{slug}-2.html`, … | All pages for each category that has at least one matching post |
 | `about.html` | Only if `about.md` exists in `content/` |

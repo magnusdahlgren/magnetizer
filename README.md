@@ -68,7 +68,9 @@ title: My post title
 Post body goes here. Standard Markdown is supported.
 ```
 
-The `title` field is optional. Set `favourite: true` to mark a post as a favourite — it will receive an additional `favourite` CSS class in the archive.
+The `title` field is optional. Set `draft: true` to mark a post as a draft — it will still be generated as an HTML page, but will be excluded from index pages, category pages, the feed, the sitemap, the archive, and next/previous navigation. Draft posts are only reachable via their direct URL. If `draft` is absent or `false`, the post is published normally.
+
+Set `favourite: true` to mark a post as a favourite — it will receive an additional `favourite` CSS class in the archive.
 
 Set `category` to a slug from the `categories` map in `config.yaml` to assign the post to a category — matching is case-insensitive. This adds a link to the category's page in the post's footer, and includes the post on that category's page (`{slug}.html`). If `categories` is configured, the build prints a warning for posts with no category or with a category not found in `categories`.
 
@@ -91,7 +93,7 @@ Run `build.py` from your project directory.
 
 Use `--flush` after editing templates. Use `--resources` after editing CSS or JS.
 
-Every full build also generates `dist/sitemap.xml` (all post, index, category, about, and archive pages with `lastmod` dates) and `dist/robots.txt` (pointing to the sitemap). These are not generated on single-file preview builds.
+Every full build also generates `dist/sitemap.xml` (all published post, index, category, about, and archive pages with `lastmod` dates) and `dist/robots.txt` (pointing to the sitemap). These are not generated on single-file preview builds.
 
 ## Templates
 

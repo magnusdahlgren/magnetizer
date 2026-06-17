@@ -4,7 +4,7 @@ from datetime import date as _date
 import markdown as _markdown
 
 
-_ALLOWED_FRONTMATTER_KEYS = frozenset({'date', 'title', 'images', 'favourite', 'category'})
+_ALLOWED_FRONTMATTER_KEYS = frozenset({'date', 'title', 'images', 'favourite', 'category', 'draft'})
 _MARKDOWN_EXTENSIONS = ['pymdownx.mark', 'smarty']
 _MARKDOWN_EXTENSION_CONFIGS = {
     'smarty': {'smart_dashes': False, 'smart_ellipses': False},
@@ -29,6 +29,7 @@ class Post:
     excerpt_html: str | None = None
     is_micro: bool = False
     is_favourite: bool = False
+    is_draft: bool = False
     category: str | None = None
     char_count: int = 0
 
@@ -85,6 +86,7 @@ def parse_post(md_text, post_id, image_filenames, micro_post_max_length=180):
     title = fm.get('title') or None
     alt_texts = fm.get('images') or []
     is_favourite = fm.get('favourite', 'false').lower() == 'true'
+    is_draft = fm.get('draft', 'false').lower() == 'true'
     category_raw = fm.get('category', '')
     category = (category_raw.lower().strip() if isinstance(category_raw, str) else '') or None
 
@@ -120,6 +122,7 @@ def parse_post(md_text, post_id, image_filenames, micro_post_max_length=180):
         excerpt_html=excerpt_html,
         is_micro=is_micro,
         is_favourite=is_favourite,
+        is_draft=is_draft,
         category=category,
         char_count=char_count,
     )
