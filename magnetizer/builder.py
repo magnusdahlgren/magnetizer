@@ -417,7 +417,11 @@ def build(cwd, filename=None, flush=False, resources=False):
                 cat_posts = [p for p in all_posts_for_cats if p.category == slug]
                 if not cat_posts:
                     continue
-                cat_lastmod = _lastmod([content_dir / f"{p.id}.md" for p in cat_posts])
+                cat_lastmod = _lastmod([
+                    path
+                    for p in cat_posts
+                    for path in [content_dir / f"{p.id}.md"] + [content_dir / img.filename for img in p.images]
+                ])
                 total_cat_pages = max(1, (len(cat_posts) + per_page - 1) // per_page)
                 for page_num in range(1, total_cat_pages + 1):
                     sitemap_pages.append((category_page_url(slug, page_num), cat_lastmod))
