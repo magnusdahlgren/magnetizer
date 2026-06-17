@@ -1449,3 +1449,23 @@ class TestDraftPosts:
         p = make_project(tmp_path, posts={1: md})
         build(p)
         assert "Published content" in (p / "dist" / "index.html").read_text()
+
+    def test_draft_post_back_link_has_no_anchor_fragment(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _DRAFT_MD})
+        build(p)
+        assert 'href="index.html#post-1"' not in (p / "dist" / "1.html").read_text()
+
+    def test_incremental_rebuild_updates_nav_when_consecutive_draft_published(self, tmp_path):
+        p = make_project(tmp_path, posts={
+            1: MINIMAL_MD,
+            2: _DRAFT_MD,
+            3: _DRAFT_MD,
+            4: MINIMAL_MD,
+        })
+        build(p)
+        assert "4.html" in (p / "dist" / "1.html").read_text()
+        (p / "content" / "3.md").write_text(
+            "---\ndate: 2026-05-24\ntitle: Now Published\n---\n\nContent\n"
+        )
+        build(p)
+        assert "3.html" in (p / "dist" / "1.html").read_text()

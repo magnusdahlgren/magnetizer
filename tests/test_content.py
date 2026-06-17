@@ -411,6 +411,12 @@ class TestDraft:
         parse_post(md, 1, [])
         assert "Warning" not in capsys.readouterr().out
 
+    def test_draft_empty_yaml_value_treated_as_not_draft(self):
+        # YAML `draft:` with no value parses as None; must not crash or set is_draft
+        md = "---\ndate: 2026-05-24\ndraft:\n---\n"
+        post = parse_post(md, 1, [])
+        assert post.is_draft is False
+
 
 # ---------------------------------------------------------------------------
 # Smart / typographic quotes

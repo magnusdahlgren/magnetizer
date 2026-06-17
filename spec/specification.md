@@ -339,7 +339,7 @@ The same warning is printed for the [about page](#about-page) and [cookies page]
 
 A post can be marked as a draft by setting `draft: true` in its frontmatter:
 
-```
+```yaml
 ---
 date: 2026-05-21
 draft: true

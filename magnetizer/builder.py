@@ -137,8 +137,8 @@ def _adjacent_post_urls(post_id, post_ids_sorted_desc):
     return newer_url, older_url
 
 
-def _write_post_html(post, index_page_url, dist_dir, config, template, newer_url=None, older_url=None, categories=None):
-    content_html = render_post_page_content(post, index_page_url, newer_url=newer_url, older_url=older_url, categories=categories)
+def _write_post_html(post, index_page_url, dist_dir, config, template, newer_url=None, older_url=None, back_url=None, categories=None):
+    content_html = render_post_page_content(post, index_page_url, newer_url=newer_url, older_url=older_url, back_url=back_url, categories=categories)
     title = render_page_title(config["site_title"], post.title, page_num=None)
     html = render_template(template, title=title, content=content_html,
                            canonical=canonical_url(config["site_url"], f"{post.id}.html"))
@@ -306,14 +306,6 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     all_post_ids_sorted_desc = sorted(_post_ids_in_content(content_dir), reverse=True)
 
-    if not filename:
-        neighbor_ids = {
-            n
-            for pid in changed_post_ids
-            for n in _neighbor_post_ids(pid, all_post_ids_sorted_desc)
-        }
-        post_ids_to_build = changed_post_ids | neighbor_ids
-
     created = updated = deleted = 0
     posts_cache = {}
     for pid in all_post_ids_sorted_desc:
@@ -325,6 +317,14 @@ def build(cwd, filename=None, flush=False, resources=False):
         if pid in posts_cache and not posts_cache[pid].is_draft
     ]
     published_posts_sorted_desc = [posts_cache[pid] for pid in published_post_ids_sorted_desc]
+
+    if not filename:
+        neighbor_ids = {
+            n
+            for pid in changed_post_ids
+            for n in _neighbor_post_ids(pid, published_post_ids_sorted_desc)
+        }
+        post_ids_to_build = changed_post_ids | neighbor_ids
 
     for post_id in post_ids_to_build:
         md_path = content_dir / f"{post_id}.md"
@@ -358,10 +358,12 @@ def build(cwd, filename=None, flush=False, resources=False):
         if post.is_draft:
             newer_url, older_url = None, None
             idx_url = "index.html"
+            back_url = "index.html"
         else:
             newer_url, older_url = _adjacent_post_urls(post_id, published_post_ids_sorted_desc)
             idx_url = _post_index_page_url(post_id, published_post_ids_sorted_desc, config["posts_per_page"])
-        _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url, categories=config["categories"])
+            back_url = None
+        _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url, back_url=back_url, categories=config["categories"])
         log.append((action, f"{post_id}.html", post.char_count, post.is_micro))
 
     if about_md.exists():
