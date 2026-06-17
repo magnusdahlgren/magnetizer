@@ -12,5 +12,5 @@ N/A
 
 [x] Read more, using a `<!-- more -->`, showing a shorter version of the post on the index list with a "Read more" link to the full post
 [x] `<-- Previous post` / `Next post -->` links on individual post pages.
-[ ] Tags - e.g. "travel", "nerdy", "me", etc. Could probably go in the Frontmatter
+[x] Tags - implemented as Categories (slug + display name in config, `category:` frontmatter field)
 [x] Archive, with links to all posts.

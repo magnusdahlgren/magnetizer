@@ -2,10 +2,7 @@ import re
 from datetime import date as _date
 from html import escape as _escape, unescape as _unescape
 
-
-def _resized_filename(original):
-    stem, dot, ext = original.rpartition('.')
-    return f"{stem}-resized.{ext}"
+from magnetizer.content import resized_filename as _resized_filename
 
 
 def index_page_url(page_num):

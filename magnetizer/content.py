@@ -34,6 +34,11 @@ class Post:
     char_count: int = 0
 
 
+def resized_filename(filename):
+    stem, _, ext = filename.rpartition('.')
+    return f"{stem}-resized.{ext}"
+
+
 def _plain_text(html):
     text = re.sub(r'<[^>]+>', '', html)
     return re.sub(r'\s+', ' ', text).strip()

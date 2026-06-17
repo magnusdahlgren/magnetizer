@@ -92,8 +92,8 @@ def _neighbor_post_ids(post_id, all_post_ids_sorted_desc):
         return [p for p in [newer, older] if p is not None]
 
 
-def _post_index_page_url(post_id, all_post_ids_sorted_desc, posts_per_page):
-    pos = all_post_ids_sorted_desc.index(post_id)
+def _post_index_page_url(post_id, post_ids_sorted_desc, posts_per_page):
+    pos = post_ids_sorted_desc.index(post_id)
     page = pos // posts_per_page + 1
     return index_page_url(page)
 
@@ -130,10 +130,10 @@ def _warn_if_heading_too_high(post):
         print(f"Warning: Post {post.id} has heading(s) more prominent than <h3> in its body: {tags}")
 
 
-def _adjacent_post_urls(post_id, all_post_ids_sorted_desc):
-    pos = all_post_ids_sorted_desc.index(post_id)
-    newer_url = f"{all_post_ids_sorted_desc[pos - 1]}.html" if pos > 0 else None
-    older_url = f"{all_post_ids_sorted_desc[pos + 1]}.html" if pos + 1 < len(all_post_ids_sorted_desc) else None
+def _adjacent_post_urls(post_id, post_ids_sorted_desc):
+    pos = post_ids_sorted_desc.index(post_id)
+    newer_url = f"{post_ids_sorted_desc[pos - 1]}.html" if pos > 0 else None
+    older_url = f"{post_ids_sorted_desc[pos + 1]}.html" if pos + 1 < len(post_ids_sorted_desc) else None
     return newer_url, older_url
 
 
