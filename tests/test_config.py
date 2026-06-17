@@ -13,6 +13,7 @@ DEFAULTS = {
     "posts_per_page": 12,
     "micro_post_max_length": 180,
     "index_meta_description": None,
+    "index_title": None,
     "categories": {},
 }
 
@@ -31,6 +32,9 @@ class TestDefaults:
 
     def test_site_name_default(self, tmp_path):
         assert load_config(tmp_path / "config.yaml")["site_name"] == "My Blog"
+
+    def test_index_title_default(self, tmp_path):
+        assert load_config(tmp_path / "config.yaml")["index_title"] is None
 
     def test_image_max_dimension_default(self, tmp_path):
         assert load_config(tmp_path / "config.yaml")["image_max_dimension"] == 1600

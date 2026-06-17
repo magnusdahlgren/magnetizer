@@ -244,6 +244,7 @@ Examples:
 | `posts_per_page` | Number of posts per page when generating the index files | `12` |
 | `micro_post_max_length` | Maximum plain-text character count for a post to be treated as a microblog post | `180` |
 | `index_meta_description` | Content for the `<meta name="description">` tag on index pages, via the `MAGNETIZER_META_DESCRIPTION` template placeholder | Not set — placeholder is removed |
+| `index_title` | When set, the title of `index.html` becomes `site_name - index_title` instead of just `site_name` | Not set — `index.html` title is just `site_name` |
 | `categories` | A map of category slug to display name, e.g. `{photography: Photography}`. See [Categories](#categories). | `{}` (no categories) |
 
 ### Image processing
@@ -259,8 +260,9 @@ The following placeholders are available:
 | Placeholder | Required | Replaced with |
 | --- | --- | --- |
 | `MAGNETIZER_TITLE`  | Yes | The title of the page, made up from the `site_name` (from config) plus contextual information, e.g:
-  • `site_name` (for index.html)
-  • `site_name - Page 2` (for index-2.html)
+  • `site_name` (for index.html, when `index_title` is not set)
+  • `site_name - index_title` (for index.html, when `index_title` is set)
+  • `site_name - Page 2` (for index-2.html and beyond)
   • `post_title - site_name` (for individual post page)
   • `site_name` (for individual post without a title) |
 | `MAGNETIZER_CONTENT` | Yes | The generated page content — one post for an individual post page or multiple posts for an index page. |

@@ -11,6 +11,7 @@ DEFAULTS = {
     "posts_per_page": 12,
     "micro_post_max_length": 180,
     "index_meta_description": None,
+    "index_title": None,
     "categories": {},
 }
 

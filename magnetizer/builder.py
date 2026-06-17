@@ -153,7 +153,7 @@ def _write_index_pages(posts_sorted_desc, dist_dir, config, template, categories
     for page_num in range(1, total_pages + 1):
         slice_ = posts_sorted_desc[(page_num - 1) * per_page: page_num * per_page]
         content_html = render_index_page_content(slice_, page_num, total_pages, categories=categories)
-        title = render_page_title(config["site_name"], None, page_num=page_num)
+        title = render_page_title(config["site_name"], None, page_num=page_num, index_title=config["index_title"])
         filename = index_page_url(page_num)
         html = render_template(template, title=title, content=content_html,
                                canonical=canonical_url(config["site_url"], filename),

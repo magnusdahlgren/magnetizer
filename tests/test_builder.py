@@ -132,6 +132,18 @@ class TestIndexPages:
         html = (p / "dist" / "index.html").read_text()
         assert "<title>Test Blog</title>" in html
 
+    def test_index_page_title_includes_index_title_when_configured(self, tmp_path):
+        config = "site_name: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 2\nindex_title: My Photos\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD}, config=config)
+        build(p)
+        assert "<title>Test Blog - My Photos</title>" in (p / "dist" / "index.html").read_text()
+
+    def test_index_page_2_title_not_affected_by_index_title(self, tmp_path):
+        config = "site_name: Test Blog\nsite_url: https://example.github.io\nposts_per_page: 1\nindex_title: My Photos\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD}, config=config)
+        build(p)
+        assert "<title>Test Blog - Page 2</title>" in (p / "dist" / "index-2.html").read_text()
+
     def test_multiple_pages_created_when_posts_exceed_per_page(self, tmp_path):
         # posts_per_page=2 in CONFIG, so 3 posts → 2 index pages
         posts = {i: MINIMAL_MD for i in range(1, 4)}
