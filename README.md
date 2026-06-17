@@ -23,7 +23,7 @@ manifest.json  Build state (created automatically)
 
 | Option | Description | Default |
 |---|---|---|
-| `site_title` | Used in page `<title>` tags | `My Blog` |
+| `site_name` | Used in page `<title>` tags | `My Blog` |
 | `posts_per_page` | Posts shown per index page | `12` |
 | `image_max_dimension` | Long-edge pixel limit when resizing images | `1600` |
 | `image_quality` | JPEG quality for resized images (0–95) | `75` |
@@ -34,7 +34,7 @@ manifest.json  Build state (created automatically)
 Example:
 
 ```yaml
-site_title: My Blog
+site_name: My Blog
 posts_per_page: 12
 image_max_dimension: 1600
 image_quality: 75

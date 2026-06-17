@@ -16,7 +16,7 @@ def make_project(tmp_path, missing=None):
         if d != missing:
             (tmp_path / d).mkdir()
     if missing != "config.yaml":
-        (tmp_path / "config.yaml").write_text("site_title: Test\n")
+        (tmp_path / "config.yaml").write_text("site_name: Test\n")
     if missing != "templates/index.html" and "templates" not in (missing or ""):
         (tmp_path / "templates" / "index.html").write_text("<html>MAGNETIZER_TITLE MAGNETIZER_CONTENT</html>")
     return tmp_path

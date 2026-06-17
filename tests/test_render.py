@@ -525,7 +525,7 @@ class TestRenderIndexPageContent:
 
 class TestRenderPageTitle:
 
-    def test_index_page_1_is_just_site_title(self):
+    def test_index_page_1_is_just_site_name(self):
         assert render_page_title("My Blog", None, page_num=1) == "My Blog"
 
     def test_index_page_2_includes_page_number(self):
@@ -537,7 +537,7 @@ class TestRenderPageTitle:
     def test_post_with_title_is_title_dash_site(self):
         assert render_page_title("My Blog", "A Great Post", page_num=None) == "A Great Post - My Blog"
 
-    def test_post_without_title_is_just_site_title(self):
+    def test_post_without_title_is_just_site_name(self):
         assert render_page_title("My Blog", None, page_num=None) == "My Blog"
 
 

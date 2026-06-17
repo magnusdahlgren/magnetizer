@@ -22,7 +22,7 @@ def el(tag):
 
 
 CONFIG = {
-    "site_title": "My Blog",
+    "site_name": "My Blog",
     "site_url": "https://example.github.io",
 }
 
@@ -42,7 +42,7 @@ class TestFeedStructure:
         root = parse([make_post()])
         assert root.tag == el("feed")
 
-    def test_feed_title_uses_site_title(self):
+    def test_feed_title_uses_site_name(self):
         root = parse([make_post()])
         assert _req(root.find(el("title"))).text == "My Blog"
 
@@ -150,7 +150,7 @@ class TestEntryStructure:
         root = parse([make_post()])
         assert root.find(el("author")) is not None
 
-    def test_feed_author_name_uses_site_title(self):
+    def test_feed_author_name_uses_site_name(self):
         root = parse([make_post()])
         assert _req(_req(root.find(el("author"))).find(el("name"))).text == "My Blog"
 
@@ -211,8 +211,8 @@ class TestEntryImages:
 
 class TestFeedXmlSafety:
 
-    def test_site_title_with_ampersand_produces_valid_xml(self):
-        config = {**CONFIG, "site_title": "Photos & Notes"}
+    def test_site_name_with_ampersand_produces_valid_xml(self):
+        config = {**CONFIG, "site_name": "Photos & Notes"}
         xml = render_feed([make_post()], config)
         ET.fromstring(xml)  # would raise ParseError if invalid
 
@@ -224,8 +224,8 @@ class TestFeedXmlSafety:
         xml = render_feed([make_post(title="A > B")], CONFIG)
         ET.fromstring(xml)
 
-    def test_site_title_special_chars_escaped_in_feed_title(self):
-        config = {**CONFIG, "site_title": "Photos & Notes"}
+    def test_site_name_special_chars_escaped_in_feed_title(self):
+        config = {**CONFIG, "site_name": "Photos & Notes"}
         root = parse([make_post()], config=config)
         assert _req(root.find(el("title"))).text == "Photos & Notes"
 

@@ -4,7 +4,7 @@ from pathlib import Path
 import yaml
 
 DEFAULTS = {
-    "site_title": "My Blog",
+    "site_name": "My Blog",
     "site_url": "",
     "image_max_dimension": 1600,
     "image_quality": 75,

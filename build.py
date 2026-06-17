@@ -28,7 +28,7 @@ def main():
 
     config = load_config(Path.cwd() / "config.yaml")
     dist_path = (Path.cwd() / "dist").resolve()
-    print(f"→ Generating {config['site_title']} to {dist_path}")
+    print(f"→ Generating {config['site_name']} to {dist_path}")
 
     outcome = build(
         Path.cwd(),

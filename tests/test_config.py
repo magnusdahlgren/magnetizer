@@ -6,7 +6,7 @@ from magnetizer.config import load_config
 
 
 DEFAULTS = {
-    "site_title": "My Blog",
+    "site_name": "My Blog",
     "site_url": "",
     "image_max_dimension": 1600,
     "image_quality": 75,
@@ -29,8 +29,8 @@ def write_config(tmp_path, content):
 
 class TestDefaults:
 
-    def test_site_title_default(self, tmp_path):
-        assert load_config(tmp_path / "config.yaml")["site_title"] == "My Blog"
+    def test_site_name_default(self, tmp_path):
+        assert load_config(tmp_path / "config.yaml")["site_name"] == "My Blog"
 
     def test_image_max_dimension_default(self, tmp_path):
         assert load_config(tmp_path / "config.yaml")["image_max_dimension"] == 1600
@@ -58,9 +58,9 @@ class TestDefaults:
 
 class TestCustomValues:
 
-    def test_site_title_overridden(self, tmp_path):
-        p = write_config(tmp_path, "site_title: My Photo Blog\n")
-        assert load_config(p)["site_title"] == "My Photo Blog"
+    def test_site_name_overridden(self, tmp_path):
+        p = write_config(tmp_path, "site_name: My Photo Blog\n")
+        assert load_config(p)["site_name"] == "My Photo Blog"
 
     def test_image_max_dimension_overridden(self, tmp_path):
         p = write_config(tmp_path, "image_max_dimension: 1200\n")
@@ -84,23 +84,23 @@ class TestCustomValues:
 
     def test_all_values_overridden(self, tmp_path):
         p = write_config(tmp_path, (
-            "site_title: Photos\n"
+            "site_name: Photos\n"
             "image_max_dimension: 1400\n"
             "image_quality: 68\n"
             "posts_per_page: 8\n"
             "micro_post_max_length: 200\n"
         ))
         config = load_config(p)
-        assert config["site_title"] == "Photos"
+        assert config["site_name"] == "Photos"
         assert config["image_max_dimension"] == 1400
         assert config["image_quality"] == 68
         assert config["posts_per_page"] == 8
         assert config["micro_post_max_length"] == 200
 
     def test_partial_override_keeps_other_defaults(self, tmp_path):
-        p = write_config(tmp_path, "site_title: My Photos\n")
+        p = write_config(tmp_path, "site_name: My Photos\n")
         config = load_config(p)
-        assert config["site_title"] == "My Photos"
+        assert config["site_name"] == "My Photos"
         assert config["image_max_dimension"] == 1600
         assert config["image_quality"] == 75
         assert config["posts_per_page"] == 12
