@@ -1,9 +1,6 @@
 import html as _html
 
-
-def _resized_filename(filename):
-    stem, _, ext = filename.rpartition('.')
-    return f"{stem}-resized.{ext}"
+from magnetizer.content import resized_filename as _resized_filename
 
 
 def _rfc3339(date_str, post_id):

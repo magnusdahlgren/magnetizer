@@ -34,6 +34,11 @@ class Post:
     char_count: int = 0
 
 
+def resized_filename(filename):
+    stem, _, ext = filename.rpartition('.')
+    return f"{stem}-resized.{ext}"
+
+
 def _plain_text(html):
     text = re.sub(r'<[^>]+>', '', html)
     return re.sub(r'\s+', ' ', text).strip()
@@ -85,8 +90,10 @@ def parse_post(md_text, post_id, image_filenames, micro_post_max_length=180):
     date_str = fm.get('date') or None
     title = fm.get('title') or None
     alt_texts = fm.get('images') or []
-    is_favourite = fm.get('favourite', 'false').lower() == 'true'
-    is_draft = fm.get('draft', 'false').lower() == 'true'
+    favourite_raw = fm.get('favourite', 'false')
+    is_favourite = isinstance(favourite_raw, str) and favourite_raw.lower() == 'true'
+    draft_raw = fm.get('draft', 'false')
+    is_draft = isinstance(draft_raw, str) and draft_raw.lower() == 'true'
     category_raw = fm.get('category', '')
     category = (category_raw.lower().strip() if isinstance(category_raw, str) else '') or None
 

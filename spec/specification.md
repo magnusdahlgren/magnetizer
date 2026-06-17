@@ -339,7 +339,7 @@ The same warning is printed for the [about page](#about-page) and [cookies page]
 
 A post can be marked as a draft by setting `draft: true` in its frontmatter:
 
-```
+```yaml
 ---
 date: 2026-05-21
 draft: true
@@ -526,11 +526,11 @@ The `MAGNETIZER_CONTENT` has the following structure on individual post pages:
 </main>
 <nav>
   <ul>
-    <li class=”newer”><a href=”NEWER_POST_URL”>← Newer post</a></li>
-    <li class=”older”><a href=”OLDER_POST_URL”>Older post →</a></li>
+    <li class=”newer”><a href=”NEWER_POST_URL”>Newer post</a></li>
+    <li class=”older”><a href=”OLDER_POST_URL”>Older post</a></li>
   </ul>
 </nav>
-<nav><a href=”POST_INDEX_PAGE_URL#POST_HTML_ID”>← Back to homepage</a></nav>
+<nav><a href=”POST_INDEX_PAGE_URL#POST_HTML_ID”>Back to homepage</a></nav>
 ```
 
 Where:
@@ -545,7 +545,7 @@ Notes:
 - The `<li class=”newer”>` is omitted when this is the newest post
 - The `<li class=”older”>` is omitted when this is the oldest post
 - The entire first `<nav>` is omitted when there is only one post
-- The “← Back to homepage” link returns the user to the exact position in the index where the post appears.
+- The “Back to homepage” link returns the user to the exact position in the index where the post appears.
 
 ### About page
 
@@ -559,7 +559,7 @@ The `MAGNETIZER_CONTENT` has the following structure:
 <main>
   <article class=”single-post”>...</article>
 </main>
-<nav><a href=”index.html”>⌂ Back to homepage</a></nav>
+<nav><a href=”index.html”>Back to homepage</a></nav>
 ```
 
 The back link always points to `index.html` with no anchor, since the about page has no position in the index.
@@ -572,9 +572,9 @@ The `MAGNETIZER_CONTENT` has the following structure:
 
 ```html
 <main>
-  <article class="single-post">...</article>
+  <article class=”single-post”>...</article>
 </main>
-<nav><a href="index.html">⌂ Back to homepage</a></nav>
+<nav><a href=”index.html”>Back to homepage</a></nav>
 ```
 
 ### Archive page
@@ -611,7 +611,7 @@ The `MAGNETIZER_CONTENT` has the following structure:
   </section>
   ...
 </main>
-<nav><a href="index.html">⌂ Back to homepage</a></nav>
+<nav><a href="index.html">Back to homepage</a></nav>
 ```
 
 Where:
@@ -620,8 +620,7 @@ Where:
 - The `<h2>Posts</h2>` heading is only included when the categories list above it is shown.
 - The `<dl class="archive-stats">` has four filter items — total post count (including undated), posts with at least one image, microblog posts, and favourite posts — each as a `<dt>`/`<dd>` pair. The `<dt>` class matches the post-type class used on archive `<li>` elements, for use as a JS filter hook.
 - `DAY` is the day of the month with no leading zero, e.g. `16`
-- Titled posts use `DAY - POST_TITLE` as link text
-- Untitled posts use just `DAY` as link text
+- The `<a>` link text is the post title for titled posts; for untitled posts it is a truncated excerpt of the first paragraph (up to 36 characters), or `Untitled` if the post has no body text
 - `POST_TYPE` is one of: `text-post` (title, no images), `photo-post` (images, no title), `mixed-post` (title and images), `micro-post` (microblog post)
 
 ### Index pages
