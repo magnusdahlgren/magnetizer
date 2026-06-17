@@ -316,6 +316,15 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     created = updated = deleted = 0
     posts_cache = {}
+    for pid in all_post_ids_sorted_desc:
+        if (content_dir / f"{pid}.md").exists():
+            posts_cache[pid] = _load_post(content_dir, pid, config["micro_post_max_length"])
+
+    published_post_ids_sorted_desc = [
+        pid for pid in all_post_ids_sorted_desc
+        if pid in posts_cache and not posts_cache[pid].is_draft
+    ]
+    published_posts_sorted_desc = [posts_cache[pid] for pid in published_post_ids_sorted_desc]
 
     for post_id in post_ids_to_build:
         md_path = content_dir / f"{post_id}.md"
@@ -333,8 +342,7 @@ def build(cwd, filename=None, flush=False, resources=False):
             else:
                 created += 1
 
-        post = _load_post(content_dir, post_id, config["micro_post_max_length"])
-        posts_cache[post_id] = post
+        post = posts_cache[post_id]
         _warn_if_missing_alt_texts(post)
         _warn_if_missing_title(post)
         _warn_if_missing_category(post, config["categories"])
@@ -347,8 +355,12 @@ def build(cwd, filename=None, flush=False, resources=False):
             resized_name = f"{stem}-resized.{ext}"
             dest_size = (dist_dir / resized_name).stat().st_size
             log.append(("RESIZED", resized_name, src_sizes[image.filename], dest_size))
-        idx_url = _post_index_page_url(post_id, all_post_ids_sorted_desc, config["posts_per_page"])
-        newer_url, older_url = _adjacent_post_urls(post_id, all_post_ids_sorted_desc)
+        if post.is_draft:
+            newer_url, older_url = None, None
+            idx_url = "index.html"
+        else:
+            newer_url, older_url = _adjacent_post_urls(post_id, published_post_ids_sorted_desc)
+            idx_url = _post_index_page_url(post_id, published_post_ids_sorted_desc, config["posts_per_page"])
         _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url, categories=config["categories"])
         log.append((action, f"{post_id}.html", post.char_count, post.is_micro))
 
@@ -373,22 +385,18 @@ def build(cwd, filename=None, flush=False, resources=False):
             log.append(("REMOVED", "cookies.html"))
 
     if not filename and post_ids_to_build:
-        all_posts = [
-            posts_cache[pid] if pid in posts_cache else _load_post(content_dir, pid, config["micro_post_max_length"])
-            for pid in all_post_ids_sorted_desc
-        ]
-        _write_index_pages(all_posts, dist_dir, config, template, categories=config["categories"])
+        _write_index_pages(published_posts_sorted_desc, dist_dir, config, template, categories=config["categories"])
         per_page = config["posts_per_page"]
-        total_pages = max(1, (len(all_posts) + per_page - 1) // per_page)
+        total_pages = max(1, (len(published_posts_sorted_desc) + per_page - 1) // per_page)
         for page_num in range(1, total_pages + 1):
             log.append(("UPDATED", index_page_url(page_num)))
-        _write_category_pages(all_posts, dist_dir, config, template)
-        (dist_dir / "feed.xml").write_text(render_feed(all_posts, config))
+        _write_category_pages(published_posts_sorted_desc, dist_dir, config, template)
+        (dist_dir / "feed.xml").write_text(render_feed(published_posts_sorted_desc, config))
         log.append(("UPDATED", "feed.xml"))
         archive_html = render_template(
             template,
             title=render_page_title(config["site_title"], "Archive", page_num=None),
-            content=render_archive_page_content(all_posts, categories=config["categories"]),
+            content=render_archive_page_content(published_posts_sorted_desc, categories=config["categories"]),
             canonical=canonical_url(config["site_url"], "archive.html"),
         )
         (dist_dir / "archive.html").write_text(archive_html)
@@ -397,10 +405,10 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     if not filename and log:
         per_page = config["posts_per_page"]
-        total_pages = max(1, (len(all_post_ids_sorted_desc) + per_page - 1) // per_page)
-        index_lastmod = _lastmod([content_dir / f"{pid}.md" for pid in all_post_ids_sorted_desc])
+        total_pages = max(1, (len(published_post_ids_sorted_desc) + per_page - 1) // per_page)
+        index_lastmod = _lastmod([content_dir / f"{pid}.md" for pid in published_post_ids_sorted_desc])
         sitemap_pages = []
-        for pid in all_post_ids_sorted_desc:
+        for pid in published_post_ids_sorted_desc:
             post_files = [content_dir / f"{pid}.md"] + [
                 f for f in content_dir.iterdir() if re.match(rf'^{pid}-image-', f.name)
             ]
@@ -409,12 +417,8 @@ def build(cwd, filename=None, flush=False, resources=False):
             sitemap_pages.append((index_page_url(page_num), index_lastmod))
         categories = config["categories"]
         if categories:
-            all_posts_for_cats = [
-                posts_cache.get(pid) or _load_post(content_dir, pid, config["micro_post_max_length"])
-                for pid in all_post_ids_sorted_desc
-            ]
             for slug in categories:
-                cat_posts = [p for p in all_posts_for_cats if p.category == slug]
+                cat_posts = [p for p in published_posts_sorted_desc if p.category == slug]
                 if not cat_posts:
                     continue
                 cat_lastmod = _lastmod([

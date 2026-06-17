@@ -387,6 +387,32 @@ class TestFavourite:
 
 
 # ---------------------------------------------------------------------------
+# Draft
+# ---------------------------------------------------------------------------
+
+class TestDraft:
+
+    def test_is_not_draft_by_default(self):
+        post = parse_post(make_md(), 1, [])
+        assert post.is_draft is False
+
+    def test_is_draft_when_frontmatter_true(self):
+        md = "---\ndate: 2026-05-24\ndraft: true\n---\n"
+        post = parse_post(md, 1, [])
+        assert post.is_draft is True
+
+    def test_draft_false_is_not_draft(self):
+        md = "---\ndate: 2026-05-24\ndraft: false\n---\n"
+        post = parse_post(md, 1, [])
+        assert post.is_draft is False
+
+    def test_draft_key_does_not_trigger_unknown_key_warning(self, capsys):
+        md = "---\ndate: 2026-05-24\ndraft: true\n---\n"
+        parse_post(md, 1, [])
+        assert "Warning" not in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
 # Smart / typographic quotes
 # ---------------------------------------------------------------------------
 
