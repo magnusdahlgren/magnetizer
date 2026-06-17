@@ -91,7 +91,7 @@ Run `build.py` from your project directory.
 
 Use `--flush` after editing templates. Use `--resources` after editing CSS or JS.
 
-Every full build also generates `dist/sitemap.xml` (all post, index, about, and archive pages with `lastmod` dates) and `dist/robots.txt` (pointing to the sitemap). These are not generated on single-file preview builds.
+Every full build also generates `dist/sitemap.xml` (all post, index, category, about, and archive pages with `lastmod` dates) and `dist/robots.txt` (pointing to the sitemap). These are not generated on single-file preview builds.
 
 ## Templates
 

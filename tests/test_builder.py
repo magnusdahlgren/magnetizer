@@ -499,6 +499,44 @@ class TestSitemap:
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         assert ("UPDATED", "robots.txt") in build(p)["log"]
 
+    def test_sitemap_contains_category_url_when_category_has_posts(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "photography.html" in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_excludes_category_url_when_no_matching_posts(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "travel.html" not in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_excludes_category_urls_when_no_categories_configured(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "photography.html" not in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_contains_paginated_category_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD, 2: _CATEGORY_MD, 3: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "photography-2.html" in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_category_lastmod_updated_when_post_image_changes(self, tmp_path):
+        import os
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        make_jpg(p / "content" / "1-image-01.jpg")
+        # Pin .md to 2021-01-01 and image to an older date so first lastmod = 2021-01-01
+        md_mtime = 1609459200.0   # 2021-01-01
+        img_mtime_old = 1000000000.0  # 2001-09-08
+        os.utime(p / "content" / "1.md", (md_mtime, md_mtime))
+        os.utime(p / "content" / "1-image-01.jpg", (img_mtime_old, img_mtime_old))
+        build(p)
+        sitemap_before = (p / "dist" / "sitemap.xml").read_text()
+        # Move image forward to 2022-01-01 — newer than .md, so category lastmod must change
+        img_mtime_new = 1640995200.0  # 2022-01-01
+        os.utime(p / "content" / "1-image-01.jpg", (img_mtime_new, img_mtime_new))
+        build(p)
+        sitemap_after = (p / "dist" / "sitemap.xml").read_text()
+        assert sitemap_before != sitemap_after
+
 
 # ---------------------------------------------------------------------------
 # Post navigation
