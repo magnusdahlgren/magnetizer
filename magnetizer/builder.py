@@ -407,6 +407,20 @@ def build(cwd, filename=None, flush=False, resources=False):
             sitemap_pages.append((f"{pid}.html", _lastmod(post_files)))
         for page_num in range(1, total_pages + 1):
             sitemap_pages.append((index_page_url(page_num), index_lastmod))
+        categories = config["categories"]
+        if categories:
+            all_posts_for_cats = [
+                posts_cache.get(pid) or _load_post(content_dir, pid, config["micro_post_max_length"])
+                for pid in all_post_ids_sorted_desc
+            ]
+            for slug in categories:
+                cat_posts = [p for p in all_posts_for_cats if p.category == slug]
+                if not cat_posts:
+                    continue
+                cat_lastmod = _lastmod([content_dir / f"{p.id}.md" for p in cat_posts])
+                total_cat_pages = max(1, (len(cat_posts) + per_page - 1) // per_page)
+                for page_num in range(1, total_cat_pages + 1):
+                    sitemap_pages.append((category_page_url(slug, page_num), cat_lastmod))
         if about_md.exists():
             about_files = [content_dir / "about.md"] + [
                 f for f in content_dir.iterdir() if re.match(r'^about-image-', f.name)

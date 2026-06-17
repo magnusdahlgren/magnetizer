@@ -728,13 +728,14 @@ Magnetizer generates an XML sitemap at `dist/sitemap.xml` and a `dist/robots.txt
 | --- | --- |
 | `{post-id}.html` | All posts, in reverse chronological order |
 | `index.html`, `index-2.html`, … | All index pages |
+| `{slug}.html`, `{slug}-2.html`, … | All pages for each category that has at least one matching post |
 | `about.html` | Only if `about.md` exists in `content/` |
 | `archive.html` | Always |
 | `cookies.html` | Not included — legal/privacy pages are excluded from sitemaps |
 
 ### lastmod dates
 
-Each `<url>` entry includes a `<lastmod>` date derived from the most recent file modification time among the source files for that page (e.g. the `.md` file and any associated images). Index pages and the archive use the most recent modification time across all posts.
+Each `<url>` entry includes a `<lastmod>` date derived from the most recent file modification time among the source files for that page (e.g. the `.md` file and any associated images). Index pages and the archive use the most recent modification time across all posts. Category pages use the most recent modification time among the posts in that category.
 
 ### Sitemap format
 

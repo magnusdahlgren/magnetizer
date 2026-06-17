@@ -499,6 +499,26 @@ class TestSitemap:
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         assert ("UPDATED", "robots.txt") in build(p)["log"]
 
+    def test_sitemap_contains_category_url_when_category_has_posts(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "photography.html" in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_excludes_category_url_when_no_matching_posts(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "travel.html" not in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_excludes_category_urls_when_no_categories_configured(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        assert "photography.html" not in (p / "dist" / "sitemap.xml").read_text()
+
+    def test_sitemap_contains_paginated_category_url(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _CATEGORY_MD, 2: _CATEGORY_MD, 3: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
+        build(p)
+        assert "photography-2.html" in (p / "dist" / "sitemap.xml").read_text()
+
 
 # ---------------------------------------------------------------------------
 # Post navigation
