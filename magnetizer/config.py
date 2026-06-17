@@ -21,6 +21,8 @@ def load_config(path):
     p = Path(path)
     if p.is_file():
         data = yaml.safe_load(p.read_text()) or {}
+        if "site_name" not in data and "site_title" in data:
+            data["site_name"] = data["site_title"]
         for key in DEFAULTS:
             if key in data:
                 config[key] = data[key]

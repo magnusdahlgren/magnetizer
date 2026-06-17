@@ -1150,7 +1150,7 @@ class TestArchivePage:
     def test_archive_title_includes_site_name(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         build(p)
-        assert "Archive" in (p / "dist" / "archive.html").read_text()
+        assert "<title>Archive - Test Blog</title>" in (p / "dist" / "archive.html").read_text()
 
 
 # ---------------------------------------------------------------------------

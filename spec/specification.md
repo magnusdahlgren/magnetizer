@@ -732,7 +732,7 @@ Where:
 - `POST_DATE` is the post date in RFC 3339 format, e.g. `2026-05-24T00:00:00Z`
 - `POST_BODY_HTML` is the HTML generated from the post's Markdown body
 
-Posts are listed in reverse chronological order (highest post ID first). All posts are included.
+Posts are listed in reverse chronological order (highest post ID first). Only published posts are included (draft posts are excluded).
 
 ## Sitemap
 

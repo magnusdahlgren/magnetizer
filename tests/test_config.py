@@ -142,3 +142,18 @@ class TestCategories:
         config["categories"]["photography"] = "Photography"
         fresh = load_config(tmp_path / "config.yaml")
         assert fresh["categories"] == {}
+
+
+# ---------------------------------------------------------------------------
+# Backward compatibility
+# ---------------------------------------------------------------------------
+
+class TestBackwardCompatibility:
+
+    def test_legacy_site_title_key_used_as_site_name(self, tmp_path):
+        p = write_config(tmp_path, "site_title: My Legacy Blog\n")
+        assert load_config(p)["site_name"] == "My Legacy Blog"
+
+    def test_site_name_takes_precedence_over_site_title(self, tmp_path):
+        p = write_config(tmp_path, "site_name: New Name\nsite_title: Old Name\n")
+        assert load_config(p)["site_name"] == "New Name"
