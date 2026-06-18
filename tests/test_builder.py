@@ -74,6 +74,12 @@ class TestBasicBuild:
         data = json.loads((p / "manifest.json").read_text())
         assert "1.md" in data
 
+    def test_manifest_contains_resource_files(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        data = json.loads((p / "manifest.json").read_text())
+        assert "resources/style.css" in data
+
 
 # ---------------------------------------------------------------------------
 # Image processing
@@ -195,13 +201,40 @@ class TestResources:
         build(p)
         assert (p / "dist" / "resources" / "style.css").exists()
 
-    def test_resources_not_copied_if_already_present(self, tmp_path):
+    def test_extra_files_in_dist_resources_are_preserved(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "dist" / "resources").mkdir()
-        sentinel = p / "dist" / "resources" / "existing.css"
+        sentinel = p / "dist" / "resources" / "extra.css"
         sentinel.write_text("existing")
         build(p)
-        assert sentinel.exists()  # not overwritten
+        assert sentinel.exists()  # files not in source resources/ are untouched
+
+    def test_changed_resource_file_copied_on_rebuild(self, tmp_path):
+        import time
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        time.sleep(0.01)
+        (p / "resources" / "style.css").write_text("body { color: red; }")
+        build(p)
+        assert "color: red" in (p / "dist" / "resources" / "style.css").read_text()
+
+    def test_unchanged_resource_not_updated_on_rebuild(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        mtime_after_first = (p / "dist" / "resources" / "style.css").stat().st_mtime
+        build(p)
+        assert (p / "dist" / "resources" / "style.css").stat().st_mtime == mtime_after_first
+
+    def test_deleted_resource_removed_from_dist_on_rebuild(self, tmp_path):
+        import time
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "resources" / "extra.css").write_text("extra {}")
+        build(p)
+        assert (p / "dist" / "resources" / "extra.css").exists()
+        time.sleep(0.01)
+        (p / "resources" / "extra.css").unlink()
+        build(p)
+        assert not (p / "dist" / "resources" / "extra.css").exists()
 
     def test_resources_replaced_with_resources_flag(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
@@ -931,15 +964,16 @@ class TestVerboseLog:
 
     def test_resources_copied_in_log(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        assert ("COPIED", "resources/") in build(p)["log"]
+        assert ("COPIED", "resources/style.css") in build(p)["log"]
 
-    def test_resources_not_in_log_when_already_present(self, tmp_path):
+    def test_resources_not_in_log_when_unchanged_on_rebuild(self, tmp_path):
         import time
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         build(p)
         time.sleep(0.01)
         (p / "content" / "1.md").write_text("---\ndate: 2026-05-24\n---\n\nUpdated!\n")
-        assert ("COPIED", "resources/") not in build(p)["log"]
+        log = build(p)["log"]
+        assert not any(entry[0] == "COPIED" and entry[1].startswith("resources/") for entry in log)
 
     def test_about_page_in_log_on_first_build(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})

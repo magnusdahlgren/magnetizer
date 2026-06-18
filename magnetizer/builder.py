@@ -7,7 +7,7 @@ from pathlib import Path
 from magnetizer.config import load_config
 from magnetizer.content import parse_post
 from magnetizer.image import resize_image
-from magnetizer.manifest import get_changed_post_ids, load_manifest, save_manifest
+from magnetizer.manifest import get_changed_post_ids, get_changed_resource_filenames, load_manifest, save_manifest
 from magnetizer.render import (
     canonical_url,
     category_page_url,
@@ -242,14 +242,29 @@ def _special_page_changed(content_dir, manifest, md_name, image_pattern=None):
     return False
 
 
-def _copy_resources(resources_dir, dist_dir, replace=False):
+def _sync_resources(resources_dir, dist_dir, changed_filenames, replace=False):
+    src = Path(resources_dir)
     dest = dist_dir / "resources"
-    if replace and dest.exists():
-        shutil.rmtree(dest)
+    if replace:
+        if dest.exists():
+            shutil.rmtree(dest)
+        if src.exists():
+            shutil.copytree(src, dest)
+            return sorted(f.name for f in dest.iterdir() if not f.name.startswith('.')), []
+        return [], []
     if not dest.exists():
-        shutil.copytree(resources_dir, dest)
-        return True
-    return False
+        dest.mkdir()
+    copied, deleted = [], []
+    for name in sorted(changed_filenames):
+        src_file = src / name
+        dest_file = dest / name
+        if src_file.exists():
+            shutil.copy2(src_file, dest_file)
+            copied.append(name)
+        elif dest_file.exists():
+            dest_file.unlink()
+            deleted.append(name)
+    return copied, deleted
 
 
 def build(cwd, filename=None, flush=False, resources=False):
@@ -403,7 +418,7 @@ def build(cwd, filename=None, flush=False, resources=False):
         )
         (dist_dir / "archive.html").write_text(archive_html)
         log.append(("UPDATED", "archive.html"))
-        save_manifest(content_dir, manifest_path)
+        save_manifest(content_dir, manifest_path, resources_dir=cwd / "resources")
 
     if not filename and log:
         per_page = config["posts_per_page"]
@@ -442,7 +457,16 @@ def build(cwd, filename=None, flush=False, resources=False):
         (dist_dir / "robots.txt").write_text(render_robots_txt(config))
         log.append(("UPDATED", "robots.txt"))
 
-    if _copy_resources(cwd / "resources", dist_dir, replace=resources or flush):
-        log.append(("COPIED", "resources/"))
+    resources_dir = cwd / "resources"
+    changed_resource_filenames = get_changed_resource_filenames(resources_dir, manifest)
+    copied, deleted_resources = _sync_resources(
+        resources_dir, dist_dir, changed_resource_filenames, replace=(resources or flush)
+    )
+    for name in copied:
+        log.append(("COPIED", f"resources/{name}"))
+    for name in deleted_resources:
+        log.append(("REMOVED", f"resources/{name}"))
+    if not filename and (copied or deleted_resources) and not post_ids_to_build:
+        save_manifest(content_dir, manifest_path, resources_dir=resources_dir)
 
     return {"created": created, "updated": updated, "deleted": deleted, "log": log}
