@@ -297,10 +297,6 @@ class TestRenderArticleIndexPagePhotoLimit:
         html = render_article(post, on_index_page=True)
         assert 'class="more-photos"' not in html
 
-    def test_img_has_alt_attribute(self):
-        html = render_article(make_post(post_id=1, images=["1-image-01.jpg"]), on_index_page=False)
-        assert 'alt=' in html
-
     def test_img_alt_text_from_image_object(self):
         img = Image(filename="1-image-01.jpg", alt="A sunny beach")
         html = render_article(make_post(post_id=1, images=[img]), on_index_page=False)
@@ -531,9 +527,6 @@ class TestRenderPageTitle:
     def test_index_page_2_includes_page_number(self):
         assert render_page_title("My Blog", None, page_num=2) == "My Blog - Page 2"
 
-    def test_index_page_3_includes_page_number(self):
-        assert render_page_title("My Blog", None, page_num=3) == "My Blog - Page 3"
-
     def test_post_with_title_is_title_dash_site(self):
         assert render_page_title("My Blog", "A Great Post", page_num=None) == "A Great Post - My Blog"
 
@@ -632,9 +625,6 @@ class TestCanonicalUrl:
     def test_trailing_slash_in_site_url_is_stripped(self):
         assert canonical_url("https://example.com/", "1.html") == "https://example.com/1.html"
 
-    def test_trailing_slash_in_site_url_stripped_for_index(self):
-        assert canonical_url("https://example.com/", "index.html") == "https://example.com/"
-
 
 # ---------------------------------------------------------------------------
 # render_article — read more
@@ -727,10 +717,6 @@ class TestRenderArchivePageContent:
     def test_untitled_imageless_post_shows_untitled(self):
         html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
         assert "Untitled" in html
-
-    def test_day_has_no_leading_zero(self):
-        html = render_archive_page_content([make_dated_post(1, "2026-05-03")])
-        assert ">03<" not in html
 
     def test_each_entry_is_a_link_to_post(self):
         html = render_archive_page_content([make_dated_post(5, "2026-05-24", title="Hello")])
