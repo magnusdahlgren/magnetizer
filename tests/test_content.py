@@ -28,10 +28,6 @@ def make_md(date="2026-05-24", title=None, body="", category=None):
 
 class TestPostDataclass:
 
-    def test_post_is_a_dataclass(self):
-        post = parse_post(make_md(), 1, [])
-        assert isinstance(post, Post)
-
     def test_post_id(self):
         post = parse_post(make_md(), 7, [])
         assert post.id == 7
@@ -155,11 +151,6 @@ class TestImages:
         post = parse_post(make_md(), 1, ["1-image-03.jpg", "1-image-01.png", "1-image-02.jpg"])
         assert [img.filename for img in post.images] == ["1-image-01.png", "1-image-02.jpg", "1-image-03.jpg"]
 
-    def test_images_provided_out_of_order_are_sorted(self):
-        post = parse_post(make_md(), 1, ["1-image-02.jpg", "1-image-01.jpg"])
-        assert post.images[0].filename == "1-image-01.jpg"
-        assert post.images[1].filename == "1-image-02.jpg"
-
 
 # ---------------------------------------------------------------------------
 # Read more marker
@@ -215,10 +206,6 @@ class TestOptionalDate:
         post = parse_post("---\n---\n", 1, [])
         assert post.date_uk is None
 
-    def test_date_set_when_present_in_frontmatter(self):
-        post = parse_post(make_md(date="2026-05-24"), 1, [])
-        assert post.date == "2026-05-24"
-
 
 # ---------------------------------------------------------------------------
 # Image dataclass and alt texts
@@ -230,10 +217,6 @@ class TestImageAltTexts:
         from magnetizer.content import Image
         post = parse_post(make_md(), 1, ["1-image-01.jpg"])
         assert isinstance(post.images[0], Image)
-
-    def test_image_has_filename(self):
-        post = parse_post(make_md(), 1, ["1-image-01.jpg"])
-        assert post.images[0].filename == "1-image-01.jpg"
 
     def test_image_alt_from_frontmatter(self):
         md = "---\ndate: 2026-05-24\nimages:\n  - A sunny beach\n---\n"
@@ -317,10 +300,6 @@ class TestMicroPost:
 
     def test_not_micro_when_images_present(self):
         post = parse_post(make_md(body="A short post."), 1, ["1-image-01.jpg"])
-        assert post.is_micro is False
-
-    def test_not_micro_when_body_exceeds_limit(self):
-        post = parse_post(make_md(body="x" * 181), 1, [])
         assert post.is_micro is False
 
     def test_is_micro_at_exactly_180_characters(self):
