@@ -100,24 +100,28 @@ def _post_index_page_url(post_id, post_ids_sorted_desc, posts_per_page):
 
 def _warn_if_missing_category(post, categories):
     if categories and not post.category:
-        print(f"Warning: Post {post.id} is missing a category")
+        return "No category"
+    return None
 
 
 def _warn_if_invalid_category(post, categories):
     if categories and post.category and post.category not in categories:
-        print(f"Warning: Post {post.id} has unknown category: '{post.category}'")
+        return f"Unknown category: '{post.category}'"
+    return None
 
 
 def _warn_if_missing_alt_texts(post):
     if post.images and any(not img.alt for img in post.images):
-        print(f"Warning: Post {post.id} is missing one or more alt texts")
+        return "Missing alt text"
+    return None
 
 
 def _warn_if_missing_title(post):
     has_text = bool(post.body_html and post.body_html.strip())
     is_photo_only = bool(post.images) and not has_text
     if not post.is_micro and not is_photo_only and (has_text or post.images) and not post.title:
-        print(f"Warning: Post {post.id} is missing a title")
+        return "No title"
+    return None
 
 
 _HIGH_HEADING_PATTERN = re.compile(r'<h([12])[ >]')
@@ -127,7 +131,8 @@ def _warn_if_heading_too_high(post):
     levels = sorted({int(m.group(1)) for m in _HIGH_HEADING_PATTERN.finditer(post.body_html)})
     if levels:
         tags = ", ".join(f"<h{level}>" for level in levels)
-        print(f"Warning: Post {post.id} has heading(s) more prominent than <h3> in its body: {tags}")
+        return f"High-level headings: {tags}"
+    return None
 
 
 def _adjacent_post_urls(post_id, post_ids_sorted_desc):
@@ -192,19 +197,20 @@ def _about_image_filenames(content_dir):
 def _build_cookies_page(content_dir, dist_dir, config, template):
     md_text = (content_dir / "cookies.md").read_text()
     post = parse_post(md_text, "cookies", [])
-    _warn_if_heading_too_high(post)
+    w = _warn_if_heading_too_high(post)
     content_html = render_post_page_content(post, "index.html", back_url="index.html")
     title = render_page_title(config["site_name"], post.title, page_num=None)
     html = render_template(template, title=title, content=content_html,
                            canonical=canonical_url(config["site_url"], "cookies.html"))
     (dist_dir / "cookies.html").write_text(html)
+    return w
 
 
 def _build_about_page(content_dir, dist_dir, config, template):
     md_text = (content_dir / "about.md").read_text()
     images = _about_image_filenames(content_dir)
     post = parse_post(md_text, "about", images)
-    _warn_if_heading_too_high(post)
+    w = _warn_if_heading_too_high(post)
 
     for image in post.images:
         stem, _, ext = image.filename.rpartition('.')
@@ -220,6 +226,7 @@ def _build_about_page(content_dir, dist_dir, config, template):
     html = render_template(template, title=title, content=content_html,
                            canonical=canonical_url(config["site_url"], "about.html"))
     (dist_dir / "about.html").write_text(html)
+    return w
 
 
 def _special_page_changed(content_dir, manifest, md_name, image_pattern=None):
@@ -295,6 +302,7 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     manifest = load_manifest(manifest_path)
     log = []
+    warnings = []
 
     about_md = content_dir / "about.md"
     cookies_md = content_dir / "cookies.md"
@@ -307,12 +315,12 @@ def build(cwd, filename=None, flush=False, resources=False):
             if about_md.exists():
                 _build_about_page(content_dir, dist_dir, config, template)
                 log.append(("UPDATED", "about.html"))
-            return {"created": 0, "updated": 0, "deleted": 0, "log": log}
+            return {"created": 0, "updated": 0, "deleted": 0, "log": log, "warnings": warnings}
         if stem == "cookies":
             if cookies_md.exists():
                 _build_cookies_page(content_dir, dist_dir, config, template)
                 log.append(("UPDATED", "cookies.html"))
-            return {"created": 0, "updated": 0, "deleted": 0, "log": log}
+            return {"created": 0, "updated": 0, "deleted": 0, "log": log, "warnings": warnings}
         post_id = int(Path(filename).stem)
         changed_post_ids = {post_id}
         post_ids_to_build = {post_id}
@@ -358,11 +366,17 @@ def build(cwd, filename=None, flush=False, resources=False):
                 created += 1
 
         post = posts_cache[post_id]
-        _warn_if_missing_alt_texts(post)
-        _warn_if_missing_title(post)
-        _warn_if_missing_category(post, config["categories"])
-        _warn_if_invalid_category(post, config["categories"])
-        _warn_if_heading_too_high(post)
+        post_warnings = [
+            w for w in [
+                _warn_if_missing_alt_texts(post),
+                _warn_if_missing_title(post),
+                _warn_if_missing_category(post, config["categories"]),
+                _warn_if_invalid_category(post, config["categories"]),
+                _warn_if_heading_too_high(post),
+            ] if w
+        ]
+        for msg in post_warnings:
+            warnings.append((f"{post_id}.html", msg))
         src_sizes = {img.filename: (content_dir / img.filename).stat().st_size for img in post.images}
         _build_post(post, dist_dir, content_dir, config)
         for image in post.images:
@@ -379,11 +393,13 @@ def build(cwd, filename=None, flush=False, resources=False):
             idx_url = _post_index_page_url(post_id, published_post_ids_sorted_desc, config["posts_per_page"])
             back_url = None
         _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url, back_url=back_url, categories=config["categories"])
-        log.append((action, f"{post_id}.html", post.char_count, post.is_micro))
+        log.append((action, f"{post_id}.html", post.char_count, post.is_micro, len(post.images), post.is_draft))
 
     if about_md.exists():
         if filename or _special_page_changed(content_dir, manifest, "about.md", r'^about-image-\d{2}\.(jpg|jpeg|png)$'):
-            _build_about_page(content_dir, dist_dir, config, template)
+            w = _build_about_page(content_dir, dist_dir, config, template)
+            if w:
+                warnings.append(("about.html", w))
             log.append(("UPDATED", "about.html"))
     elif not filename:
         about_html = dist_dir / "about.html"
@@ -393,7 +409,9 @@ def build(cwd, filename=None, flush=False, resources=False):
 
     if cookies_md.exists():
         if filename or _special_page_changed(content_dir, manifest, "cookies.md"):
-            _build_cookies_page(content_dir, dist_dir, config, template)
+            w = _build_cookies_page(content_dir, dist_dir, config, template)
+            if w:
+                warnings.append(("cookies.html", w))
             log.append(("UPDATED", "cookies.html"))
     elif not filename:
         cookies_html = dist_dir / "cookies.html"
@@ -469,4 +487,4 @@ def build(cwd, filename=None, flush=False, resources=False):
     if not filename and (copied or deleted_resources) and not post_ids_to_build:
         save_manifest(content_dir, manifest_path, resources_dir=resources_dir)
 
-    return {"created": created, "updated": updated, "deleted": deleted, "log": log}
+    return {"created": created, "updated": updated, "deleted": deleted, "log": log, "warnings": warnings}

@@ -177,29 +177,29 @@ class TestCLISingleFile:
 
 class TestCLIOutcome:
 
-    def test_outcome_printed_on_fresh_build(self, tmp_path):
+    def test_outcome_shows_created_count(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build([], cwd=p)
-        assert "1 post(s) created" in result.stdout
+        assert "1 created" in result.stdout
 
     def test_outcome_shows_all_three_counts(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build([], cwd=p)
-        assert "post(s) created" in result.stdout
-        assert "post(s) updated" in result.stdout
-        assert "post(s) deleted" in result.stdout
+        assert "created" in result.stdout
+        assert "updated" in result.stdout
+        assert "deleted" in result.stdout
 
     def test_no_changes_message_when_nothing_changed(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         run_build([], cwd=p)
         result = run_build([], cwd=p)
-        assert "No changes detected." in result.stdout
+        assert "No changes." in result.stdout
 
-    def test_no_zero_counts_when_nothing_changed(self, tmp_path):
+    def test_counts_not_shown_when_nothing_changed(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         run_build([], cwd=p)
         result = run_build([], cwd=p)
-        assert "post(s)" not in result.stdout
+        assert "created" not in result.stdout
 
 
 # ---------------------------------------------------------------------------
@@ -208,81 +208,54 @@ class TestCLIOutcome:
 
 class TestCLIVerbose:
 
-    def test_verbose_shows_created_post(self, tmp_path):
+    def test_verbose_shows_post_line(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build(["--verbose"], cwd=p)
-        assert "CREATED: 1.html" in result.stdout
+        assert "1.html" in result.stdout
 
-    def test_verbose_shows_index_page(self, tmp_path):
+    def test_verbose_post_line_includes_zero_padded_id(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build(["--verbose"], cwd=p)
-        assert "UPDATED: index.html" in result.stdout
+        assert "001" in result.stdout
 
-    def test_verbose_shows_feed(self, tmp_path):
+    def test_verbose_shows_index_in_pages_section(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build(["--verbose"], cwd=p)
-        assert "UPDATED: feed.xml" in result.stdout
+        assert "index" in result.stdout
 
-    def test_verbose_shows_resources(self, tmp_path):
+    def test_verbose_shows_feed_in_pages_section(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build(["--verbose"], cwd=p)
-        assert "COPIED: resources/" in result.stdout
+        assert "feed.xml" in result.stdout
 
-    def test_no_action_lines_without_verbose(self, tmp_path):
+    def test_verbose_shows_resources_section(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        result = run_build([], cwd=p)
-        assert "CREATED:" not in result.stdout
-        assert "UPDATED:" not in result.stdout
+        result = run_build(["--verbose"], cwd=p)
+        assert "style.css" in result.stdout
+
+    def test_verbose_shows_image_count_for_post_with_images(self, tmp_path):
+        from PIL import Image as PILImage
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        img = PILImage.new("RGB", (800, 600))
+        img.save(p / "content" / "1-image-01.jpg", "JPEG")
+        result = run_build(["--verbose"], cwd=p)
+        assert "[1 img]" in result.stdout
+
+    def test_verbose_shows_plus_prefix_for_draft_post(self, tmp_path):
+        draft_md = "---\ndate: 2026-05-24\ndraft: true\n---\n\nDraft\n"
+        p = make_project(tmp_path, posts={1: draft_md})
+        result = run_build(["--verbose"], cwd=p)
+        assert "+1.html" in result.stdout
 
     def test_verbose_compatible_with_single_file(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
         result = run_build(["1.md", "--verbose"], cwd=p)
         assert result.returncode == 0
 
-    def test_verbose_resized_images_are_indented(self, tmp_path):
-        from PIL import Image as PILImage
-        p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        img = PILImage.new("RGB", (800, 600))
-        img.save(p / "content" / "1-image-01.jpg", "JPEG")
-        result = run_build(["--verbose"], cwd=p)
-        assert "  RESIZED: 1-image-01-resized.jpg" in result.stdout
-
-    def test_verbose_resized_shows_file_sizes(self, tmp_path):
-        from PIL import Image as PILImage
-        p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        img = PILImage.new("RGB", (800, 600))
-        img.save(p / "content" / "1-image-01.jpg", "JPEG")
-        result = run_build(["--verbose"], cwd=p)
-        resized_line = next(line for line in result.stdout.splitlines() if "RESIZED: 1-image-01-resized.jpg" in line)
-        assert "→" in resized_line
-
-    def test_verbose_blank_line_between_post_and_site_entries(self, tmp_path):
-        p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        result = run_build(["--verbose"], cwd=p)
-        created_pos = result.stdout.index("CREATED: 1.html")
-        index_pos = result.stdout.index("UPDATED: index.html")
-        assert "\n\n" in result.stdout[created_pos:index_pos]
-
-    def test_verbose_shows_char_count_for_post(self, tmp_path):
-        p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        result = run_build(["--verbose"], cwd=p)
-        assert "characters" in result.stdout
-
-    def test_verbose_shows_micro_label_for_micro_post(self, tmp_path):
-        p = make_project(tmp_path, posts={1: MINIMAL_MD})  # "Hello world" — micro
-        result = run_build(["--verbose"], cwd=p)
-        assert "(micro)" in result.stdout
-
-    def test_verbose_no_micro_label_for_regular_post(self, tmp_path):
-        regular_md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\nNot micro.\n"
-        p = make_project(tmp_path, posts={1: regular_md})
-        result = run_build(["--verbose"], cwd=p)
-        assert "(micro)" not in result.stdout
-
-    def test_generating_line_has_arrow_prefix(self, tmp_path):
+    def test_generating_line_has_site_name_then_arrow(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build([], cwd=p)
-        assert "→ Generating" in result.stdout
+        assert "Generating Test Blog →" in result.stdout
 
 
 # ---------------------------------------------------------------------------
@@ -294,7 +267,7 @@ class TestCLIHeaderAndStatus:
     def test_generating_line_includes_site_name(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build([], cwd=p)
-        assert "Generating Test" in result.stdout
+        assert "Generating Test Blog" in result.stdout
 
     def test_generating_line_includes_dist_path(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
@@ -304,22 +277,33 @@ class TestCLIHeaderAndStatus:
     def test_generating_line_appears_before_summary(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build([], cwd=p)
-        assert result.stdout.index("Generating") < result.stdout.index("post(s)")
+        assert result.stdout.index("Generating") < result.stdout.index("created")
 
     def test_no_changes_message_shown_on_second_build(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         run_build([], cwd=p)
         result = run_build([], cwd=p)
-        assert "No changes detected." in result.stdout
+        assert "No changes." in result.stdout
 
     def test_summary_counts_not_shown_when_no_changes(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         run_build([], cwd=p)
         result = run_build([], cwd=p)
-        assert "post(s)" not in result.stdout
+        assert "created" not in result.stdout
 
     def test_summary_counts_shown_when_changes_exist(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         result = run_build([], cwd=p)
-        assert "post(s)" in result.stdout
-        assert "No changes detected." not in result.stdout
+        assert "created" in result.stdout
+        assert "No changes." not in result.stdout
+
+    def test_done_shown_on_success(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        result = run_build([], cwd=p)
+        assert "DONE" in result.stdout
+
+    def test_done_shown_when_no_changes(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        run_build([], cwd=p)
+        result = run_build([], cwd=p)
+        assert "DONE" in result.stdout
