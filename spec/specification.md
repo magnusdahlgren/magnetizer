@@ -219,7 +219,7 @@ Examples:
 
     **Normal output** (only posts with warnings are listed):
 
-    ```
+    ```text
     Generating MXGNS → dist/
       002   2.html    ⚠ No title
     30 created · 0 updated · 0 deleted
@@ -230,7 +230,7 @@ Examples:
 
     **Verbose output** (all generated posts are listed):
 
-    ```
+    ```text
     Generating MXGNS → dist/
 
       001   1.html

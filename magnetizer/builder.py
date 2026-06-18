@@ -313,12 +313,16 @@ def build(cwd, filename=None, flush=False, resources=False):
         stem = Path(filename).stem
         if stem == "about":
             if about_md.exists():
-                _build_about_page(content_dir, dist_dir, config, template)
+                w = _build_about_page(content_dir, dist_dir, config, template)
+                if w:
+                    warnings.append(("about.html", w))
                 log.append(("UPDATED", "about.html"))
             return {"created": 0, "updated": 0, "deleted": 0, "log": log, "warnings": warnings}
         if stem == "cookies":
             if cookies_md.exists():
-                _build_cookies_page(content_dir, dist_dir, config, template)
+                w = _build_cookies_page(content_dir, dist_dir, config, template)
+                if w:
+                    warnings.append(("cookies.html", w))
                 log.append(("UPDATED", "cookies.html"))
             return {"created": 0, "updated": 0, "deleted": 0, "log": log, "warnings": warnings}
         post_id = int(Path(filename).stem)

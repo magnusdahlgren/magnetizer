@@ -194,7 +194,7 @@ def main():
         )
     except Exception as e:
         print(f"  {e}", file=sys.stderr)
-        print(_c(_RED, "ERROR"))
+        print(_c(_RED, "ERROR"), file=sys.stderr)
         sys.exit(1)
 
     has_warnings = _print_output(outcome, config, dist_path, verbose=args.verbose)

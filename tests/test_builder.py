@@ -876,6 +876,20 @@ class TestAboutAndCookiesHeadingWarnings:
         warnings = build(p)["warnings"]
         assert not any(f == "cookies.html" for f, msg in warnings)
 
+    def test_warning_propagated_when_about_built_by_filename(self, tmp_path):
+        md = "---\ntitle: About\n---\n\n## A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(md)
+        warnings = build(p, filename="about.md")["warnings"]
+        assert any(f == "about.html" and "heading" in msg.lower() for f, msg in warnings)
+
+    def test_warning_propagated_when_cookies_built_by_filename(self, tmp_path):
+        md = "---\ntitle: Cookie Policy\n---\n\n# A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(md)
+        warnings = build(p, filename="cookies.md")["warnings"]
+        assert any(f == "cookies.html" and "heading" in msg.lower() for f, msg in warnings)
+
 
 # ---------------------------------------------------------------------------
 # Verbose log

@@ -89,7 +89,7 @@ Run `build.py` from your project directory.
 | `build.py --flush` | Delete all output and rebuild everything from scratch |
 | `build.py --resources` | Force-replace all of `dist/resources/` with the current `resources/` |
 | `build.py --push` | Build, then push `dist/` to GitHub Pages |
-| `build.py --verbose` | Build and print every generated post, page, and resource file |
+| `build.py --verbose` | Build and print a detailed post log plus summarised pages/resources sections |
 | `build.py 1.md` | Preview a single post or special page (does not update index pages) |
 
 Use `--flush` after editing templates. Resource file changes (CSS, JS) are picked up automatically on the next build. Warnings (missing title, alt text, etc.) are always shown inline next to the affected post.
