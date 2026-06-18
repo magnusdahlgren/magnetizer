@@ -85,14 +85,16 @@ Run `build.py` from your project directory.
 
 | Command | What it does |
 |---|---|
-| `build.py` | Build anything that has changed since the last build |
+| Command | What it does |
+|---|---|
+| `build.py` | Build anything that has changed since the last build, including resource files |
 | `build.py --flush` | Delete all output and rebuild everything from scratch |
-| `build.py --resources` | Replace `dist/resources/` with the current `resources/` |
+| `build.py --resources` | Force-replace all of `dist/resources/` with the current `resources/` |
 | `build.py --push` | Build, then push `dist/` to GitHub Pages |
 | `build.py --verbose` | Build and print a detailed log of every file changed |
 | `build.py 1.md` | Preview a single post or special page (does not update index pages) |
 
-Use `--flush` after editing templates. Use `--resources` after editing CSS or JS.
+Use `--flush` after editing templates. Resource file changes (CSS, JS) are picked up automatically on the next build.
 
 Every full build also generates `dist/sitemap.xml` (all published posts, index, category, about, and archive pages with `lastmod` dates) and `dist/robots.txt` (pointing to the sitemap). These are not generated on single-file preview builds.
 

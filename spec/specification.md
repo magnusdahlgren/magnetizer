@@ -156,8 +156,8 @@ Options:
   --help        Show this message and exit
   --flush       Delete the existing output and build all content from scratch. 
                 Use whenever templates have been updated.
-  --resources   Replace any existing resources with those in ./resources. Use
-                whenever resources (e.g. CSS or JS) have been updated.  
+  --resources   Replace all files in ./dist/resources with those in ./resources.
+                Use to force a full resync of resource files.  
   --push        Push the contents of ./dist to GitHub Pages after a successful 
                 build.
   --verbose     Print a detailed log of every file created, updated, or removed
@@ -165,13 +165,13 @@ Options:
 
 Examples:
   build.py             Build all content from ./content that has changed since 
-                       the last build, plus index pages. Copy ./resources into 
-                       ./dist only if no ./dist/resources directory exists.
+                       the last build, plus index pages. Copy any changed files
+                       from ./resources to ./dist/resources.
   build.py --flush     Remove existing output in ./dist, build ALL content from
-                       ./content, plus index pages, and copy the ./resources 
+                       ./content, plus index pages, and copy all ./resources 
                        into ./dist
-  build.py --resources Remove the existing ./dist/resources and copy 
-                       ./resources into ./dist
+  build.py --resources Replace all files in ./dist/resources with those from 
+                       ./resources
   build.py 1.md        Build a single page (e.g. generate 1.html from 1.md).
                        Index pages are not updated.
 ```
@@ -211,10 +211,9 @@ Examples:
     
     Note: when `FILENAME` is specified, the index pages and the manifest are deliberately not updated — single-file builds are for preview only.
     
-8. Copy `resources/` to `dist/resources/` if any of the following:
-    - `--flush` (`dist/` was already wiped in step 3)
-    - `--resources` (delete existing `dist/resources/` first)
-    - `dist/resources/` does not exist
+8. Sync `resources/` to `dist/resources/`:
+    - If `--flush` or `--resources`: delete `dist/resources/` and copy all files from `resources/`
+    - Otherwise: copy any files from `resources/` that are new or changed since the last build (detected via the manifest), and delete any files from `dist/resources/` that no longer exist in `resources/`
 9. If `--push` and no errors, push to GitHub Pages
 10. Exit and return to the command line, indicating the outcome, e.g. `0 post(s) created, 2 post(s) updated, 1 post(s) deleted`
 11. If `--verbose`, print a detailed log before the summary line. Post entries include character count and a `(micro)` label if applicable:
@@ -658,7 +657,7 @@ Note:
 
 ### manifest.json
 
-The build manifest is a JSON file named `manifest.json`, stored in the project root alongside `config.yaml`. It records the state of every file in `content/` at the time of the last successful build, and is used by `build.py` to determine what has changed since the last build.
+The build manifest is a JSON file named `manifest.json`, stored in the project root alongside `config.yaml`. It records the state of every file in `content/` and `resources/` at the time of the last successful build, and is used by `build.py` to determine what has changed since the last build.
 
 The manifest has the following structure:
 
@@ -672,13 +671,17 @@ The manifest has the following structure:
   },
   "2.md": {
     "mtime": 1748123789.0
+  },
+  "resources/style.css": {
+    "mtime": 1748123456.0
   }
 }
 ```
 
 Where:
 
-- Each key is a filename from `content/`
+- Keys without a prefix are filenames from `content/`
+- Keys with a `resources/` prefix are filenames from `resources/`
 - `mtime` is the file's last modified time as a Unix timestamp, recorded at the time of the last successful build
 
 The manifest is:
