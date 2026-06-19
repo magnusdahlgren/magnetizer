@@ -215,7 +215,8 @@ Examples:
     - If `--flush` or `--resources`: delete `dist/resources/` and copy all files from `resources/`
     - Otherwise: copy any files from `resources/` that are new or changed since the last build (detected via the manifest), and delete any files from `dist/resources/` that no longer exist in `resources/`
 9. If `--push` and no errors, push to GitHub Pages
-10. Print console output and exit. The output format depends on whether `--verbose` is passed:
+10. During the build, print a `.` for each file generated or updated (flushed immediately, all on one line). When the build completes, erase the dots line in normal mode; keep it in verbose mode (followed by a newline).
+11. Print console output and exit. The output format depends on whether `--verbose` is passed:
 
     **Normal output** (only posts with warnings are listed):
 

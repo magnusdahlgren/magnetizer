@@ -92,7 +92,7 @@ Run `build.py` from your project directory.
 | `build.py --verbose` | Build and print a detailed post log plus summarised pages/resources sections |
 | `build.py 1.md` | Preview a single post or special page (does not update index pages) |
 
-Use `--flush` after editing templates. Resource file changes (CSS, JS) are picked up automatically on the next build. Warnings (missing title, alt text, etc.) are always shown inline next to the affected post.
+Use `--flush` after editing templates. Resource file changes (CSS, JS) are picked up automatically on the next build. A `.` is printed for each file generated so you can see progress — in normal mode the dots are erased when the build finishes; in `--verbose` mode they remain. Warnings (missing title, alt text, etc.) are always shown inline next to the affected post.
 
 Every full build also generates `dist/sitemap.xml` (all published posts, index, category, about, and archive pages with `lastmod` dates) and `dist/robots.txt` (pointing to the sitemap). These are not generated on single-file preview builds.
 

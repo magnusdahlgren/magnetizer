@@ -274,7 +274,7 @@ def _sync_resources(resources_dir, dist_dir, changed_filenames, replace=False):
     return copied, deleted
 
 
-def build(cwd, filename=None, flush=False, resources=False):
+def build(cwd, filename=None, flush=False, resources=False, on_progress=None):
     cwd = Path(cwd)
     content_dir = cwd / "content"
     dist_dir = cwd / "dist"
@@ -304,6 +304,11 @@ def build(cwd, filename=None, flush=False, resources=False):
     log = []
     warnings = []
 
+    def _log(entry):
+        log.append(entry)
+        if on_progress:
+            on_progress()
+
     about_md = content_dir / "about.md"
     cookies_md = content_dir / "cookies.md"
 
@@ -316,14 +321,14 @@ def build(cwd, filename=None, flush=False, resources=False):
                 w = _build_about_page(content_dir, dist_dir, config, template)
                 if w:
                     warnings.append(("about.html", w))
-                log.append(("UPDATED", "about.html"))
+                _log(("UPDATED", "about.html"))
             return {"created": 0, "updated": 0, "deleted": 0, "log": log, "warnings": warnings}
         if stem == "cookies":
             if cookies_md.exists():
                 w = _build_cookies_page(content_dir, dist_dir, config, template)
                 if w:
                     warnings.append(("cookies.html", w))
-                log.append(("UPDATED", "cookies.html"))
+                _log(("UPDATED", "cookies.html"))
             return {"created": 0, "updated": 0, "deleted": 0, "log": log, "warnings": warnings}
         post_id = int(Path(filename).stem)
         changed_post_ids = {post_id}
@@ -359,7 +364,7 @@ def build(cwd, filename=None, flush=False, resources=False):
             if post_id in changed_post_ids:
                 _delete_post_files(dist_dir, post_id)
                 deleted += 1
-                log.append(("REMOVED", f"{post_id}.html"))
+                _log(("REMOVED", f"{post_id}.html"))
             continue
 
         action = "UPDATED" if f"{post_id}.md" in manifest else "CREATED"
@@ -387,7 +392,7 @@ def build(cwd, filename=None, flush=False, resources=False):
             stem, _, ext = image.filename.rpartition('.')
             resized_name = f"{stem}-resized.{ext}"
             dest_size = (dist_dir / resized_name).stat().st_size
-            log.append(("RESIZED", resized_name, src_sizes[image.filename], dest_size))
+            _log(("RESIZED", resized_name, src_sizes[image.filename], dest_size))
         if post.is_draft:
             newer_url, older_url = None, None
             idx_url = "index.html"
@@ -397,41 +402,41 @@ def build(cwd, filename=None, flush=False, resources=False):
             idx_url = _post_index_page_url(post_id, published_post_ids_sorted_desc, config["posts_per_page"])
             back_url = None
         _write_post_html(post, idx_url, dist_dir, config, template, newer_url=newer_url, older_url=older_url, back_url=back_url, categories=config["categories"])
-        log.append((action, f"{post_id}.html", post.char_count, post.is_micro, len(post.images), post.is_draft))
+        _log((action, f"{post_id}.html", post.char_count, post.is_micro, len(post.images), post.is_draft))
 
     if about_md.exists():
         if filename or _special_page_changed(content_dir, manifest, "about.md", r'^about-image-\d{2}\.(jpg|jpeg|png)$'):
             w = _build_about_page(content_dir, dist_dir, config, template)
             if w:
                 warnings.append(("about.html", w))
-            log.append(("UPDATED", "about.html"))
+            _log(("UPDATED", "about.html"))
     elif not filename:
         about_html = dist_dir / "about.html"
         if about_html.exists():
             about_html.unlink()
-            log.append(("REMOVED", "about.html"))
+            _log(("REMOVED", "about.html"))
 
     if cookies_md.exists():
         if filename or _special_page_changed(content_dir, manifest, "cookies.md"):
             w = _build_cookies_page(content_dir, dist_dir, config, template)
             if w:
                 warnings.append(("cookies.html", w))
-            log.append(("UPDATED", "cookies.html"))
+            _log(("UPDATED", "cookies.html"))
     elif not filename:
         cookies_html = dist_dir / "cookies.html"
         if cookies_html.exists():
             cookies_html.unlink()
-            log.append(("REMOVED", "cookies.html"))
+            _log(("REMOVED", "cookies.html"))
 
     if not filename and post_ids_to_build:
         _write_index_pages(published_posts_sorted_desc, dist_dir, config, template, categories=config["categories"])
         per_page = config["posts_per_page"]
         total_pages = max(1, (len(published_posts_sorted_desc) + per_page - 1) // per_page)
         for page_num in range(1, total_pages + 1):
-            log.append(("UPDATED", index_page_url(page_num)))
+            _log(("UPDATED", index_page_url(page_num)))
         _write_category_pages(published_posts_sorted_desc, dist_dir, config, template)
         (dist_dir / "feed.xml").write_text(render_feed(published_posts_sorted_desc, config))
-        log.append(("UPDATED", "feed.xml"))
+        _log(("UPDATED", "feed.xml"))
         archive_html = render_template(
             template,
             title=render_page_title(config["site_name"], "Archive", page_num=None),
@@ -439,7 +444,7 @@ def build(cwd, filename=None, flush=False, resources=False):
             canonical=canonical_url(config["site_url"], "archive.html"),
         )
         (dist_dir / "archive.html").write_text(archive_html)
-        log.append(("UPDATED", "archive.html"))
+        _log(("UPDATED", "archive.html"))
         save_manifest(content_dir, manifest_path, resources_dir=cwd / "resources")
 
     if not filename and log:
@@ -475,9 +480,9 @@ def build(cwd, filename=None, flush=False, resources=False):
             sitemap_pages.append(("about.html", _lastmod(about_files)))
         sitemap_pages.append(("archive.html", index_lastmod))
         (dist_dir / "sitemap.xml").write_text(render_sitemap(sitemap_pages, config))
-        log.append(("UPDATED", "sitemap.xml"))
+        _log(("UPDATED", "sitemap.xml"))
         (dist_dir / "robots.txt").write_text(render_robots_txt(config))
-        log.append(("UPDATED", "robots.txt"))
+        _log(("UPDATED", "robots.txt"))
 
     resources_dir = cwd / "resources"
     changed_resource_filenames = get_changed_resource_filenames(resources_dir, manifest)
@@ -485,9 +490,9 @@ def build(cwd, filename=None, flush=False, resources=False):
         resources_dir, dist_dir, changed_resource_filenames, replace=(resources or flush)
     )
     for name in copied:
-        log.append(("COPIED", f"resources/{name}"))
+        _log(("COPIED", f"resources/{name}"))
     for name in deleted_resources:
-        log.append(("REMOVED", f"resources/{name}"))
+        _log(("REMOVED", f"resources/{name}"))
     if not filename and (copied or deleted_resources) and not post_ids_to_build:
         save_manifest(content_dir, manifest_path, resources_dir=resources_dir)
 

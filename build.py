@@ -185,17 +185,38 @@ def main():
     config = load_config(Path.cwd() / "config.yaml")
     dist_path = (Path.cwd() / "dist").resolve()
 
+    dot_count = 0
+
+    def _on_progress():
+        nonlocal dot_count
+        dot_count += 1
+        if sys.stdout.isatty():
+            print(".", end="", flush=True)
+
+    def _finish_dots():
+        if not sys.stdout.isatty() or dot_count == 0:
+            return
+        if args.verbose:
+            print()
+        else:
+            sys.stdout.write("\r" + " " * dot_count + "\r")
+            sys.stdout.flush()
+
     try:
         outcome = build(
             Path.cwd(),
             filename=args.filename,
             flush=args.flush,
             resources=args.resources,
+            on_progress=_on_progress,
         )
     except Exception as e:
+        _finish_dots()
         print(f"  {e}", file=sys.stderr)
         print(_c(_RED, "ERROR"), file=sys.stderr)
         sys.exit(1)
+
+    _finish_dots()
 
     has_warnings = _print_output(outcome, config, dist_path, verbose=args.verbose)
 

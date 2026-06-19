@@ -1621,3 +1621,33 @@ class TestWarnings:
         warnings = build(p)["warnings"]
         post_warnings = [msg for f, msg in warnings if f == "1.html"]
         assert len(post_warnings) >= 2
+
+
+# ---------------------------------------------------------------------------
+# Progress callback
+# ---------------------------------------------------------------------------
+
+class TestProgressCallback:
+
+    def test_on_progress_not_required(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)  # should not raise
+
+    def test_on_progress_called_for_each_log_entry(self, tmp_path):
+        calls = []
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        outcome = build(p, on_progress=lambda: calls.append(1))
+        assert len(calls) == len(outcome["log"])
+
+    def test_on_progress_called_during_filename_build(self, tmp_path):
+        calls = []
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        outcome = build(p, filename="1.md", on_progress=lambda: calls.append(1))
+        assert len(calls) == len(outcome["log"])
+
+    def test_on_progress_called_zero_times_when_no_changes(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        calls = []
+        build(p, on_progress=lambda: calls.append(1))
+        assert calls == []
