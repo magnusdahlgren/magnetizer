@@ -86,8 +86,6 @@ def _print_output(outcome, config, dist_path, verbose):
     log = outcome["log"]
     warnings_list = outcome.get("warnings", [])
 
-    print(f"Generating {config['site_name']} → {dist_path}/")
-
     if not log:
         print("No changes.")
         return False
@@ -184,6 +182,8 @@ def main():
 
     config = load_config(Path.cwd() / "config.yaml")
     dist_path = (Path.cwd() / "dist").resolve()
+
+    print(f"Generating {config['site_name']} → {dist_path}/")
 
     dot_count = 0
 
