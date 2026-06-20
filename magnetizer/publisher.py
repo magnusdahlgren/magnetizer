@@ -19,17 +19,29 @@ def _run_git(cmd, *, cwd):
 def publish(dist_dir, timestamp):
     _run_git(["git", "add", "."], cwd=dist_dir)
 
-    has_staged = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=dist_dir).returncode != 0
+    diff = subprocess.run(
+        ["git", "diff", "--cached", "--quiet"],
+        cwd=dist_dir, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
+    )
+    if diff.returncode == 0:
+        has_staged = False
+    elif diff.returncode == 1:
+        has_staged = True
+    else:
+        raise RuntimeError(f"Git command failed: git diff --cached --quiet\n{(diff.stderr or '').strip()}")
+
     if has_staged:
         _run_git(["git", "commit", "-m", f"Build {timestamp}"], cwd=dist_dir)
         _run_git(["git", "push", "origin", "main"], cwd=dist_dir)
         return
 
-    result = subprocess.run(
+    ahead = subprocess.run(
         ["git", "rev-list", "origin/main..HEAD", "--count"],
         cwd=dist_dir, capture_output=True, text=True,
     )
-    if result.stdout.strip() != "0":
+    if ahead.returncode != 0:
+        raise RuntimeError(f"Git command failed: git rev-list origin/main..HEAD --count\n{(ahead.stderr or '').strip()}")
+    if ahead.stdout.strip() != "0":
         _run_git(["git", "push", "origin", "main"], cwd=dist_dir)
         return
 

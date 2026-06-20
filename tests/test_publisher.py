@@ -164,3 +164,32 @@ class TestGitFailure:
                    side_effect=self._failing_mock(["git", "push"])):
             with pytest.raises(RuntimeError, match="push failed"):
                 publish(tmp_path, "2026-05-24 14:32:00")
+
+    def test_git_diff_probe_error_raises_runtime_error(self, tmp_path):
+        def side_effect(cmd, **kwargs):
+            if cmd == ["git", "diff", "--cached", "--quiet"]:
+                m = MagicMock()
+                m.returncode = 128
+                m.stderr = "fatal: not a git repository"
+                return m
+            return MagicMock(returncode=0)
+        with patch("magnetizer.publisher.subprocess.run", side_effect=side_effect):
+            with pytest.raises(RuntimeError, match="not a git repository"):
+                publish(tmp_path, "2026-05-24 14:32:00")
+
+    def test_git_rev_list_error_raises_runtime_error(self, tmp_path):
+        def side_effect(cmd, **kwargs):
+            if cmd == ["git", "diff", "--cached", "--quiet"]:
+                m = MagicMock()
+                m.returncode = 0
+                return m
+            if cmd[:2] == ["git", "rev-list"]:
+                m = MagicMock()
+                m.returncode = 128
+                m.stdout = ""
+                m.stderr = "fatal: not a git repository"
+                return m
+            return MagicMock(returncode=0)
+        with patch("magnetizer.publisher.subprocess.run", side_effect=side_effect):
+            with pytest.raises(RuntimeError, match="not a git repository"):
+                publish(tmp_path, "2026-05-24 14:32:00")
