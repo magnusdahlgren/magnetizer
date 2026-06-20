@@ -225,7 +225,13 @@ def main():
             print()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         print("Pushing to GitHub...", end=" ", flush=True)
-        publish(Path.cwd() / "dist", timestamp)
+        try:
+            publish(Path.cwd() / "dist", timestamp)
+        except RuntimeError as e:
+            print()
+            print(f"  {e}", file=sys.stderr)
+            print(_c(_RED, "ERROR"), file=sys.stderr)
+            sys.exit(1)
         print("DONE.")
 
     if has_warnings:

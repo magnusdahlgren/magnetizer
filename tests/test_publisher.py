@@ -133,3 +133,34 @@ class TestPublishWithUnpushedCommits:
         with patch("magnetizer.publisher.subprocess.run", side_effect=make_mock(has_staged_changes=False, has_unpushed_commits=True)):
             publish(tmp_path, "2026-05-24 14:32:00")
         assert "Nothing to publish" not in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
+# Git failure handling
+# ---------------------------------------------------------------------------
+
+class TestGitFailure:
+
+    def _failing_mock(self, fail_cmd_prefix):
+        import subprocess as sp
+        def side_effect(cmd, **kwargs):
+            if cmd == ["git", "diff", "--cached", "--quiet"]:
+                m = MagicMock()
+                m.returncode = 1
+                return m
+            if cmd[:2] == fail_cmd_prefix:
+                raise sp.CalledProcessError(1, cmd, stderr="error: push failed")
+            return MagicMock(returncode=0)
+        return side_effect
+
+    def test_git_push_failure_raises_runtime_error(self, tmp_path):
+        with patch("magnetizer.publisher.subprocess.run",
+                   side_effect=self._failing_mock(["git", "push"])):
+            with pytest.raises(RuntimeError):
+                publish(tmp_path, "2026-05-24 14:32:00")
+
+    def test_git_push_failure_message_includes_stderr(self, tmp_path):
+        with patch("magnetizer.publisher.subprocess.run",
+                   side_effect=self._failing_mock(["git", "push"])):
+            with pytest.raises(RuntimeError, match="push failed"):
+                publish(tmp_path, "2026-05-24 14:32:00")
