@@ -215,20 +215,40 @@ Examples:
     - If `--flush` or `--resources`: delete `dist/resources/` and copy all files from `resources/`
     - Otherwise: copy any files from `resources/` that are new or changed since the last build (detected via the manifest), and delete any files from `dist/resources/` that no longer exist in `resources/`
 9. If `--push` and no errors, push to GitHub Pages
-10. Exit and return to the command line, indicating the outcome, e.g. `0 post(s) created, 2 post(s) updated, 1 post(s) deleted`
-11. If `--verbose`, print a detailed log before the summary line. Post entries include character count and a `(micro)` label if applicable:
+10. During the build, print a `.` for each file generated or updated (flushed immediately, all on one line). When the build completes, erase the dots line in normal mode; keep it in verbose mode (followed by a newline).
+11. Print console output and exit. The output format depends on whether `--verbose` is passed:
 
+    **Normal output** (only posts with warnings are listed):
+
+    ```text
+    Generating MXGNS → dist/
+      002   2.html    ⚠ No title
+    30 created · 0 updated · 0 deleted
+    updated    about, index(+3), feed.xml
+    resources  style.css
+    DONE with warnings
     ```
-    CREATED: 1.html - 11 characters (micro)
-    UPDATED: 2.html - 340 characters
-      RESIZED: 2-image-01-resized.jpg (120 KB → 45 KB)
-    REMOVED: 3.html
 
-    UPDATED: index.html
-    UPDATED: feed.xml
+    **Verbose output** (all generated posts are listed):
+
+    ```text
+    Generating MXGNS → dist/
+
+      001   1.html
+      002   2.html    [2 imgs]   ⚠ No title
+      003   3.html    [1 img]
+      026   +26.html   [7 imgs]
+
+    30 created · 0 updated · 0 deleted
+    ⚠ 1 warning: 2.html
+
+    Pages updated   about, cookies, index(+3), feed.xml, archive.html, sitemap.xml, robots.txt
+    Resources       style.css
+
+    DONE with warnings
     ```
 
-    Post entries are printed first, separated from site entries (index pages, feed, etc.) by a blank line.
+    Draft posts are shown with a `+` prefix (e.g. `+26.html`). The final status line is `DONE` (green) on success, `DONE with warnings` (yellow, `DONE` in colour) when warnings were raised, or `ERROR` (red) if the build failed. Warnings are collected and shown in-line per post; they do not interrupt the build.
 
 ### Configuration
 

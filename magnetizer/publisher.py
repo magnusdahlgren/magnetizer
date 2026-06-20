@@ -1,21 +1,48 @@
 import subprocess
 
 
-def publish(dist_dir, timestamp):
-    subprocess.run(["git", "add", "."], cwd=dist_dir, check=True)
+def _run_git(cmd, *, cwd):
+    try:
+        return subprocess.run(
+            cmd,
+            cwd=cwd,
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
+    except subprocess.CalledProcessError as e:
+        msg = (e.stderr or "").strip()
+        raise RuntimeError(f"Git command failed: {' '.join(cmd)}\n{msg}") from e
 
-    has_staged = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=dist_dir).returncode != 0
+
+def publish(dist_dir, timestamp):
+    _run_git(["git", "add", "."], cwd=dist_dir)
+
+    diff = subprocess.run(
+        ["git", "diff", "--cached", "--quiet"],
+        cwd=dist_dir, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, text=True,
+    )
+    if diff.returncode == 0:
+        has_staged = False
+    elif diff.returncode == 1:
+        has_staged = True
+    else:
+        raise RuntimeError(f"Git command failed: git diff --cached --quiet\n{(diff.stderr or '').strip()}")
+
     if has_staged:
-        subprocess.run(["git", "commit", "-m", f"Build {timestamp}"], cwd=dist_dir, check=True)
-        subprocess.run(["git", "push", "origin", "main"], cwd=dist_dir, check=True)
+        _run_git(["git", "commit", "-m", f"Build {timestamp}"], cwd=dist_dir)
+        _run_git(["git", "push", "origin", "main"], cwd=dist_dir)
         return
 
-    result = subprocess.run(
+    ahead = subprocess.run(
         ["git", "rev-list", "origin/main..HEAD", "--count"],
         cwd=dist_dir, capture_output=True, text=True,
     )
-    if result.stdout.strip() != "0":
-        subprocess.run(["git", "push", "origin", "main"], cwd=dist_dir, check=True)
+    if ahead.returncode != 0:
+        raise RuntimeError(f"Git command failed: git rev-list origin/main..HEAD --count\n{(ahead.stderr or '').strip()}")
+    if ahead.stdout.strip() != "0":
+        _run_git(["git", "push", "origin", "main"], cwd=dist_dir)
         return
 
     print("Nothing to publish — no changes since last build.")

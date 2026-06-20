@@ -848,33 +848,47 @@ class TestCookiesPage:
 
 class TestAboutAndCookiesHeadingWarnings:
 
-    def test_warning_for_h2_heading_in_about_body(self, tmp_path, capsys):
+    def test_warning_for_h2_heading_in_about_body(self, tmp_path):
         md = "---\ntitle: About\n---\n\n## A heading\n\nContent.\n"
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "about.md").write_text(md)
-        build(p)
-        assert "Warning: Post about has heading(s) more prominent than <h3> in its body: <h2>" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert any(f == "about.html" and "heading" in msg.lower() for f, msg in warnings)
 
-    def test_no_warning_for_h3_heading_in_about_body(self, tmp_path, capsys):
+    def test_no_warning_for_h3_heading_in_about_body(self, tmp_path):
         md = "---\ntitle: About\n---\n\n### A heading\n\nContent.\n"
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "about.md").write_text(md)
-        build(p)
-        assert "more prominent than <h3>" not in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert not any(f == "about.html" for f, msg in warnings)
 
-    def test_warning_for_h1_heading_in_cookies_body(self, tmp_path, capsys):
+    def test_warning_for_h1_heading_in_cookies_body(self, tmp_path):
         md = "---\ntitle: Cookie Policy\n---\n\n# A heading\n\nContent.\n"
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "cookies.md").write_text(md)
-        build(p)
-        assert "Warning: Post cookies has heading(s) more prominent than <h3> in its body: <h1>" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert any(f == "cookies.html" and "heading" in msg.lower() for f, msg in warnings)
 
-    def test_no_warning_for_h3_heading_in_cookies_body(self, tmp_path, capsys):
+    def test_no_warning_for_h3_heading_in_cookies_body(self, tmp_path):
         md = "---\ntitle: Cookie Policy\n---\n\n### A heading\n\nContent.\n"
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         (p / "content" / "cookies.md").write_text(md)
-        build(p)
-        assert "more prominent than <h3>" not in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert not any(f == "cookies.html" for f, msg in warnings)
+
+    def test_warning_propagated_when_about_built_by_filename(self, tmp_path):
+        md = "---\ntitle: About\n---\n\n## A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "about.md").write_text(md)
+        warnings = build(p, filename="about.md")["warnings"]
+        assert any(f == "about.html" and "heading" in msg.lower() for f, msg in warnings)
+
+    def test_warning_propagated_when_cookies_built_by_filename(self, tmp_path):
+        md = "---\ntitle: Cookie Policy\n---\n\n# A heading\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        (p / "content" / "cookies.md").write_text(md)
+        warnings = build(p, filename="cookies.md")["warnings"]
+        assert any(f == "cookies.html" and "heading" in msg.lower() for f, msg in warnings)
 
 
 # ---------------------------------------------------------------------------
@@ -915,6 +929,33 @@ class TestVerboseLog:
         log = build(p)["log"]
         entry = next(e for e in log if e[0] == "CREATED" and e[1] == "1.html")
         assert entry[3] is False
+
+    def test_post_log_entry_image_count_zero_when_no_images(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        log = build(p)["log"]
+        entry = next(e for e in log if e[0] == "CREATED" and e[1] == "1.html")
+        assert entry[4] == 0
+
+    def test_post_log_entry_image_count_matches_images(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        make_jpg(p / "content" / "1-image-02.jpg")
+        log = build(p)["log"]
+        entry = next(e for e in log if e[0] == "CREATED" and e[1] == "1.html")
+        assert entry[4] == 2
+
+    def test_post_log_entry_is_draft_false_for_published_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        log = build(p)["log"]
+        entry = next(e for e in log if e[0] == "CREATED" and e[1] == "1.html")
+        assert entry[5] is False
+
+    def test_post_log_entry_is_draft_true_for_draft_post(self, tmp_path):
+        draft_md = "---\ndate: 2026-05-24\ndraft: true\n---\n\nDraft content\n"
+        p = make_project(tmp_path, posts={1: draft_md})
+        log = build(p)["log"]
+        entry = next(e for e in log if e[0] == "CREATED" and e[1] == "1.html")
+        assert entry[5] is True
 
     def test_removed_post_in_log(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD, 2: MINIMAL_MD})
@@ -1193,32 +1234,29 @@ class TestArchivePage:
 
 class TestAltTextWarnings:
 
-    def test_warning_printed_when_post_has_images_without_alt_texts(self, tmp_path, capsys):
+    def test_warning_when_post_has_images_without_alt_texts(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
         make_jpg(p / "content" / "1-image-01.jpg")
-        build(p)
-        assert "Warning: Post 1 is missing one or more alt texts" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert any(f == "1.html" and "alt" in msg.lower() for f, msg in warnings)
 
-    def test_no_warning_when_all_images_have_alt_texts(self, tmp_path, capsys):
+    def test_no_warning_when_all_images_have_alt_texts(self, tmp_path):
         md = "---\ndate: 2026-05-24\ntitle: My Post\nimages:\n  - Alt text\n---\n\nHello\n"
         p = make_project(tmp_path, posts={1: md})
         make_jpg(p / "content" / "1-image-01.jpg")
-        build(p)
-        assert "Warning" not in capsys.readouterr().out
+        assert build(p)["warnings"] == []
 
-    def test_no_warning_when_post_has_no_images(self, tmp_path, capsys):
+    def test_no_warning_when_post_has_no_images(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        build(p)
-        assert "Warning" not in capsys.readouterr().out
+        assert build(p)["warnings"] == []
 
-    def test_each_warning_printed_only_once(self, tmp_path, capsys):
+    def test_each_alt_text_warning_appears_only_once(self, tmp_path, capsys):
         md = "---\ndate: 2026-05-24\nimage:\n  - Alt\n---\n\nHello\n"
         p = make_project(tmp_path, posts={1: md})
         make_jpg(p / "content" / "1-image-01.jpg")
-        build(p)
-        output = capsys.readouterr().out
-        assert output.count("unknown frontmatter key") == 1
-        assert output.count("missing one or more alt texts") == 1
+        warnings = build(p)["warnings"]
+        assert capsys.readouterr().out.count("unknown frontmatter key") == 1
+        assert sum(1 for f, msg in warnings if "alt" in msg.lower()) == 1
 
 
 # ---------------------------------------------------------------------------
@@ -1253,37 +1291,34 @@ class TestMicroPostDetection:
 
 class TestMissingTitleWarnings:
 
-    def test_warning_for_long_text_post_without_title(self, tmp_path, capsys):
+    def test_warning_for_long_text_post_without_title(self, tmp_path):
         long_body = "Word " * 50
         md = f"---\ndate: 2026-05-24\n---\n\n{long_body}\n"
         p = make_project(tmp_path, posts={1: md})
-        build(p)
-        assert "Warning: Post 1 is missing a title" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert any(f == "1.html" and "title" in msg.lower() for f, msg in warnings)
 
-    def test_no_warning_for_micro_post(self, tmp_path, capsys):
+    def test_no_warning_for_micro_post(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        build(p)
-        assert "missing a title" not in capsys.readouterr().out
+        assert not any("title" in msg.lower() for _, msg in build(p)["warnings"])
 
-    def test_no_warning_when_post_has_title(self, tmp_path, capsys):
+    def test_no_warning_when_post_has_title(self, tmp_path):
         p = make_project(tmp_path, posts={1: TITLED_MD})
-        build(p)
-        assert "missing a title" not in capsys.readouterr().out
+        assert not any("title" in msg.lower() for _, msg in build(p)["warnings"])
 
-    def test_no_warning_for_photo_only_post(self, tmp_path, capsys):
+    def test_no_warning_for_photo_only_post(self, tmp_path):
         md = "---\ndate: 2026-05-24\nimages:\n  - Alt\n---\n\n"
         p = make_project(tmp_path, posts={1: md})
         make_jpg(p / "content" / "1-image-01.jpg")
-        build(p)
-        assert "missing a title" not in capsys.readouterr().out
+        assert not any("title" in msg.lower() for _, msg in build(p)["warnings"])
 
-    def test_warning_for_mixed_post_without_title(self, tmp_path, capsys):
+    def test_warning_for_mixed_post_without_title(self, tmp_path):
         long_body = "Word " * 50
         md = f"---\ndate: 2026-05-24\nimages:\n  - Alt\n---\n\n{long_body}\n"
         p = make_project(tmp_path, posts={1: md})
         make_jpg(p / "content" / "1-image-01.jpg")
-        build(p)
-        assert "Warning: Post 1 is missing a title" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert any(f == "1.html" and "title" in msg.lower() for f, msg in warnings)
 
 
 # ---------------------------------------------------------------------------
@@ -1300,32 +1335,29 @@ _NO_CATEGORY_MD = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\nHello world\n"
 
 class TestCategoryWarnings:
 
-    def test_warning_when_post_missing_category_and_categories_configured(self, tmp_path, capsys):
+    def test_warning_when_post_missing_category_and_categories_configured(self, tmp_path):
         p = make_project(tmp_path, posts={1: _NO_CATEGORY_MD}, config=_CATEGORIES_CONFIG)
-        build(p)
-        assert "Warning: Post 1 is missing a category" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert any(f == "1.html" and "category" in msg.lower() for f, msg in warnings)
 
-    def test_no_warning_when_categories_not_configured(self, tmp_path, capsys):
+    def test_no_warning_when_categories_not_configured(self, tmp_path):
         p = make_project(tmp_path, posts={1: _NO_CATEGORY_MD})
-        build(p)
-        assert "missing a category" not in capsys.readouterr().out
+        assert not any("category" in msg.lower() for _, msg in build(p)["warnings"])
 
-    def test_no_warning_when_post_has_valid_category(self, tmp_path, capsys):
+    def test_no_warning_when_post_has_valid_category(self, tmp_path):
         p = make_project(tmp_path, posts={1: _CATEGORY_MD}, config=_CATEGORIES_CONFIG)
-        build(p)
-        assert "missing a category" not in capsys.readouterr().out
+        assert not any("category" in msg.lower() for _, msg in build(p)["warnings"])
 
-    def test_warning_when_post_has_unknown_category(self, tmp_path, capsys):
+    def test_warning_when_post_has_unknown_category(self, tmp_path):
         md = "---\ndate: 2026-05-24\ntitle: My Post\ncategory: unknown-cat\n---\n\nHello\n"
         p = make_project(tmp_path, posts={1: md}, config=_CATEGORIES_CONFIG)
-        build(p)
-        assert "Warning: Post 1 has unknown category: 'unknown-cat'" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert any(f == "1.html" and "unknown" in msg.lower() for f, msg in warnings)
 
-    def test_no_warning_for_unknown_category_when_no_categories_configured(self, tmp_path, capsys):
+    def test_no_warning_for_unknown_category_when_no_categories_configured(self, tmp_path):
         md = "---\ndate: 2026-05-24\ntitle: My Post\ncategory: unknown-cat\n---\n\nHello\n"
         p = make_project(tmp_path, posts={1: md})
-        build(p)
-        assert "unknown category" not in capsys.readouterr().out
+        assert not any("unknown" in msg.lower() for _, msg in build(p)["warnings"])
 
 
 # ---------------------------------------------------------------------------
@@ -1334,34 +1366,33 @@ class TestCategoryWarnings:
 
 class TestHeadingLevelWarnings:
 
-    def test_warning_for_h1_heading_in_post_body(self, tmp_path, capsys):
+    def test_warning_for_h1_heading_in_post_body(self, tmp_path):
         md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n# A heading\n\nContent.\n"
         p = make_project(tmp_path, posts={1: md})
-        build(p)
-        assert "Warning: Post 1 has heading(s) more prominent than <h3> in its body: <h1>" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert any(f == "1.html" and "<h1>" in msg for f, msg in warnings)
 
-    def test_warning_for_h2_heading_in_post_body(self, tmp_path, capsys):
+    def test_warning_for_h2_heading_in_post_body(self, tmp_path):
         md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n## A heading\n\nContent.\n"
         p = make_project(tmp_path, posts={1: md})
-        build(p)
-        assert "Warning: Post 1 has heading(s) more prominent than <h3> in its body: <h2>" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        assert any(f == "1.html" and "<h2>" in msg for f, msg in warnings)
 
-    def test_warning_lists_both_h1_and_h2_when_both_present(self, tmp_path, capsys):
+    def test_warning_lists_both_h1_and_h2_when_both_present(self, tmp_path):
         md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n# One\n\n## Two\n\nContent.\n"
         p = make_project(tmp_path, posts={1: md})
-        build(p)
-        assert "Warning: Post 1 has heading(s) more prominent than <h3> in its body: <h1>, <h2>" in capsys.readouterr().out
+        warnings = build(p)["warnings"]
+        entry = next(msg for f, msg in warnings if f == "1.html")
+        assert "<h1>" in entry and "<h2>" in entry
 
-    def test_no_warning_for_h3_heading_in_post_body(self, tmp_path, capsys):
+    def test_no_warning_for_h3_heading_in_post_body(self, tmp_path):
         md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n### A heading\n\nContent.\n"
         p = make_project(tmp_path, posts={1: md})
-        build(p)
-        assert "more prominent than <h3>" not in capsys.readouterr().out
+        assert not any("heading" in msg.lower() for _, msg in build(p)["warnings"])
 
-    def test_no_warning_when_no_headings_in_post_body(self, tmp_path, capsys):
+    def test_no_warning_when_no_headings_in_post_body(self, tmp_path):
         p = make_project(tmp_path, posts={1: MINIMAL_MD})
-        build(p)
-        assert "more prominent than <h3>" not in capsys.readouterr().out
+        assert not any("heading" in msg.lower() for _, msg in build(p)["warnings"])
 
 
 # ---------------------------------------------------------------------------
@@ -1515,3 +1546,108 @@ class TestDraftPosts:
         )
         build(p)
         assert "3.html" in (p / "dist" / "1.html").read_text()
+
+
+# ---------------------------------------------------------------------------
+# Warnings
+# ---------------------------------------------------------------------------
+
+_LONG_MD = "---\ndate: 2026-05-24\n---\n\n" + "a" * 200 + "\n"
+_TITLED_LONG_MD = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n" + "a" * 200 + "\n"
+
+
+class TestWarnings:
+
+    def test_outcome_has_warnings_key(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        assert "warnings" in build(p)
+
+    def test_no_warnings_for_clean_micro_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        assert build(p)["warnings"] == []
+
+    def test_missing_title_produces_warning(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _LONG_MD})
+        warnings = build(p)["warnings"]
+        assert any(filename == "1.html" and "title" in msg.lower() for filename, msg in warnings)
+
+    def test_no_title_warning_for_post_with_title(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _TITLED_LONG_MD})
+        warnings = build(p)["warnings"]
+        assert not any(filename == "1.html" and "title" in msg.lower() for filename, msg in warnings)
+
+    def test_missing_alt_text_produces_warning(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        warnings = build(p)["warnings"]
+        assert any(filename == "1.html" and "alt" in msg.lower() for filename, msg in warnings)
+
+    def test_missing_category_produces_warning(self, tmp_path):
+        config = (
+            "site_name: Test Blog\nsite_url: https://example.github.io\n"
+            "posts_per_page: 2\ncategories:\n  photo: Photography\n"
+        )
+        p = make_project(tmp_path, posts={1: MINIMAL_MD}, config=config)
+        warnings = build(p)["warnings"]
+        assert any(filename == "1.html" and "category" in msg.lower() for filename, msg in warnings)
+
+    def test_invalid_category_produces_warning(self, tmp_path):
+        config = (
+            "site_name: Test Blog\nsite_url: https://example.github.io\n"
+            "posts_per_page: 2\ncategories:\n  photo: Photography\n"
+        )
+        cat_md = "---\ndate: 2026-05-24\ncategory: unknown\n---\n\nContent\n"
+        p = make_project(tmp_path, posts={1: cat_md}, config=config)
+        warnings = build(p)["warnings"]
+        assert any(filename == "1.html" and "unknown" in msg.lower() for filename, msg in warnings)
+
+    def test_high_level_heading_produces_warning(self, tmp_path):
+        h1_md = "---\ndate: 2026-05-24\ntitle: My Post\n---\n\n# Top Level\n\nContent.\n"
+        p = make_project(tmp_path, posts={1: h1_md})
+        warnings = build(p)["warnings"]
+        assert any(filename == "1.html" and "heading" in msg.lower() for filename, msg in warnings)
+
+    def test_warning_is_tuple_of_filename_and_message(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _LONG_MD})
+        warnings = build(p)["warnings"]
+        assert len(warnings) > 0
+        filename, msg = warnings[0]
+        assert isinstance(filename, str)
+        assert isinstance(msg, str)
+
+    def test_multiple_warnings_for_same_post(self, tmp_path):
+        p = make_project(tmp_path, posts={1: _LONG_MD})
+        make_jpg(p / "content" / "1-image-01.jpg")
+        warnings = build(p)["warnings"]
+        post_warnings = [msg for f, msg in warnings if f == "1.html"]
+        assert len(post_warnings) >= 2
+
+
+# ---------------------------------------------------------------------------
+# Progress callback
+# ---------------------------------------------------------------------------
+
+class TestProgressCallback:
+
+    def test_on_progress_not_required(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)  # should not raise
+
+    def test_on_progress_called_for_each_log_entry(self, tmp_path):
+        calls = []
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        outcome = build(p, on_progress=lambda: calls.append(1))
+        assert len(calls) == len(outcome["log"])
+
+    def test_on_progress_called_during_filename_build(self, tmp_path):
+        calls = []
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        outcome = build(p, filename="1.md", on_progress=lambda: calls.append(1))
+        assert len(calls) == len(outcome["log"])
+
+    def test_on_progress_called_zero_times_when_no_changes(self, tmp_path):
+        p = make_project(tmp_path, posts={1: MINIMAL_MD})
+        build(p)
+        calls = []
+        build(p, on_progress=lambda: calls.append(1))
+        assert calls == []
